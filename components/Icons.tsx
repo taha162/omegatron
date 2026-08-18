@@ -141,11 +141,57 @@ export function PrototypingIcon(props: IconProps) {
   );
 }
 
+export function IotIcon(props: IconProps) {
+  return (
+    <Base {...props}>
+      <circle cx="12" cy="12" r="2.4" />
+      <circle cx="4.5" cy="5.5" r="1.8" />
+      <circle cx="19.5" cy="5.5" r="1.8" />
+      <circle cx="4.5" cy="18.5" r="1.8" />
+      <circle cx="19.5" cy="18.5" r="1.8" />
+      <path d="m6 6.8 4.2 3.6M18 6.8l-4.2 3.6M6 17.2l4.2-3.6M18 17.2l-4.2-3.6" />
+    </Base>
+  );
+}
+
+export function MachineLearningIcon(props: IconProps) {
+  return (
+    <Base {...props}>
+      <path d="M3.5 20.5V3.5" />
+      <path d="M3.5 20.5h17" />
+      <rect x="6.5" y="13" width="3" height="4.5" />
+      <rect x="11.5" y="9.5" width="3" height="8" />
+      <rect x="16.5" y="6" width="3" height="11.5" />
+    </Base>
+  );
+}
+
+export function SensorsIcon(props: IconProps) {
+  return (
+    <Base {...props}>
+      <path d="M2.5 14.5h3l2-6 3 11 2.5-8 1.8 3h6.7" />
+      <circle cx="12" cy="4" r="1.4" />
+    </Base>
+  );
+}
+
+export function MechanicalIcon(props: IconProps) {
+  return (
+    <Base {...props}>
+      <circle cx="12" cy="12" r="3.2" />
+      <path d="M12 2.5v3.4M12 18.1v3.4M2.5 12h3.4M18.1 12h3.4M5.3 5.3l2.4 2.4M16.3 16.3l2.4 2.4M18.7 5.3l-2.4 2.4M7.7 16.3l-2.4 2.4" />
+    </Base>
+  );
+}
+
 export const CAPABILITY_ICONS = [
-  RoboticsIcon,
-  MechatronicsIcon,
-  AiIcon,
   EmbeddedIcon,
+  RoboticsIcon,
+  IotIcon,
+  AiIcon,
+  MachineLearningIcon,
+  SensorsIcon,
   AutomationIcon,
+  MechanicalIcon,
   PrototypingIcon,
 ] as const;

@@ -31,8 +31,9 @@ npm run typecheck              # tsc --noEmit
 app/
   [lang]/                 ar | en — both prerendered at build time
     layout.tsx            root layout: <html lang dir>, fonts, header, footer
-    page.tsx              home: hero, achievement, about, project, capabilities, founder
-    start/page.tsx        Start a Project
+    page.tsx              home: hero, achievement, about, projects,
+                          capabilities, process, founder, contact
+    start/page.tsx        Start a Project — the long-form request
     not-found.tsx
   api/contact/route.ts    server-side form handler and email delivery
   globals.css             the entire design system, one file
@@ -81,6 +82,21 @@ time, preloaded, and paired with auto-generated fallback metrics, so there is no
 layout shift when it lands and no request to a third-party font host.
 
 ---
+
+## The two enquiry forms
+
+`components/ProjectForm.tsx` renders one of two shapes from the same component,
+so validation, submission, and error handling can never diverge:
+
+- **`compact`** — the contact section on the home page. Name, email, project
+  type, description of the challenge, expected outcome. This is the low-friction
+  path for someone who has just read the case study.
+- **`full`** — the `/start` page. Adds phone/WhatsApp, organisation, budget,
+  timeline, and attachments.
+
+Both post to `/api/contact`. The handler requires the five shared fields and
+treats the rest as optional, so either shape is accepted; the email records
+which form the enquiry came from.
 
 ## Email delivery
 

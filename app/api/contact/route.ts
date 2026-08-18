@@ -21,15 +21,17 @@ const FIELD_LIMITS: Record<string, number> = {
   timeline: 80,
 };
 
+/**
+ * The short contact form on the home page sends only these; the full request
+ * form on /start adds phone, organisation, budget, and timeline, which the
+ * browser enforces there and this handler treats as optional.
+ */
 const REQUIRED_FIELDS = [
   "name",
   "email",
-  "phone",
   "projectType",
   "description",
   "outcome",
-  "budget",
-  "timeline",
 ] as const;
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -79,11 +81,11 @@ function buildHtml(submission: Submission, meta: Submission): string {
   const rows = [
     ["Name", submission.name],
     ["Email", submission.email],
-    ["Phone / WhatsApp", submission.phone],
+    ["Phone / WhatsApp", submission.phone || "—"],
     ["Organisation", submission.organization || "—"],
     ["Project type", submission.projectType],
-    ["Budget", submission.budget],
-    ["Timeline", submission.timeline],
+    ["Budget", submission.budget || "—"],
+    ["Timeline", submission.timeline || "—"],
     ["Description", submission.description],
     ["Expected outcome", submission.outcome],
   ];
@@ -113,9 +115,9 @@ function buildHtml(submission: Submission, meta: Submission): string {
       <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;">${body}</table>
     </td></tr>
     <tr><td style="padding:16px;color:#6a7078;font-size:12px;">
-      Submitted ${escapeHtml(meta.submittedAt)} · language: ${escapeHtml(meta.locale)} · attachments: ${escapeHtml(
-        meta.attachments,
-      )}
+      Submitted ${escapeHtml(meta.submittedAt)} · language: ${escapeHtml(meta.locale)} · form: ${escapeHtml(
+        meta.source,
+      )} · attachments: ${escapeHtml(meta.attachments)}
     </td></tr>
   </table>
 </body></html>`;
@@ -127,11 +129,11 @@ function buildText(submission: Submission, meta: Submission): string {
     "",
     `Name:              ${submission.name}`,
     `Email:             ${submission.email}`,
-    `Phone / WhatsApp:  ${submission.phone}`,
+    `Phone / WhatsApp:  ${submission.phone || "—"}`,
     `Organisation:      ${submission.organization || "—"}`,
     `Project type:      ${submission.projectType}`,
-    `Budget:            ${submission.budget}`,
-    `Timeline:          ${submission.timeline}`,
+    `Budget:            ${submission.budget || "—"}`,
+    `Timeline:          ${submission.timeline || "—"}`,
     "",
     "Description:",
     submission.description,
@@ -139,7 +141,7 @@ function buildText(submission: Submission, meta: Submission): string {
     "Expected outcome:",
     submission.outcome,
     "",
-    `Submitted ${meta.submittedAt} · language: ${meta.locale} · attachments: ${meta.attachments}`,
+    `Submitted ${meta.submittedAt} · language: ${meta.locale} · form: ${meta.source} · attachments: ${meta.attachments}`,
   ].join("\n");
 }
 
@@ -205,9 +207,11 @@ export async function POST(request: Request) {
   }
 
   const locale = String(form.get("locale") ?? "ar").slice(0, 5);
+  const source = String(form.get("source") ?? "full").slice(0, 16);
   const meta: Submission = {
     submittedAt: new Date().toISOString().replace("T", " ").slice(0, 16) + " UTC",
     locale,
+    source,
     attachments: attachments.length > 0 ? attachments.map((a) => a.filename).join(", ") : "none",
   };
 

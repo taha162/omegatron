@@ -22,10 +22,12 @@ export function Header({ locale, dict }: { locale: Locale; dict: Dictionary }) {
   const close = useCallback(() => setOpen(false), []);
 
   const links = [
+    { href: `/${locale}`, label: dict.nav.home },
     { href: `/${locale}#about`, label: dict.nav.about },
-    { href: `/${locale}#project`, label: dict.nav.project },
+    { href: `/${locale}#projects`, label: dict.nav.projects },
     { href: `/${locale}#capabilities`, label: dict.nav.capabilities },
     { href: `/${locale}#founder`, label: dict.nav.founder },
+    { href: `/${locale}#contact`, label: dict.nav.contact },
   ];
 
   const alt = otherLocale(locale);
@@ -41,7 +43,7 @@ export function Header({ locale, dict }: { locale: Locale; dict: Dictionary }) {
           </span>
         </Link>
 
-        <nav className="nav" aria-label={dict.nav.menu}>
+        <nav className="nav" aria-label={dict.nav.primary}>
           {links.map((link) => (
             <Link key={link.href} href={link.href} className="nav__link">
               {link.label}

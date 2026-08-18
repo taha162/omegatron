@@ -6,6 +6,7 @@ import type { Metadata } from "next";
 import { Reveal } from "@/components/Reveal";
 import { SectionHeading } from "@/components/SectionHeading";
 import { ArrowIcon, CAPABILITY_ICONS } from "@/components/Icons";
+import { ProjectForm } from "@/components/ProjectForm";
 import { DEFAULT_LOCALE, getDictionary, isLocale } from "@/lib/i18n";
 import { FOUNDER_NAME_AR, FOUNDER_NAME_EN, ORG_NAME_AR, ORG_NAME_EN, SITE_URL } from "@/lib/site";
 
@@ -28,6 +29,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
   const { lang } = await params;
   if (!isLocale(lang)) notFound();
   const dict = getDictionary(lang);
+  const caseStudy = dict.projects.items[0];
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -40,19 +42,23 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
         url: `${SITE_URL}/${lang}`,
         description: dict.meta.description,
         foundingLocation: { "@type": "Place", name: "Iraq" },
+        areaServed: { "@type": "Country", name: "Iraq" },
         founder: {
           "@type": "Person",
+          "@id": `${SITE_URL}/#founder`,
           name: lang === "ar" ? FOUNDER_NAME_AR : FOUNDER_NAME_EN,
           jobTitle: dict.founder.role,
+          knowsAbout: dict.founder.expertise,
         },
-        knowsAbout: [
-          "Mechatronics",
-          "Robotics",
-          "Artificial Intelligence",
-          "Embedded Systems",
-          "Automation",
-          "Rapid Prototyping",
-        ],
+        knowsAbout: dict.capabilities.items.map((item) => item.title),
+        hasOfferCatalog: {
+          "@type": "OfferCatalog",
+          name: dict.capabilities.heading,
+          itemListElement: dict.capabilities.items.map((item) => ({
+            "@type": "Offer",
+            itemOffered: { "@type": "Service", name: item.title, description: item.body },
+          })),
+        },
         award: `${dict.achievement.place} — ${dict.achievement.event}`,
       },
       {
@@ -62,6 +68,15 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
         name: dict.meta.siteName,
         inLanguage: lang,
         publisher: { "@id": `${SITE_URL}/#organization` },
+      },
+      {
+        "@type": "CreativeWork",
+        "@id": `${SITE_URL}/#${caseStudy.id}`,
+        name: caseStudy.name,
+        abstract: caseStudy.summary,
+        inLanguage: lang,
+        creator: { "@id": `${SITE_URL}/#organization` },
+        about: caseStudy.domains,
       },
     ],
   };
@@ -78,23 +93,29 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
       <section className="hero">
         <div className="container">
           <div className="hero__inner">
-            <div>
+            <div className="hero__copy">
               <p className="hero__eyebrow mono" lang={lang}>
                 {dict.hero.eyebrow}
               </p>
-              <h1 className="hero__title" lang="en">
-                {dict.hero.wordmark}
+              <h1 className="hero__title">
+                <span className="hero__wordmark" lang="en">
+                  {dict.hero.wordmark}
+                </span>
+                <span className="hero__statement">{dict.hero.statement}</span>
               </h1>
-              <p className="hero__statement">{dict.hero.statement}</p>
               <p className="hero__lead">{dict.hero.lead}</p>
+              <p className="hero__diff">
+                <span className="hero__diff-rule" aria-hidden="true" />
+                {dict.hero.differentiator}
+              </p>
               <div className="hero__actions">
-                <Link href={`/${lang}/start`} className="btn">
+                <a href="#projects" className="btn">
                   {dict.hero.primaryCta}
                   <ArrowIcon className="btn__arrow" />
-                </Link>
-                <a href="#project" className="btn btn--ghost">
-                  {dict.hero.secondaryCta}
                 </a>
+                <Link href={`/${lang}/start`} className="btn btn--ghost">
+                  {dict.hero.secondaryCta}
+                </Link>
               </div>
             </div>
 
@@ -106,6 +127,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
                     alt={dict.hero.imageAlt}
                     fill
                     priority
+                    fetchPriority="high"
                     sizes="(max-width: 1024px) 92vw, 44vw"
                   />
                 </div>
@@ -180,13 +202,6 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
               {dict.about.body.map((paragraph) => (
                 <p key={paragraph}>{paragraph}</p>
               ))}
-              <ul className="disciplines">
-                {dict.capabilities.items.map((item) => (
-                  <li className="chip" key={item.title}>
-                    {item.title}
-                  </li>
-                ))}
-              </ul>
             </Reveal>
 
             <Reveal delay={80}>
@@ -206,97 +221,90 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
         </div>
       </section>
 
-      {/* ------------------------------------------------------------- Project */}
+      {/* ------------------------------------------------------------ Projects */}
       <section
         className="section section--surface"
-        id="project"
-        aria-labelledby="project-title"
+        id="projects"
+        aria-labelledby="projects-title"
       >
         <div className="container">
           <SectionHeading
-            index={dict.project.index}
-            label={dict.project.label}
-            title={dict.project.heading}
-            id="project-title"
+            index={dict.projects.index}
+            label={dict.projects.label}
+            title={dict.projects.heading}
+            lead={dict.projects.lead}
+            id="projects-title"
           />
 
-          <div className="project__top">
-            <Reveal>
-              <p className="lead">{dict.project.lead}</p>
-            </Reveal>
-            <Reveal delay={80}>
-              <figure className="figure">
-                <div className="media media--3x2">
-                  <Image
-                    src="/images/project-enclosure.jpg"
-                    alt={dict.project.images.enclosureAlt}
-                    fill
-                    loading="lazy"
-                    sizes="(max-width: 1024px) 92vw, 44vw"
-                  />
-                </div>
-                <figcaption className="figure__cap">
-                  {dict.project.images.enclosureAlt}
-                </figcaption>
-              </figure>
-            </Reveal>
-          </div>
+          {dict.projects.items.map((project) => (
+            <article className="case" key={project.id} aria-labelledby={`case-${project.id}`}>
+              <Reveal className="case__head">
+                <p className="case__meta">
+                  <span className="case__status mono">{project.status}</span>
+                  <span className="case__badge mono">{project.badge}</span>
+                </p>
+                <h3 className="case__name" id={`case-${project.id}`}>
+                  {project.name}
+                </h3>
+                <p className="case__summary">{project.summary}</p>
+                <ul className="case__domains">
+                  {project.domains.map((domain) => (
+                    <li className="chip" key={domain}>
+                      {domain}
+                    </li>
+                  ))}
+                </ul>
+              </Reveal>
 
-          <Reveal>
-            <ol className="stages">
-              {dict.project.stages.map((stage) => (
-                <li className="stage" key={stage.index}>
-                  <span className="stage__index mono">
-                    {stage.index}
-                  </span>
-                  <h3 className="stage__title">{stage.title}</h3>
-                  <p className="stage__body">{stage.body}</p>
-                </li>
-              ))}
-            </ol>
+              <Reveal className="case__gallery" delay={60}>
+                {(
+                  [
+                    ["/images/project-enclosure.jpg", dict.projects.images.enclosureAlt],
+                    ["/images/project-chamber.jpg", dict.projects.images.chamberAlt],
+                    ["/images/project-array.jpg", dict.projects.images.unitAlt],
+                  ] as const
+                ).map(([src, alt]) => (
+                  <figure className="figure" key={src}>
+                    <div className="media media--4x5">
+                      <Image
+                        src={src}
+                        alt={alt}
+                        fill
+                        loading="lazy"
+                        sizes="(max-width: 380px) 92vw, (max-width: 860px) 46vw, 30vw"
+                      />
+                    </div>
+                  </figure>
+                ))}
+              </Reveal>
+
+              <Reveal as="ol" className="case__blocks" delay={80}>
+                {(
+                  [
+                    ["problem", dict.projects.blockLabels.problem, project.problem],
+                    ["approach", dict.projects.blockLabels.approach, project.approach],
+                    ["engineering", dict.projects.blockLabels.engineering, project.engineering],
+                    ["outcome", dict.projects.blockLabels.outcome, project.outcome],
+                  ] as const
+                ).map(([key, label, body], i) => (
+                  <li className="case-block" key={key}>
+                    <p className="case-block__label">
+                      <span className="case-block__index mono" lang="en">
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                      <span className="case-block__name">{label}</span>
+                    </p>
+                    <p className="case-block__body">{body}</p>
+                  </li>
+                ))}
+              </Reveal>
+            </article>
+          ))}
+
+          <Reveal as="aside" className="note note--flag">
+            <h3 className="note__title">{dict.projects.confidentialTitle}</h3>
+            <p className="note__body">{dict.projects.confidentialBody}</p>
           </Reveal>
-
-          <div className="project__gallery">
-            <Reveal>
-              <figure className="figure">
-                <div className="media media--3x2">
-                  <Image
-                    src="/images/project-chamber.jpg"
-                    alt={dict.project.images.chamberAlt}
-                    fill
-                    loading="lazy"
-                    sizes="(max-width: 860px) 92vw, 46vw"
-                  />
-                </div>
-                <figcaption className="figure__cap">{dict.project.images.chamberAlt}</figcaption>
-              </figure>
-            </Reveal>
-            <Reveal delay={80}>
-              <figure className="figure">
-                <div className="media media--3x2">
-                  <Image
-                    src="/images/project-array.jpg"
-                    alt={dict.project.images.unitAlt}
-                    fill
-                    loading="lazy"
-                    sizes="(max-width: 860px) 92vw, 46vw"
-                  />
-                </div>
-                <figcaption className="figure__cap">{dict.project.images.unitAlt}</figcaption>
-              </figure>
-            </Reveal>
-          </div>
-
-          <div className="project__notes">
-            <Reveal as="article" className="note">
-              <h3 className="note__title">{dict.project.enclosureTitle}</h3>
-              <p className="note__body">{dict.project.enclosureBody}</p>
-            </Reveal>
-            <Reveal as="article" className="note note--flag" delay={80}>
-              <h3 className="note__title">{dict.project.confidentialTitle}</h3>
-              <p className="note__body">{dict.project.confidentialBody}</p>
-            </Reveal>
-          </div>
         </div>
       </section>
 
@@ -326,12 +334,42 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
         </div>
       </section>
 
-      {/* ------------------------------------------------------------- Founder */}
+      {/* ------------------------------------------------------------- Process */}
       <section
         className="section section--surface"
-        id="founder"
-        aria-labelledby="founder-title"
+        id="process"
+        aria-labelledby="process-title"
       >
+        <div className="container">
+          <SectionHeading
+            index={dict.process.index}
+            label={dict.process.label}
+            title={dict.process.heading}
+            lead={dict.process.lead}
+            id="process-title"
+          />
+
+          <ol className="flow">
+            {dict.process.steps.map((step, i) => (
+              <li className="flow__step" key={step.index}>
+                {/* Outside the reveal so the node stays pinned to the rule
+                    while the text beneath it settles. */}
+                <span className="flow__marker" aria-hidden="true" />
+                <Reveal delay={i * 60}>
+                  <span className="flow__index mono" lang="en">
+                    {step.index}
+                  </span>
+                  <h3 className="flow__title">{step.title}</h3>
+                  <p className="flow__body">{step.body}</p>
+                </Reveal>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      {/* ------------------------------------------------------------- Founder */}
+      <section className="section" id="founder" aria-labelledby="founder-title">
         <div className="container">
           <SectionHeading
             index={dict.founder.index}
@@ -341,47 +379,87 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
           />
 
           <div className="founder">
-            <Reveal>
+            <Reveal className="founder__aside">
               <figure className="founder__figure">
-                <div className="media media--3x4">
+                <div className="media media--4x5">
                   <Image
                     src="/images/founder.jpg"
                     alt={dict.founder.imageAlt}
                     fill
                     loading="lazy"
-                    sizes="(max-width: 1024px) 22rem, 32vw"
+                    sizes="(max-width: 1024px) 20rem, 24vw"
                   />
                 </div>
               </figure>
+              <p className="founder__role">{dict.founder.role}</p>
+
+              <h3 className="founder__expertise-title mono">{dict.founder.expertiseTitle}</h3>
+              <ul className="founder__expertise">
+                {dict.founder.expertise.map((area) => (
+                  <li key={area}>{area}</li>
+                ))}
+              </ul>
             </Reveal>
 
             <Reveal delay={80}>
-              <p className="founder__role">{dict.founder.role}</p>
               <blockquote className="founder__quote">{dict.founder.quote}</blockquote>
-              <div className="prose">
-                {dict.founder.body.map((paragraph) => (
-                  <p key={paragraph}>{paragraph}</p>
+              <p className="founder__intro">{dict.founder.intro}</p>
+
+              <dl className="founder__blocks">
+                {dict.founder.blocks.map((block) => (
+                  <div className="founder__block" key={block.title}>
+                    <dt className="founder__block-title">{block.title}</dt>
+                    <dd className="founder__block-body">{block.body}</dd>
+                  </div>
                 ))}
-              </div>
+              </dl>
             </Reveal>
           </div>
         </div>
       </section>
 
-      {/* ----------------------------------------------------------- CTA band */}
-      <section className="section section--ink" aria-labelledby="cta-title">
+      {/* ------------------------------------------------------------- Contact */}
+      <section
+        className="section section--surface"
+        id="contact"
+        aria-labelledby="contact-title"
+      >
         <div className="container">
-          <div className="cta-band">
-            <div>
-              <h2 className="cta-band__heading" id="cta-title">
-                {dict.cta.heading}
+          <div className="contact">
+            <div className="contact__intro">
+              <p className="sec-head__meta mono">
+                <span className="sec-head__index">{dict.contact.index}</span>
+                <span>{dict.contact.label}</span>
+              </p>
+              <h2 className="contact__heading" id="contact-title">
+                {dict.contact.heading}
               </h2>
-              <p className="cta-band__body">{dict.cta.body}</p>
+              <p className="lead">{dict.contact.lead}</p>
+
+              <ol className="contact__steps">
+                {dict.start.steps.map((step) => (
+                  <li className="contact__step" key={step.index}>
+                    <span className="contact__step-index mono" lang="en">
+                      {step.index}
+                    </span>
+                    <span>
+                      <strong className="contact__step-title">{step.title}</strong>
+                      <span className="contact__step-body">{step.body}</span>
+                    </span>
+                  </li>
+                ))}
+              </ol>
             </div>
-            <Link href={`/${lang}/start`} className="btn btn--inverse">
-              {dict.cta.button}
-              <ArrowIcon className="btn__arrow" />
-            </Link>
+
+            <div className="contact__panel">
+              <ProjectForm locale={lang} dict={dict} variant="compact" idPrefix="contact" />
+              <p className="contact__full">
+                {dict.contact.fullFormPrompt}{" "}
+                <Link href={`/${lang}/start`} className="contact__full-link">
+                  {dict.contact.fullFormLink}
+                </Link>
+              </p>
+            </div>
           </div>
         </div>
       </section>
