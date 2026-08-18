@@ -19,20 +19,26 @@ const FIELD_LIMITS: Record<string, number> = {
   outcome: 3000,
   budget: 80,
   timeline: 80,
+  environment: 120,
+  stage: 120,
 };
 
 /**
- * The short contact form on the home page sends only these; the full request
- * form on /start adds phone, organisation, budget, and timeline, which the
- * browser enforces there and this handler treats as optional.
+ * Mandatory on every enquiry, whichever form it came from. Without a way to
+ * reach the sender and a description of what they want built, the request
+ * cannot be answered, so it is rejected rather than half-delivered.
  */
 const REQUIRED_FIELDS = [
   "name",
   "email",
+  "phone",
   "projectType",
   "description",
   "outcome",
 ] as const;
+
+/** Additionally mandatory on the long-form request at /start. */
+const REQUIRED_FULL_FIELDS = ["environment", "stage", "budget", "timeline"] as const;
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -84,6 +90,8 @@ function buildHtml(submission: Submission, meta: Submission): string {
     ["Phone / WhatsApp", submission.phone || "—"],
     ["Organisation", submission.organization || "—"],
     ["Project type", submission.projectType],
+    ["Operating environment", submission.environment || "—"],
+    ["Current stage", submission.stage || "—"],
     ["Budget", submission.budget || "—"],
     ["Timeline", submission.timeline || "—"],
     ["Description", submission.description],
@@ -132,6 +140,8 @@ function buildText(submission: Submission, meta: Submission): string {
     `Phone / WhatsApp:  ${submission.phone || "—"}`,
     `Organisation:      ${submission.organization || "—"}`,
     `Project type:      ${submission.projectType}`,
+    `Environment:       ${submission.environment || "—"}`,
+    `Current stage:     ${submission.stage || "—"}`,
     `Budget:            ${submission.budget || "—"}`,
     `Timeline:          ${submission.timeline || "—"}`,
     "",
@@ -179,9 +189,16 @@ export async function POST(request: Request) {
       .slice(0, limit);
   }
 
-  const missing = REQUIRED_FIELDS.filter((field) => !submission[field]);
+  const source = String(form.get("source") ?? "full").slice(0, 16);
+  const required =
+    source === "full" ? [...REQUIRED_FIELDS, ...REQUIRED_FULL_FIELDS] : REQUIRED_FIELDS;
+
+  const missing = required.filter((field) => !submission[field]);
   if (missing.length > 0 || !EMAIL_RE.test(submission.email)) {
-    return NextResponse.json({ error: "Some required fields are missing." }, { status: 400 });
+    return NextResponse.json(
+      { error: `Missing required fields: ${missing.join(", ") || "email"}.` },
+      { status: 400 },
+    );
   }
 
   const uploads = form.getAll("attachments").filter((entry): entry is File => entry instanceof File);
@@ -207,7 +224,6 @@ export async function POST(request: Request) {
   }
 
   const locale = String(form.get("locale") ?? "ar").slice(0, 5);
-  const source = String(form.get("source") ?? "full").slice(0, 16);
   const meta: Submission = {
     submittedAt: new Date().toISOString().replace("T", " ").slice(0, 16) + " UTC",
     locale,

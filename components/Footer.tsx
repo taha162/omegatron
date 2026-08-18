@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Logo } from "./Logo";
+import { Logo, Wordmark } from "./Logo";
 import { LOCALES, type Dictionary, type Locale } from "@/lib/i18n";
 
 /**
@@ -18,10 +18,10 @@ export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
         <div className="footer__grid">
           <div>
             <Link href={`/${locale}`} className="brand" aria-label={dict.nav.home}>
-              <Logo className="brand__mark" />
+              <Logo className="brand__mark brand__mark--lg" />
               <span className="brand__text">
-                <span className="brand__name">{dict.meta.siteName}</span>
-                <span className="brand__sub">Mechatronics</span>
+                <Wordmark className="brand__name wordmark" />
+                <span className="brand__sub">{dict.meta.tagline}</span>
               </span>
             </Link>
             <p className="footer__tagline">{dict.footer.tagline}</p>

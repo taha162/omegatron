@@ -4,8 +4,8 @@
   "description": "Competitive mechatronics engineering team — robotics, AI, embedded systems, automation.",
   "start_url": "/ar",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#ffffff",
+  "background_color": "#0a0e14",
+  "theme_color": "#0a0e14",
   "icons": [
     {
       "src": "/icon.svg",

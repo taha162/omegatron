@@ -74,6 +74,38 @@ where its translation is missing.
 - `hreflang` alternates and an `x-default` pointing at Arabic are emitted on
   every page, and the sitemap carries per-language alternates.
 
+## Identity
+
+The palette is taken from the official logo: a deep navy ground (`#0a0e14`),
+brushed-steel type, and a single gold accent (`#d9ae45`) used sparingly. Every
+colour is a CSS custom property in the `:root` block of `app/globals.css`, so
+the whole identity can be re-pitched from one place.
+
+The mark itself is redrawn as vector art in `components/Logo.tsx` — the open
+omega ring, the gear quadrant, the circuit traces, and the gold needle — so it
+costs no network request, stays crisp at any size, and inherits theme colours.
+`components/Logo.tsx` also exports `Wordmark`, which sets OMEGA in steel and
+TRON in gold exactly as the logo does.
+
+Measured contrast against the page ground: body text 6.5:1, headings 16.6:1,
+gold accents 9.3:1 — all above WCAG AA.
+
+## Scroll-linked motion
+
+Handled entirely with CSS scroll-driven animations (`animation-timeline`), so
+there are no scroll listeners and nothing runs on the main thread:
+
+- a reading-progress hairline across the top of the viewport,
+- the hero drafting grid drifting and fading as the hero leaves,
+- photographs settling out of a slight over-scale as they enter frame,
+- section rules and the process timeline drawing themselves in,
+- cards lifting into place as they scroll into view.
+
+Browsers without support skip the `@supports` block and get the static
+composition. Every "from" state stays partly opaque rather than transparent, so
+a failure can never blank the content. `prefers-reduced-motion` removes the
+timelines outright rather than just shortening durations.
+
 ## Typography
 
 Cairo, loaded through `next/font/google` as a **variable** font — one file per
@@ -88,15 +120,17 @@ layout shift when it lands and no request to a third-party font host.
 `components/ProjectForm.tsx` renders one of two shapes from the same component,
 so validation, submission, and error handling can never diverge:
 
-- **`compact`** — the contact section on the home page. Name, email, project
-  type, description of the challenge, expected outcome. This is the low-friction
-  path for someone who has just read the case study.
-- **`full`** — the `/start` page. Adds phone/WhatsApp, organisation, budget,
-  timeline, and attachments.
+- **`compact`** — the contact section on the home page. Name, email, phone,
+  project type, description of the challenge, expected outcome.
+- **`full`** — the `/start` page. Adds organisation (optional), operating
+  environment, current stage, budget, timeline, and attachments.
 
-Both post to `/api/contact`. The handler requires the five shared fields and
-treats the rest as optional, so either shape is accepted; the email records
-which form the enquiry came from.
+Both post to `/api/contact`, and **mandatory fields are enforced on the server,
+not just in the browser**. Six fields are required on every enquiry; the long
+form additionally requires environment, stage, budget, and timeline. A request
+missing any of them is rejected with a 400 naming the fields, rather than
+delivered half-complete. Required fields carry a gold `*` and the form states
+why they are being asked for.
 
 ## Email delivery
 
@@ -159,6 +193,7 @@ generated `*.vercel.app` hostname.
 ## Performance and accessibility
 
 - **Static by default.** Both languages of both pages are prerendered.
+- **Motion costs nothing.** All scroll effects are CSS scroll-driven animations; the only client JavaScript is the mobile menu, the forms, and a small entrance observer.
 - **Minimal client JavaScript.** Only three components are interactive: the
   mobile menu, the form, and a small scroll-reveal. Everything else — including
   the language toggle — is server-rendered HTML.

@@ -1,29 +1,38 @@
 /* ==========================================================================
    OmegaTron — design system
-   Light mode. Precise, minimal, technical. One stylesheet, no runtime CSS.
+
+   Dark engineering identity, taken from the official mark: deep navy ground,
+   brushed-steel type, a single gold accent. One stylesheet, no runtime CSS.
    Direction-agnostic: logical properties only, so RTL and LTR share the rules.
    ========================================================================== */
 
 :root {
-  /* Surfaces — warm paper, not clinical white */
-  --paper: #ffffff;
-  --surface: #f7f6f3;
-  --surface-2: #efece6;
+  color-scheme: dark;
 
-  /* Ink */
-  --ink: #101418;
-  --ink-2: #3a4149;
-  --ink-3: #6a7078;
-  --ink-inverse: #f7f6f3;
+  /* Ground — deep navy, not pure black, so the steel type stays warm */
+  --paper: #0a0e14;
+  --surface: #0f151e;
+  --surface-2: #161f2b;
+  --panel: #121a25;
+
+  /* Type — brushed steel */
+  --ink: #e9eef4;
+  --ink-2: #b4c0cc;
+  --ink-3: #8a97a6;
+  --ink-inverse: #0a0e14;
 
   /* Rules and edges */
-  --line: #e3e0d9;
-  --line-strong: #cfcbc2;
+  --line: #1e2836;
+  --line-strong: #2f3f52;
 
-  /* Single accent: bronze. Used sparingly, never decoratively. */
-  --accent: #a9561e;
-  --accent-deep: #8a4416;
-  --accent-tint: #f6efe8;
+  /* Single accent: the gold from the mark. Used sparingly, never decoratively. */
+  --accent: #d9ae45;
+  --accent-deep: #f0c860;
+  --accent-tint: rgba(217, 174, 69, 0.1);
+  --accent-line: rgba(217, 174, 69, 0.32);
+
+  /* Steel highlight, for the mark and hairline bevels */
+  --steel: #c3ccd6;
 
   /* Type */
   --font-sans: var(--font-cairo), "Cairo", "Segoe UI", system-ui, -apple-system,
@@ -129,8 +138,8 @@ hr {
 }
 
 ::selection {
-  background: var(--ink);
-  color: var(--paper);
+  background: var(--accent);
+  color: var(--ink-inverse);
 }
 
 /* --------------------------------------------------------------------------
@@ -210,9 +219,9 @@ hr {
 }
 
 .section--ink {
-  background: var(--ink);
-  color: var(--ink-inverse);
-  border-block-start: 0;
+  position: relative;
+  background: var(--surface-2);
+  border-block-start: 1px solid var(--accent-line);
 }
 
 .lead {
@@ -314,15 +323,15 @@ hr {
 }
 
 .section--ink .sec-head__meta {
-  color: rgba(247, 246, 243, 0.6);
+  color: var(--ink-3);
 }
 
 .section--ink .sec-head__meta::after {
-  background: rgba(247, 246, 243, 0.2);
+  background: var(--line-strong);
 }
 
 .section--ink .sec-head__index {
-  color: #d99a63;
+  color: var(--accent);
 }
 
 .sec-head__title {
@@ -353,9 +362,9 @@ hr {
    -------------------------------------------------------------------------- */
 
 .btn {
-  --btn-bg: var(--ink);
-  --btn-fg: var(--paper);
-  --btn-bd: var(--ink);
+  --btn-bg: var(--accent);
+  --btn-fg: var(--ink-inverse);
+  --btn-bd: var(--accent);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -391,15 +400,15 @@ hr {
 }
 
 .btn--inverse {
-  --btn-bg: var(--paper);
-  --btn-fg: var(--ink);
-  --btn-bd: var(--paper);
+  --btn-bg: var(--accent);
+  --btn-fg: var(--ink-inverse);
+  --btn-bd: var(--accent);
 }
 
 .btn--inverse:hover {
-  --btn-bg: #e8d9cb;
+  --btn-bg: var(--accent-deep);
   --btn-fg: var(--ink);
-  --btn-bd: #e8d9cb;
+  --btn-bd: var(--accent-deep);
 }
 
 .btn__arrow {
@@ -425,8 +434,8 @@ hr {
 }
 
 .btn[disabled]:hover {
-  --btn-bg: var(--ink);
-  --btn-bd: var(--ink);
+  --btn-bg: var(--accent);
+  --btn-bd: var(--accent);
 }
 
 /* Focus — one visible, consistent ring everywhere */
@@ -437,7 +446,7 @@ hr {
 }
 
 .section--ink :where(a, button):focus-visible {
-  outline-color: #e0a877;
+  outline-color: var(--accent-deep);
 }
 
 /* --------------------------------------------------------------------------
@@ -468,7 +477,7 @@ hr {
   position: sticky;
   inset-block-start: 0;
   z-index: 50;
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(10, 14, 20, 0.86);
   border-block-end: 1px solid var(--line);
   backdrop-filter: saturate(1.4) blur(8px);
 }
@@ -490,9 +499,35 @@ hr {
 
 .brand__mark {
   flex: none;
-  width: 2rem;
-  height: 2rem;
+  width: 2.25rem;
+  height: 2.25rem;
+  color: var(--steel);
+  transition: color 0.2s ease;
+}
+
+.brand:hover .brand__mark {
   color: var(--ink);
+}
+
+.brand__mark--lg {
+  width: 2.75rem;
+  height: 2.75rem;
+}
+
+/* Wordmark: silver "OMEGA", gold "TRON", exactly as the official logo sets it. */
+.wordmark {
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.wordmark__a {
+  color: var(--steel);
+}
+
+.wordmark__b {
+  color: var(--accent);
 }
 
 .brand__text {
@@ -502,22 +537,22 @@ hr {
 
 .brand__name {
   font-size: 1.0625rem;
-  font-weight: 800;
-  letter-spacing: -0.01em;
-}
-
-[lang="ar"] .brand__name {
-  letter-spacing: 0;
-  font-size: 1.125rem;
 }
 
 .brand__sub {
-  font-family: var(--font-mono);
-  font-size: 0.5625rem;
+  font-size: 0.625rem;
   font-weight: 500;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--ink-3);
+  font-family: var(--font-mono);
+}
+
+[lang="ar"] .brand__sub {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
 .nav {
@@ -591,8 +626,8 @@ hr {
 }
 
 .lang-toggle__opt[aria-current="true"] {
-  background: var(--ink);
-  color: var(--paper);
+  background: var(--accent);
+  color: var(--ink-inverse);
 }
 
 .header__cta {
@@ -674,8 +709,8 @@ hr {
   content: "";
   position: absolute;
   inset: 0;
-  background-image: linear-gradient(to right, rgba(16, 20, 24, 0.045) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(16, 20, 24, 0.045) 1px, transparent 1px);
+  background-image: linear-gradient(to right, rgba(195, 204, 214, 0.055) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(195, 204, 214, 0.055) 1px, transparent 1px);
   background-size: 5rem 5rem;
   mask-image: linear-gradient(to bottom, #000 0%, transparent 78%);
   -webkit-mask-image: linear-gradient(to bottom, #000 0%, transparent 78%);
@@ -788,34 +823,55 @@ hr {
   inset-block-end: 0;
   inset-inline: 0;
   padding: 1.25rem;
-  background: linear-gradient(to top, rgba(16, 20, 24, 0.82), rgba(16, 20, 24, 0));
-  color: #fff;
+  background: linear-gradient(to top, rgba(10, 14, 20, 0.9), rgba(10, 14, 20, 0));
+  color: var(--ink);
 }
 
-/* Facts strip */
+/* Facts strip — instrument readouts rather than three lines of text */
 .hero__facts {
   position: relative;
   margin-block-start: clamp(3rem, 2rem + 4vw, 5rem);
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  border-block-start: 1px solid var(--line);
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
 }
 
 .fact {
-  padding-block-start: 1.75rem;
-  padding-inline-end: 1.5rem;
+  position: relative;
+  background: var(--panel);
+  padding: 1.75rem clamp(1.25rem, 1rem + 1vw, 1.75rem);
+  transition: background-color 0.25s ease;
 }
 
-.fact + .fact {
-  border-inline-start: 1px solid var(--line);
-  padding-inline-start: 1.5rem;
+.fact::before {
+  content: "";
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  width: 2.25rem;
+  height: 2px;
+  background: var(--accent);
+  transition: width 0.35s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.fact:hover {
+  background: var(--surface-2);
+}
+
+.fact:hover::before {
+  width: 4.5rem;
 }
 
 .fact__value {
-  font-size: var(--step-1);
+  font-size: var(--step-2);
   font-weight: 700;
-  line-height: 1.3;
-  margin-block-end: 0.375rem;
+  line-height: 1.25;
+  margin-block-end: 0.5rem;
+  color: var(--ink);
 }
 
 .fact__label {
@@ -840,9 +896,9 @@ hr {
   align-items: center;
   gap: 0.75rem;
   padding: 0.4375rem 0.875rem;
-  border: 1px solid rgba(247, 246, 243, 0.25);
+  border: 1px solid var(--accent-line);
   border-radius: var(--radius);
-  color: rgba(247, 246, 243, 0.85);
+  color: var(--ink-2);
   margin-block-end: 2rem;
 }
 
@@ -850,7 +906,7 @@ hr {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #d99a63;
+  background: var(--accent);
   flex: none;
 }
 
@@ -879,16 +935,16 @@ hr {
   font-size: var(--step-1);
   font-weight: 600;
   letter-spacing: 0.06em;
-  color: #d99a63;
+  color: var(--accent);
 }
 
 .achv__event-scope {
   font-size: var(--step--1);
-  color: rgba(247, 246, 243, 0.6);
+  color: var(--ink-3);
 }
 
 .achv__body {
-  color: rgba(247, 246, 243, 0.78);
+  color: var(--ink-2);
   max-width: 52ch;
   font-weight: 300;
 }
@@ -898,10 +954,10 @@ hr {
 }
 
 .achv__figure {
-  border: 1px solid rgba(247, 246, 243, 0.16);
+  border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   overflow: hidden;
-  background: rgba(247, 246, 243, 0.04);
+  background: var(--panel);
 }
 
 /* --------------------------------------------------------------------------
@@ -917,32 +973,62 @@ hr {
 
 .principles {
   display: grid;
-  gap: 0;
-  border-block-start: 1px solid var(--line);
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
 }
 
 .principle {
-  padding-block: 1.5rem;
-  border-block-end: 1px solid var(--line);
+  position: relative;
+  background: var(--panel);
+  padding: 1.5rem clamp(1.25rem, 1rem + 1vw, 1.75rem);
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
-  gap: 1.25rem;
+  gap: 1.125rem;
   align-items: start;
+  transition: background-color 0.25s ease;
+}
+
+.principle:hover {
+  background: var(--surface-2);
+}
+
+/* A gold rule that grows down the inline edge on hover. */
+.principle::before {
+  content: "";
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  width: 2px;
+  height: 0;
+  background: var(--accent);
+  transition: height 0.35s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.principle:hover::before {
+  height: 100%;
 }
 
 .principle__dot {
-  width: 7px;
-  height: 7px;
+  width: 9px;
+  height: 9px;
   border: 1px solid var(--accent);
-  margin-block-start: 0.6875rem;
+  margin-block-start: 0.55em;
   transform: rotate(45deg);
   flex: none;
+  transition: background-color 0.25s ease;
+}
+
+.principle:hover .principle__dot {
+  background: var(--accent);
 }
 
 .principle__title {
-  font-size: var(--step-0);
+  font-size: var(--step-1);
   font-weight: 700;
-  margin-block-end: 0.25rem;
+  margin-block-end: 0.375rem;
 }
 
 .principle__body {
@@ -962,7 +1048,7 @@ hr {
   font-size: var(--step--1);
   font-weight: 500;
   color: var(--ink-2);
-  background: var(--paper);
+  background: var(--panel);
 }
 
 /* --------------------------------------------------------------------------
@@ -976,6 +1062,35 @@ hr {
   margin-block-start: clamp(3.5rem, 2.5rem + 4vw, 6rem);
   padding-block-start: clamp(3.5rem, 2.5rem + 4vw, 6rem);
   border-block-start: 1px solid var(--line-strong);
+}
+
+.projects__oneof {
+  max-width: 72ch;
+  margin-block-end: clamp(2.5rem, 2rem + 2vw, 3.5rem);
+  padding-inline-start: 1.25rem;
+  border-inline-start: 2px solid var(--accent-line);
+  color: var(--ink-3);
+  font-size: var(--step--1);
+  line-height: 1.8;
+}
+
+[lang="ar"] .projects__oneof {
+  line-height: 2;
+}
+
+.case__counter {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  color: var(--ink-3);
+  margin-block-end: 1rem;
+}
+
+.case__counter-num {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.04em;
 }
 
 .case__head {
@@ -995,7 +1110,7 @@ hr {
   border: 1px solid var(--line-strong);
   border-radius: var(--radius);
   color: var(--ink-2);
-  background: var(--paper);
+  background: var(--panel);
 }
 
 .case__badge {
@@ -1003,7 +1118,7 @@ hr {
   border-radius: var(--radius);
   color: var(--accent-deep);
   background: var(--accent-tint);
-  border: 1px solid #e3cdb9;
+  border: 1px solid var(--accent-line);
 }
 
 .case__name {
@@ -1093,13 +1208,48 @@ hr {
   padding: clamp(1.5rem, 1.2rem + 1.2vw, 2.25rem);
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
-  background: var(--paper);
+  background: var(--panel);
   margin-block-start: clamp(2.5rem, 2rem + 2vw, 3.5rem);
 }
 
 .note--flag {
+  position: relative;
   background: var(--accent-tint);
-  border-color: #e3cdb9;
+  border-color: var(--accent-line);
+  padding-inline-start: clamp(2.5rem, 2rem + 2vw, 3.5rem);
+  overflow: hidden;
+}
+
+/* Hazard hatching down the leading edge — the one place the site raises a flag. */
+.note--flag::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: 0.75rem;
+  background: repeating-linear-gradient(
+    135deg,
+    var(--accent) 0 2px,
+    transparent 2px 7px
+  );
+  opacity: 0.55;
+}
+
+.note--flag .note__title {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  color: var(--accent-deep);
+}
+
+.note--flag .note__title::before {
+  content: "";
+  flex: none;
+  width: 0.875rem;
+  height: 0.875rem;
+  border: 2px solid currentColor;
+  border-radius: 1px;
+  clip-path: polygon(0 35%, 50% 35%, 50% 0, 100% 50%, 50% 100%, 50% 65%, 0 65%);
 }
 
 .note__title {
@@ -1118,7 +1268,7 @@ hr {
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   overflow: hidden;
-  background: var(--paper);
+  background: var(--panel);
 }
 
 .figure__cap {
@@ -1126,7 +1276,7 @@ hr {
   border-block-start: 1px solid var(--line);
   font-size: var(--step--1);
   color: var(--ink-3);
-  background: var(--paper);
+  background: var(--panel);
   line-height: 1.6;
 }
 
@@ -1145,7 +1295,7 @@ hr {
 }
 
 .cap {
-  background: var(--paper);
+  background: var(--panel);
   padding: clamp(1.75rem, 1.4rem + 1.4vw, 2.5rem);
   transition: background-color 0.2s ease;
 }
@@ -1427,7 +1577,7 @@ hr {
 
 .contact__panel {
   padding: clamp(1.5rem, 1.1rem + 1.8vw, 2.5rem);
-  background: var(--paper);
+  background: var(--panel);
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
 }
@@ -1721,7 +1871,7 @@ hr {
 .field__control {
   width: 100%;
   padding: 0.8125rem 1rem;
-  background: var(--paper);
+  background: var(--surface);
   border: 1px solid var(--line-strong);
   border-radius: var(--radius);
   font-size: var(--step-0);
@@ -1732,7 +1882,7 @@ hr {
 }
 
 .field__control::placeholder {
-  color: #9aa0a6;
+  color: #62707f;
 }
 
 .field__control:hover {
@@ -1742,15 +1892,15 @@ hr {
 .field__control:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(169, 86, 30, 0.12);
+  box-shadow: 0 0 0 3px rgba(217, 174, 69, 0.18);
 }
 
 .field__control[aria-invalid="true"] {
-  border-color: #b3261e;
+  border-color: #f2837c;
 }
 
 .field__control[aria-invalid="true"]:focus {
-  box-shadow: 0 0 0 3px rgba(179, 38, 30, 0.14);
+  box-shadow: 0 0 0 3px rgba(242, 131, 124, 0.18);
 }
 
 textarea.field__control {
@@ -1760,7 +1910,7 @@ textarea.field__control {
 
 select.field__control {
   /* Caret drawn with a background image so it flips with direction. */
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%236a7078' stroke-width='1.5' stroke-linecap='square'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%238a97a6' stroke-width='1.5' stroke-linecap='square'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 1rem center;
   padding-inline-end: 2.5rem;
@@ -1773,7 +1923,7 @@ select.field__control {
 
 .field__error {
   font-size: 0.8125rem;
-  color: #b3261e;
+  color: #f2837c;
   font-weight: 500;
 }
 
@@ -1806,7 +1956,7 @@ select.field__control {
   padding: 0.6875rem 1.125rem;
   border: 1px dashed var(--line-strong);
   border-radius: var(--radius);
-  background: var(--paper);
+  background: var(--panel);
   font-size: 0.9375rem;
   font-weight: 600;
   color: var(--ink-2);
@@ -1837,7 +1987,7 @@ select.field__control {
   padding: 0.625rem 0.875rem;
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  background: var(--paper);
+  background: var(--panel);
   font-size: 0.875rem;
 }
 
@@ -1868,7 +2018,7 @@ select.field__control {
 }
 
 .files__remove:hover {
-  color: #b3261e;
+  color: #f2837c;
 }
 
 .form__footer {
@@ -1876,6 +2026,21 @@ select.field__control {
   display: grid;
   gap: 1rem;
   justify-items: start;
+}
+
+.form__required-note {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+  font-size: 0.8125rem;
+  color: var(--ink-2);
+  max-width: 52ch;
+  line-height: 1.7;
+}
+
+.field__req {
+  color: var(--accent);
+  font-weight: 700;
 }
 
 .form__privacy {
@@ -1894,9 +2059,9 @@ select.field__control {
 }
 
 .form__alert--error {
-  border-color: #e6b4b0;
-  background: #fdf3f2;
-  color: #8c1d18;
+  border-color: rgba(242, 131, 124, 0.4);
+  background: rgba(242, 131, 124, 0.09);
+  color: #f2837c;
 }
 
 .form__alert-title {
@@ -1907,7 +2072,7 @@ select.field__control {
 .form-success {
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
-  background: var(--paper);
+  background: var(--panel);
   padding: clamp(2rem, 1.5rem + 2vw, 3rem);
   max-width: 46rem;
 }
@@ -1986,6 +2151,143 @@ select.field__control {
   opacity: 1;
   transform: none;
   will-change: auto;
+}
+
+/* --------------------------------------------------------------------------
+   Scroll-linked motion
+
+   All of it runs on CSS scroll-driven animations — no scroll listeners, no
+   JavaScript, nothing on the main thread. Browsers without support simply skip
+   the @supports block and get the static composition, which is why every
+   "from" state stays legible rather than fully transparent.
+   -------------------------------------------------------------------------- */
+
+/* Reading-progress hairline across the top of the viewport. */
+.scroll-progress {
+  position: fixed;
+  inset-block-start: 0;
+  inset-inline: 0;
+  z-index: 60;
+  height: 2px;
+  background: linear-gradient(to right, var(--accent), var(--accent-deep));
+  transform: scaleX(0);
+  transform-origin: left center;
+  pointer-events: none;
+}
+
+[dir="rtl"] .scroll-progress {
+  transform-origin: right center;
+}
+
+@keyframes progress-x {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes drift-up {
+  to {
+    transform: translateY(-5%);
+    opacity: 0.3;
+  }
+}
+
+@keyframes settle-in {
+  from {
+    opacity: 0.25;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes ease-scale {
+  from {
+    transform: scale(1.07);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@supports (animation-timeline: scroll()) {
+  .scroll-progress {
+    animation: progress-x linear both;
+    animation-timeline: scroll(root block);
+  }
+
+  /* The drafting grid drifts and fades as the hero leaves. */
+  .hero::before {
+    animation: drift-up linear both;
+    animation-timeline: scroll(root block);
+    animation-range: 0 100vh;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  /* Photographs settle out of a slight over-scale as they come into frame. */
+  .media img {
+    animation: ease-scale linear both;
+    animation-timeline: view();
+    animation-range: entry 5% cover 55%;
+  }
+
+  /* Section rules draw themselves in. */
+  .sec-head__meta::after,
+  .form__legend::after {
+    transform-origin: left center;
+    animation: progress-x linear both;
+    animation-timeline: view();
+    animation-range: entry 25% entry 95%;
+  }
+
+  [dir="rtl"] .sec-head__meta::after,
+  [dir="rtl"] .form__legend::after {
+    transform-origin: right center;
+  }
+
+  /* Cards lift into place, staggered by their own position in the scroll. */
+  .cap,
+  .fact,
+  .principle,
+  .case-block,
+  .step {
+    animation: settle-in linear both;
+    animation-timeline: view();
+    animation-range: entry 5% entry 70%;
+  }
+
+  /* The process rule draws across as the section is covered. */
+  .flow::after {
+    animation: progress-x linear both;
+    animation-timeline: view();
+    animation-range: entry 10% cover 40%;
+  }
+}
+
+/* The gold rule that the process timeline draws over its static hairline. */
+.flow {
+  position: relative;
+}
+
+.flow::after {
+  content: "";
+  position: absolute;
+  inset-block-start: -1px;
+  inset-inline: 0;
+  height: 1px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+[dir="rtl"] .flow::after {
+  transform-origin: right center;
 }
 
 /* --------------------------------------------------------------------------
@@ -2230,6 +2532,32 @@ select.field__control {
     opacity: 1;
     transform: none;
   }
+
+  /* Scroll-driven animations ignore duration, so the timeline itself is removed. */
+  .scroll-progress,
+  .hero::before,
+  .media img,
+  .sec-head__meta::after,
+  .form__legend::after,
+  .cap,
+  .fact,
+  .principle,
+  .case-block,
+  .step,
+  .flow::after {
+    animation-timeline: none !important;
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+  }
+
+  .scroll-progress {
+    display: none;
+  }
+
+  .flow::after {
+    display: none;
+  }
 }
 
 @media print {
@@ -2243,5 +2571,12 @@ select.field__control {
   body {
     color: #000;
     background: #fff;
+  }
+
+  .section--ink,
+  .contact__panel,
+  .note {
+    background: #fff !important;
+    color: #000 !important;
   }
 }

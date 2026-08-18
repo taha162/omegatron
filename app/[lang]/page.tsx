@@ -131,9 +131,6 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
                     sizes="(max-width: 1024px) 92vw, 44vw"
                   />
                 </div>
-                <figcaption className="hero__caption mono" lang="en">
-                  OmegaTron · Sensing Unit
-                </figcaption>
               </figure>
             </div>
           </div>
@@ -236,9 +233,19 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
             id="projects-title"
           />
 
-          {dict.projects.items.map((project) => (
+          <Reveal as="p" className="projects__oneof">
+            {dict.projects.oneOf}
+          </Reveal>
+
+          {dict.projects.items.map((project, i) => (
             <article className="case" key={project.id} aria-labelledby={`case-${project.id}`}>
               <Reveal className="case__head">
+                <p className="case__counter mono">
+                  <span>{dict.projects.counterLabel}</span>
+                  <span className="case__counter-num" lang="en">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                </p>
                 <p className="case__meta">
                   <span className="case__status mono">{project.status}</span>
                   <span className="case__badge mono">{project.badge}</span>

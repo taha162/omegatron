@@ -23,9 +23,9 @@ const PLATES = [
   { file: "founder.jpg", width: 1200, height: 1600 },
 ];
 
-const PAPER = "#efece6";
-const RULE = "#dcd7ce";
-const MARK = "#c9c2b7";
+const PAPER = "#141c27";
+const RULE = "#1f2a38";
+const MARK = "#33445a";
 
 function plate(width, height) {
   const step = Math.round(Math.min(width, height) / 8);
@@ -58,9 +58,11 @@ function plate(width, height) {
   <rect width="${width}" height="${height}" fill="${PAPER}"/>
   ${lines.join("")}
   ${corners}
-  <g transform="translate(${tx} ${ty}) scale(${scale})">
-    <path d="M6.4 26h6.2C8.6 23.4 6.2 19.5 6.2 15 6.2 9.2 10.4 5 16 5s9.8 4.2 9.8 10c0 4.5-2.4 8.4-6.4 11h6.2"
-          fill="none" stroke="${MARK}" stroke-width="2.4" stroke-linecap="square"/>
+  <g transform="translate(${tx} ${ty}) scale(${scale / 3.125})">
+    <path d="M35.1 63.3 A26 26 0 1 1 64.9 63.3" fill="none" stroke="${MARK}" stroke-width="7"/>
+    <path d="M14 66 H40 L50 75 L60 66 H86" fill="none" stroke="${MARK}" stroke-width="6"/>
+    <path d="M50 10 V66" fill="none" stroke="#5a4a24" stroke-width="2.4"/>
+    <circle cx="50" cy="7.5" r="3.2" fill="none" stroke="#5a4a24" stroke-width="2.2"/>
   </g>
 </svg>`);
 }
@@ -75,12 +77,14 @@ for (const { file, width, height } of PLATES) {
 
 // Open Graph card, 1200×630.
 const og = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630">
-  <rect width="1200" height="630" fill="#101418"/>
-  <g transform="translate(96 220) scale(3.4)">
-    <path d="M6.4 26h6.2C8.6 23.4 6.2 19.5 6.2 15 6.2 9.2 10.4 5 16 5s9.8 4.2 9.8 10c0 4.5-2.4 8.4-6.4 11h6.2"
-          fill="none" stroke="#f7f6f3" stroke-width="2.4" stroke-linecap="square"/>
+  <rect width="1200" height="630" fill="#0a0e14"/>
+  <g transform="translate(96 175) scale(2.8)">
+    <path d="M35.1 63.3 A26 26 0 1 1 64.9 63.3" fill="none" stroke="#c3ccd6" stroke-width="7"/>
+    <path d="M14 66 H40 L50 75 L60 66 H86" fill="none" stroke="#c3ccd6" stroke-width="6"/>
+    <path d="M50 10 V66" fill="none" stroke="#d9ae45" stroke-width="2.4"/>
+    <circle cx="50" cy="7.5" r="3.2" fill="none" stroke="#d9ae45" stroke-width="2.2"/>
   </g>
-  <rect x="96" y="420" width="120" height="3" fill="#a9561e"/>
+  <rect x="96" y="452" width="120" height="3" fill="#d9ae45"/>
 </svg>`);
 
 await writeFile(path.join(OUT, "og.png"), await sharp(og).png({ compressionLevel: 9 }).toBuffer());
