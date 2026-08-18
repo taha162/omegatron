@@ -36,8 +36,8 @@ export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
                 </Link>
               </li>
               <li>
-                <Link href={`/${locale}#project`} className="footer__link">
-                  {dict.nav.project}
+                <Link href={`/${locale}#projects`} className="footer__link">
+                  {dict.nav.projects}
                 </Link>
               </li>
               <li>
@@ -48,6 +48,11 @@ export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
               <li>
                 <Link href={`/${locale}#founder`} className="footer__link">
                   {dict.nav.founder}
+                </Link>
+              </li>
+              <li>
+                <Link href={`/${locale}#contact`} className="footer__link">
+                  {dict.nav.contact}
                 </Link>
               </li>
             </ul>

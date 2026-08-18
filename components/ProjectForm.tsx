@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type ChangeEvent, type FormEvent } from "react";
+import { useRef, useState, type ChangeEvent, type FormEvent, type ReactNode } from "react";
 import { ArrowIcon, CheckIcon, CloseIcon } from "./Icons";
 import type { Dictionary, Locale } from "@/lib/i18n";
 import {
@@ -9,6 +9,16 @@ import {
   MAX_TOTAL_BYTES,
   isAcceptedFile,
 } from "@/lib/upload";
+
+/**
+ * One form, two shapes.
+ *
+ * `full`    — the /start page: every field, including attachments.
+ * `compact` — the contact section on the home page: the five fields needed to
+ *             open an engineering conversation. Both post to the same endpoint,
+ *             which treats the extra fields as optional.
+ */
+export type FormVariant = "full" | "compact";
 
 type Errors = Partial<Record<string, string>>;
 
@@ -20,11 +30,24 @@ function formatBytes(bytes: number, locale: Locale): string {
   return `${new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(kb / 1024)} MB`;
 }
 
-export function ProjectForm({ locale, dict }: { locale: Locale; dict: Dictionary }) {
+export function ProjectForm({
+  locale,
+  dict,
+  variant = "full",
+  idPrefix,
+}: {
+  locale: Locale;
+  dict: Dictionary;
+  variant?: FormVariant;
+  /** Keeps element ids unique when both variants exist in one document. */
+  idPrefix?: string;
+}) {
   const t = dict.start.form;
   const v = dict.start.validation;
+  const isFull = variant === "full";
+  const prefix = idPrefix ? `${idPrefix}-` : "";
+  const id = (name: string) => `${prefix}${name}`;
 
-  const formRef = useRef<HTMLFormElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const startedAt = useRef<number>(Date.now());
 
@@ -64,16 +87,19 @@ export function ProjectForm({ locale, dict }: { locale: Locale; dict: Dictionary
 
     if (get("name").length < 2) next.name = v.name;
     if (!EMAIL_RE.test(get("email"))) next.email = v.email;
-    if (get("phone").length < 6) next.phone = v.phone;
     if (!get("projectType")) next.projectType = v.projectType;
     if (get("description").length < 20) next.description = v.description;
     if (get("outcome").length < 5) next.outcome = v.outcome;
-    if (!get("budget")) next.budget = v.budget;
-    if (!get("timeline")) next.timeline = v.timeline;
 
-    if (files.length > MAX_FILES) next.files = v.filesCount;
-    if (files.reduce((sum, file) => sum + file.size, 0) > MAX_TOTAL_BYTES) {
-      next.files = v.filesSize;
+    if (isFull) {
+      if (get("phone").length < 6) next.phone = v.phone;
+      if (!get("budget")) next.budget = v.budget;
+      if (!get("timeline")) next.timeline = v.timeline;
+
+      if (files.length > MAX_FILES) next.files = v.filesCount;
+      if (files.reduce((sum, file) => sum + file.size, 0) > MAX_TOTAL_BYTES) {
+        next.files = v.filesSize;
+      }
     }
 
     return next;
@@ -105,6 +131,7 @@ export function ProjectForm({ locale, dict }: { locale: Locale; dict: Dictionary
     data.delete("attachments");
     for (const file of files) data.append("attachments", file);
     data.set("locale", locale);
+    data.set("source", variant);
     data.set("elapsed", String(Date.now() - startedAt.current));
 
     try {
@@ -126,7 +153,6 @@ export function ProjectForm({ locale, dict }: { locale: Locale; dict: Dictionary
       setStatus("sent");
       setFiles([]);
       form.reset();
-      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch {
       setFormError(v.network);
       setStatus("idle");
@@ -139,7 +165,7 @@ export function ProjectForm({ locale, dict }: { locale: Locale; dict: Dictionary
         <div className="form-success__mark" aria-hidden="true">
           <CheckIcon />
         </div>
-        <h2 className="form-success__title">{dict.start.success.title}</h2>
+        <h3 className="form-success__title">{dict.start.success.title}</h3>
         <p className="form-success__body">{dict.start.success.body}</p>
         <button
           type="button"
@@ -155,63 +181,44 @@ export function ProjectForm({ locale, dict }: { locale: Locale; dict: Dictionary
     );
   }
 
-  const required = (
-    <span className="field__req" aria-hidden="true">
-      *
-    </span>
-  );
+  const optional = <span className="field__opt">{t.optional}</span>;
 
-  return (
-    <form className="form" ref={formRef} onSubmit={onSubmit} noValidate>
-      {formError ? (
-        <div className="form__alert form__alert--error" role="alert">
-          <p className="form__alert-title">{dict.start.errorTitle}</p>
-          <p>{formError}</p>
-        </div>
-      ) : null}
+  const contactFields = (
+    <div className="form__row">
+      <Field id={id("name")} label={t.name} error={errors.name}>
+        <input
+          id={id("name")}
+          name="name"
+          type="text"
+          className="field__control"
+          placeholder={t.namePlaceholder}
+          autoComplete="name"
+          required
+          aria-invalid={errors.name ? "true" : undefined}
+          aria-describedby={errors.name ? `${id("name")}-error` : undefined}
+        />
+      </Field>
 
-      {/* Honeypot: hidden from people, tempting to bots. */}
-      <div aria-hidden="true" className="visually-hidden">
-        <label htmlFor="company-website">Company website</label>
-        <input id="company-website" name="companyWebsite" type="text" tabIndex={-1} autoComplete="off" />
-      </div>
+      <Field id={id("email")} label={t.email} error={errors.email}>
+        <input
+          id={id("email")}
+          name="email"
+          type="email"
+          dir="ltr"
+          className="field__control"
+          placeholder={t.emailPlaceholder}
+          autoComplete="email"
+          required
+          aria-invalid={errors.email ? "true" : undefined}
+          aria-describedby={errors.email ? `${id("email")}-error` : undefined}
+        />
+      </Field>
 
-      <fieldset className="form__fieldset">
-        <legend className="form__legend mono">{t.legendContact}</legend>
-
-        <div className="form__row">
-          <Field id="name" label={t.name} error={errors.name} requiredMark={required}>
+      {isFull ? (
+        <>
+          <Field id={id("phone")} label={t.phone} error={errors.phone}>
             <input
-              id="name"
-              name="name"
-              type="text"
-              className="field__control"
-              placeholder={t.namePlaceholder}
-              autoComplete="name"
-              required
-              aria-invalid={errors.name ? "true" : undefined}
-              aria-describedby={errors.name ? "name-error" : undefined}
-            />
-          </Field>
-
-          <Field id="email" label={t.email} error={errors.email} requiredMark={required}>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              dir="ltr"
-              className="field__control"
-              placeholder={t.emailPlaceholder}
-              autoComplete="email"
-              required
-              aria-invalid={errors.email ? "true" : undefined}
-              aria-describedby={errors.email ? "email-error" : undefined}
-            />
-          </Field>
-
-          <Field id="phone" label={t.phone} error={errors.phone} requiredMark={required}>
-            <input
-              id="phone"
+              id={id("phone")}
               name="phone"
               type="tel"
               dir="ltr"
@@ -220,13 +227,13 @@ export function ProjectForm({ locale, dict }: { locale: Locale; dict: Dictionary
               autoComplete="tel"
               required
               aria-invalid={errors.phone ? "true" : undefined}
-              aria-describedby={errors.phone ? "phone-error" : undefined}
+              aria-describedby={errors.phone ? `${id("phone")}-error` : undefined}
             />
           </Field>
 
-          <Field id="organization" label={t.organization} optionalLabel={t.optional}>
+          <Field id={id("organization")} label={t.organization} suffix={optional}>
             <input
-              id="organization"
+              id={id("organization")}
               name="organization"
               type="text"
               className="field__control"
@@ -234,107 +241,99 @@ export function ProjectForm({ locale, dict }: { locale: Locale; dict: Dictionary
               autoComplete="organization"
             />
           </Field>
-        </div>
-      </fieldset>
+        </>
+      ) : null}
+    </div>
+  );
 
-      <fieldset className="form__fieldset">
-        <legend className="form__legend mono">{t.legendProject}</legend>
+  const projectFields = (
+    <div className="form__row">
+      <Field
+        id={id("projectType")}
+        label={t.projectType}
+        error={errors.projectType}
+        full={!isFull}
+      >
+        <select
+          id={id("projectType")}
+          name="projectType"
+          className="field__control"
+          defaultValue=""
+          required
+          aria-invalid={errors.projectType ? "true" : undefined}
+          aria-describedby={errors.projectType ? `${id("projectType")}-error` : undefined}
+        >
+          <option value="" disabled>
+            {t.select}
+          </option>
+          {t.projectTypeOptions.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+      </Field>
 
-        <div className="form__row">
-          <Field
-            id="projectType"
-            label={t.projectType}
-            error={errors.projectType}
-            requiredMark={required}
+      {isFull ? (
+        <Field id={id("budget")} label={t.budget} error={errors.budget}>
+          <select
+            id={id("budget")}
+            name="budget"
+            className="field__control"
+            defaultValue=""
+            required
+            aria-invalid={errors.budget ? "true" : undefined}
+            aria-describedby={errors.budget ? `${id("budget")}-error` : undefined}
           >
-            <select
-              id="projectType"
-              name="projectType"
-              className="field__control"
-              defaultValue=""
-              required
-              aria-invalid={errors.projectType ? "true" : undefined}
-              aria-describedby={errors.projectType ? "projectType-error" : undefined}
-            >
-              <option value="" disabled>
-                {t.select}
+            <option value="" disabled>
+              {t.select}
+            </option>
+            {t.budgetOptions.map((option) => (
+              <option key={option} value={option}>
+                {option}
               </option>
-              {t.projectTypeOptions.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-          </Field>
+            ))}
+          </select>
+        </Field>
+      ) : null}
 
-          <Field id="budget" label={t.budget} error={errors.budget} requiredMark={required}>
+      <Field id={id("description")} label={t.description} error={errors.description} full>
+        <textarea
+          id={id("description")}
+          name="description"
+          className="field__control"
+          placeholder={t.descriptionPlaceholder}
+          rows={isFull ? 6 : 5}
+          required
+          aria-invalid={errors.description ? "true" : undefined}
+          aria-describedby={errors.description ? `${id("description")}-error` : undefined}
+        />
+      </Field>
+
+      <Field id={id("outcome")} label={t.outcome} error={errors.outcome} full>
+        <textarea
+          id={id("outcome")}
+          name="outcome"
+          className="field__control"
+          placeholder={t.outcomePlaceholder}
+          rows={isFull ? 4 : 3}
+          required
+          aria-invalid={errors.outcome ? "true" : undefined}
+          aria-describedby={errors.outcome ? `${id("outcome")}-error` : undefined}
+        />
+      </Field>
+
+      {isFull ? (
+        <>
+          <Field id={id("timeline")} label={t.timeline} error={errors.timeline}>
             <select
-              id="budget"
-              name="budget"
-              className="field__control"
-              defaultValue=""
-              required
-              aria-invalid={errors.budget ? "true" : undefined}
-              aria-describedby={errors.budget ? "budget-error" : undefined}
-            >
-              <option value="" disabled>
-                {t.select}
-              </option>
-              {t.budgetOptions.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-          </Field>
-
-          <Field
-            id="description"
-            label={t.description}
-            error={errors.description}
-            requiredMark={required}
-            full
-          >
-            <textarea
-              id="description"
-              name="description"
-              className="field__control"
-              placeholder={t.descriptionPlaceholder}
-              rows={6}
-              required
-              aria-invalid={errors.description ? "true" : undefined}
-              aria-describedby={errors.description ? "description-error" : undefined}
-            />
-          </Field>
-
-          <Field
-            id="outcome"
-            label={t.outcome}
-            error={errors.outcome}
-            requiredMark={required}
-            full
-          >
-            <textarea
-              id="outcome"
-              name="outcome"
-              className="field__control"
-              placeholder={t.outcomePlaceholder}
-              rows={4}
-              required
-              aria-invalid={errors.outcome ? "true" : undefined}
-              aria-describedby={errors.outcome ? "outcome-error" : undefined}
-            />
-          </Field>
-
-          <Field id="timeline" label={t.timeline} error={errors.timeline} requiredMark={required}>
-            <select
-              id="timeline"
+              id={id("timeline")}
               name="timeline"
               className="field__control"
               defaultValue=""
               required
               aria-invalid={errors.timeline ? "true" : undefined}
-              aria-describedby={errors.timeline ? "timeline-error" : undefined}
+              aria-describedby={errors.timeline ? `${id("timeline")}-error` : undefined}
             >
               <option value="" disabled>
                 {t.select}
@@ -348,25 +347,29 @@ export function ProjectForm({ locale, dict }: { locale: Locale; dict: Dictionary
           </Field>
 
           <div className="field field--full">
-            <span className="field__label" id="attachments-label">
+            <span className="field__label">
               {t.attachments}
+              {optional}
             </span>
 
             <div className="files__row">
               <input
                 ref={fileInputRef}
-                id="attachments"
+                id={id("attachments")}
                 name="attachments"
                 type="file"
                 className="files__input"
                 multiple
                 accept={ACCEPTED_FILE_EXTENSIONS.join(",")}
                 onChange={onFilesChosen}
+                aria-describedby={id("attachments-hint")}
               />
-              <label htmlFor="attachments" className="files__btn">
+              <label htmlFor={id("attachments")} className="files__btn">
                 {t.attachmentsButton}
               </label>
-              {files.length === 0 ? <span className="files__empty">{t.attachmentsEmpty}</span> : null}
+              {files.length === 0 ? (
+                <span className="files__empty">{t.attachmentsEmpty}</span>
+              ) : null}
             </div>
 
             {files.length > 0 ? (
@@ -390,7 +393,7 @@ export function ProjectForm({ locale, dict }: { locale: Locale; dict: Dictionary
               </ul>
             ) : null}
 
-            <p className="field__hint" id="attachments-hint">
+            <p className="field__hint" id={id("attachments-hint")}>
               {t.attachmentsHint}
             </p>
             {errors.files ? (
@@ -399,8 +402,49 @@ export function ProjectForm({ locale, dict }: { locale: Locale; dict: Dictionary
               </p>
             ) : null}
           </div>
+        </>
+      ) : null}
+    </div>
+  );
+
+  return (
+    <form className={isFull ? "form" : "form form--compact"} onSubmit={onSubmit} noValidate>
+      {formError ? (
+        <div className="form__alert form__alert--error" role="alert">
+          <p className="form__alert-title">{dict.start.errorTitle}</p>
+          <p>{formError}</p>
         </div>
-      </fieldset>
+      ) : null}
+
+      {/* Honeypot: hidden from people, tempting to bots. */}
+      <div aria-hidden="true" className="visually-hidden">
+        <label htmlFor={id("company-website")}>Company website</label>
+        <input
+          id={id("company-website")}
+          name="companyWebsite"
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+        />
+      </div>
+
+      {isFull ? (
+        <>
+          <fieldset className="form__fieldset">
+            <legend className="form__legend mono">{t.legendContact}</legend>
+            {contactFields}
+          </fieldset>
+          <fieldset className="form__fieldset">
+            <legend className="form__legend mono">{t.legendProject}</legend>
+            {projectFields}
+          </fieldset>
+        </>
+      ) : (
+        <fieldset className="form__fieldset">
+          {contactFields}
+          {projectFields}
+        </fieldset>
+      )}
 
       <div className="form__footer">
         <button type="submit" className="btn" disabled={status === "sending"}>
@@ -417,25 +461,22 @@ function Field({
   id,
   label,
   error,
-  optionalLabel,
-  requiredMark,
+  suffix,
   full,
   children,
 }: {
   id: string;
   label: string;
   error?: string;
-  optionalLabel?: string;
-  requiredMark?: React.ReactNode;
+  suffix?: ReactNode;
   full?: boolean;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <div className={full ? "field field--full" : "field"}>
       <label className="field__label" htmlFor={id}>
         {label}
-        {requiredMark}
-        {optionalLabel ? <span className="field__opt">{optionalLabel}</span> : null}
+        {suffix}
       </label>
       {children}
       {error ? (

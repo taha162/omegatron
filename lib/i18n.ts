@@ -22,67 +22,71 @@ const ar = {
     otherLocaleName: "English",
     otherLocaleLabel: "Switch to English",
     siteName: "أوميكاترون",
-    title: "أوميكاترون | فريق هندسة ميكاترونكس",
+    title: "أوميكاترون | هندسة أنظمة متكاملة وبحث وتطوير",
     description:
-      "أوميكاترون فريق ميكاترونكس تنافسي يبني أنظمة مدمجة تستشعر وتُقرِّر وتتحرّك — روبوتات، وذكاء اصطناعي، وأنظمة مدمجة، وأتمتة، ونمذجة سريعة.",
+      "أوميكاترون فريق هندسي للبحث والتطوير يُصمّم ويبني ويُكامل أنظمة ذكية تجمع الميكانيكا والإلكترونيات والبرمجيات والذكاء الاصطناعي وأنظمة التحكّم.",
     keywords: [
+      "هندسة الميكاترونكس",
+      "الروبوتات",
+      "الأنظمة المدمجة",
+      "أنظمة الذكاء الاصطناعي",
+      "حلول هندسية",
+      "بحث وتطوير",
+      "إنترنت الأشياء",
+      "أنظمة التحكّم",
+      "الحسّاسات والقياس",
       "أوميكاترون",
-      "ميكاترونكس",
-      "روبوتات",
-      "ذكاء اصطناعي",
-      "أنظمة مدمجة",
-      "أتمتة",
-      "هندسة",
       "العراق",
       "NURAI",
     ],
   },
 
   nav: {
-    about: "من نحن",
-    project: "المشروع",
+    home: "الرئيسية",
+    about: "عن الفريق",
+    projects: "المشاريع",
     capabilities: "القدرات",
     founder: "المؤسس",
-    start: "ابدأ مشروعك",
+    contact: "تواصل",
+    start: "ابدأ مشروعًا",
     menu: "القائمة",
     close: "إغلاق",
     skipToContent: "تخطَّ إلى المحتوى",
-    home: "الصفحة الرئيسية",
+    primary: "التنقّل الرئيسي",
   },
 
   hero: {
-    eyebrow: "فريق ميكاترونكس تنافسي — العراق",
-    name: "أوميكاترون",
+    eyebrow: "هندسة أنظمة متكاملة · بحث وتطوير",
     wordmark: "OmegaTron",
-    statement: "نُهندس أنظمة تستشعر، وتُقرِّر، وتتحرّك.",
-    lead: "نجمع الميكانيكا والإلكترونيات والتحكّم والبرمجيات في نظام واحد متماسك — من الفكرة الأولى إلى نموذج يعمل خارج المختبر.",
-    primaryCta: "ابدأ مشروعًا",
-    secondaryCta: "استعرض المشروع",
+    statement: "نُصمّم ونبني ونُكامل أنظمة هندسية ذكية.",
+    lead: "أوميكاترون فريق هندسي للبحث والتطوير يجمع الميكانيكا والإلكترونيات والبرمجيات والذكاء الاصطناعي وأنظمة التحكّم في نظام واحد يعمل — من تعريف المشكلة إلى نموذج مُختبَر.",
+    differentiator: "التصميم والتصنيع والبرمجة والاختبار كلّها تجري داخل الفريق.",
+    primaryCta: "استعرض المشاريع",
+    secondaryCta: "ابدأ مشروعًا",
     facts: [
       { value: "المركز الثالث", label: "على مستوى العراق — NURAI 2026" },
-      { value: "أربعة تخصّصات", label: "ميكانيكا · إلكترونيات · تحكّم · برمجيات" },
-      { value: "تنفيذ داخلي", label: "تصميم وتصنيع واختبار داخل الفريق" },
+      { value: "خمس طبقات هندسية", label: "ميكانيكا · إلكترونيات · تحكّم · برمجيات · ذكاء اصطناعي" },
+      { value: "تنفيذ داخلي", label: "من التصميم إلى النموذج المُختبَر" },
     ],
-    imageAlt: "وحدة الاستشعار المدمجة التي طوّرها فريق أوميكاترون.",
+    imageAlt: "وحدة الاستشعار والقرار المُدمجة التي طوّرها فريق أوميكاترون.",
   },
 
   achievement: {
     label: "إنجاز",
     place: "المركز الثالث على مستوى العراق",
     event: "NURAI 2026",
-    year: "2026",
     scope: "منافسة وطنية",
-    body: "نتيجةٌ حقّقها الفريق ضمن منافسة وطنية، بنظام صُمِّم ونُفِّذ واختُبر بالكامل داخل الفريق — من الغلاف الميكانيكي إلى البرمجيات المدمجة.",
+    body: "نتيجةٌ حقّقها الفريق بنظام صُمِّم ونُفِّذ واختُبر بالكامل داخله — من الغرفة الميكانيكية إلى البرمجيات المدمجة ونموذج التصنيف.",
     imageAlt: "فريق أوميكاترون في منافسة NURAI 2026.",
   },
 
   about: {
     index: "٠١",
-    label: "من نحن",
+    label: "عن الفريق",
     heading: "نبني أنظمة، لا عروضًا تقديمية.",
     body: [
-      "أوميكاترون فريق هندسي تنافسي يعمل عند تقاطع أربعة مجالات: الميكانيكا، والإلكترونيات، وأنظمة التحكّم، والبرمجيات. هذا التقاطع هو تعريف الميكاترونكس، وهو الموضع الذي تُولد فيه الأنظمة الحقيقية.",
-      "نبدأ من متطلّب واضح، ثم ننتقل إلى التصميم والتنفيذ والاختبار. كل قرار هندسي — اختيار حسّاس، أو خوارزمية، أو تفصيل ميكانيكي — يُتَّخذ لأنه يخدم أداء النظام، لا لأنه يبدو جيّدًا على الورق.",
+      "أوميكاترون فريق هندسي للبحث والتطوير يعمل عند تقاطع خمسة مجالات: الميكانيكا، والإلكترونيات، وأنظمة التحكّم، والبرمجيات، والذكاء الاصطناعي. النظام الحقيقي لا يولد داخل أيٍّ منها منفردًا، بل عند حدودها المشتركة.",
+      "نبدأ من متطلّب قابل للقياس، ثم ننتقل إلى معمارية النظام والتنفيذ والتكامل والتحقّق. كل قرار هندسي — اختيار حسّاس، أو خوارزمية، أو تفصيل ميكانيكي — يُتَّخذ لأنه يخدم أداء النظام، لا لأنه يبدو جيّدًا على الورق.",
       "نُصنّع النماذج داخليًا، ونكتب البرمجيات المدمجة بأنفسنا، ونختبر تحت ظروف قريبة من الواقع. ما نعرضه هو ما يعمل فعلًا.",
     ],
     principles: [
@@ -96,44 +100,44 @@ const ar = {
       },
       {
         title: "نموذج يعمل",
-        body: "المعيار المقبول هو نظام يعمل خارج المختبر، لا محاكاة على الشاشة.",
+        body: "المعيار المقبول هو نظام يصمد خارج المختبر، لا محاكاة على الشاشة.",
       },
     ],
   },
 
-  project: {
+  projects: {
     index: "٠٢",
-    label: "المشروع",
-    heading: "نظام استشعار وقرار مُدمج",
-    lead: "نظام مُدمج يجمع مصفوفة حسّاسات داخل غلافٍ مُصمَّم هندسيًا مع وحدة معالجة تُحلّل القراءات محليًا وتُصدر قرارًا لحظيًا، دون الاعتماد على اتصال خارجي.",
-    stages: [
+    label: "المشاريع",
+    heading: "دراسات حالة هندسية",
+    lead: "نوثّق مشاريعنا كما نوثّق العمل الهندسي نفسه: المشكلة، والمنهج، والتنفيذ، والنتيجة.",
+    blockLabels: {
+      problem: "المشكلة",
+      approach: "المنهج",
+      engineering: "التنفيذ الهندسي",
+      outcome: "النتيجة",
+    },
+    items: [
       {
-        index: "01",
-        title: "الاستشعار",
-        body: "مصفوفة حسّاسات تقرأ الوسط المحيط قراءةً مستمرة عبر أكثر من قناة.",
-      },
-      {
-        index: "02",
-        title: "المعالجة",
-        body: "تُنقّى الإشارة وتُستخلَص خصائصها محليًا على المتحكّم، لا على خادم بعيد.",
-      },
-      {
-        index: "03",
-        title: "القرار",
-        body: "نموذج مُدرَّب يُصنِّف الحالة ويُقدِّر مستوى الثقة في التصنيف.",
-      },
-      {
-        index: "04",
-        title: "الاستجابة",
-        body: "إنذار أو أمر تحكّم يصدر خلال زمنٍ محدود ومعروف مسبقًا.",
+        id: "sensing-unit",
+        name: "وحدة استشعار وقرار مُدمجة",
+        summary:
+          "وحدة مستقلة تقرأ الوسط المحيط عبر عدة قنوات، وتُصدر قرارها على المتحكّم نفسه دون الاعتماد على اتصال خارجي.",
+        status: "نموذج عامل",
+        badge: "NURAI 2026 — المركز الثالث على مستوى العراق",
+        domains: ["أنظمة مدمجة", "حسّاسات وقياس", "ذكاء اصطناعي", "تصميم ميكانيكي"],
+        problem:
+          "كشف الحالة الخطرة في الهواء قرارٌ يجب أن يقع خلال ثوانٍ. الأنظمة التي تُرسل قراءاتها إلى خادم بعيد تُنفق هذه الثواني على الشبكة، وتتوقّف تمامًا حين ينقطع الاتصال — وهو الوضع المعتاد في كثير من المواقع الصناعية والسكنية.",
+        approach:
+          "بناء وحدة مستقلة تقرأ الوسط المحيط عبر عدة قنوات، وتُنفّذ المعالجة والقرار على المتحكّم نفسه. يصبح الاتصال بالشبكة إضافةً للتسجيل والتنبيه البعيد، لا شرطًا لعمل النظام.",
+        engineering:
+          "مصفوفة حسّاسات موزّعة داخل غرفة استشعار صُمّمت وطُبعت ثلاثيّ الأبعاد داخل الفريق، مع مسار دخول موجَّه يضبط وصول العيّنة إلى الحسّاسات. فوقها طبقة برمجية مُدمجة تُنقّي الإشارة وتستخلص خصائصها ضمن قيود الزمن الحقيقي، ونموذج تصنيف مُهيّأ ليعمل داخل ذاكرة المتحكّم ويُرفق مستوى ثقة مع كل قرار. صُمّمت الطبقات الثلاث معًا، وأُعيد تعديل الغلاف أكثر من مرة استنادًا إلى نتائج الاختبار لا إلى الشكل.",
+        outcome:
+          "نموذج عامل يُصدر قراره محليًا ضمن زمن استجابة محدود ومعروف، ودون أي اعتماد على اتصال خارجي. عُرض النظام في NURAI 2026 وحصل على المركز الثالث على مستوى العراق.",
       },
     ],
-    enclosureTitle: "الغلاف جزء من النظام",
-    enclosureBody:
-      "الغلاف ليس علبة. مسار دخول الهواء، وحجم الغرفة الداخلية، وتوزيع الحسّاسات داخلها، كلها عناصر تصميمية تؤثر مباشرة في جودة القراءة وزمن الاستجابة. صُمِّم الغلاف وطُبع ثلاثيّ الأبعاد داخل الفريق، وأُعيد تعديله بناءً على نتائج الاختبار.",
     confidentialTitle: "ما لا يُنشَر",
     confidentialBody:
-      "الهندسة التفصيلية — تركيبة المصفوفة، ومنهج المعالجة، وبيانات التدريب والمعايرة — محفوظة ولا تُنشَر. ما يظهر هنا هو وصف النظام على مستواه العام.",
+      "الهندسة التفصيلية — تركيبة المصفوفة، ومنهج استخلاص الخصائص، وبيانات التدريب والمعايرة، وأبعاد الغرفة الداخلية — محفوظة ولا تُنشَر. ما يظهر هنا وصفٌ للنظام على مستواه المعماري، وهو ما نشارك مثله في أي تعاون قبل توقيع اتفاقية.",
     images: {
       unitAlt: "الوحدة كاملةً: غلاف مطبوع ثلاثيّ الأبعاد تعلوه مصفوفة الحسّاسات.",
       enclosureAlt: "الغلاف الأسود المطبوع ثلاثيّ الأبعاد وفتحة الدخول الجانبية.",
@@ -144,60 +148,129 @@ const ar = {
   capabilities: {
     index: "٠٣",
     label: "القدرات",
-    heading: "ما نستطيع بناءه",
-    lead: "ستة مجالات نعمل فيها فعليًا، بأدوات ومنهجية واحدة.",
+    heading: "ما نبنيه",
+    lead: "تسعة مجالات نعمل فيها فعليًا، بمنهجية واحدة وأدوات مشتركة.",
     items: [
       {
-        title: "الروبوتات",
-        body: "أنظمة متحرّكة وأذرع مناولة: التصميم الحركي، والدفع، والتحكّم بالمسار.",
+        title: "الأنظمة المدمجة",
+        body: "برمجيات المتحكّمات، وقراءة الحسّاسات، والتشغيل ضمن قيود الزمن الحقيقي والطاقة المحدودة.",
       },
       {
-        title: "الميكاترونكس",
-        body: "دمج الميكانيكا والإلكترونيات والتحكّم في منظومة واحدة متّسقة.",
+        title: "الروبوتات",
+        body: "منصّات متحرّكة وأذرع مناولة: التصميم الحركي، ومنظومة الدفع، والتحكّم بالمسار.",
+      },
+      {
+        title: "أنظمة إنترنت الأشياء",
+        body: "أجهزة طرفية متصلة، وبروتوكولات اتصال موفّرة للطاقة، وتسجيل ومراقبة عن بُعد.",
       },
       {
         title: "الذكاء الاصطناعي",
-        body: "نماذج تصنيف وتنبّؤ مُهيّأة للعمل على أجهزة محدودة الموارد.",
+        body: "تصنيف وتنبّؤ ورؤية حاسوبية، مُهيّأة للعمل على أجهزة محدودة الموارد لا على خوادم بعيدة.",
       },
       {
-        title: "الأنظمة المدمجة",
-        body: "برمجيات المتحكّمات، وقراءة الحسّاسات، والعمل ضمن قيود الزمن الحقيقي.",
+        title: "تعلّم الآلة",
+        body: "بناء مجموعات البيانات، وتدريب النماذج وتقييمها، وضغطها حتى تعمل داخل المتحكّم.",
       },
       {
-        title: "الأتمتة",
-        body: "أتمتة العمليات، والتحكّم المنطقي، وحلقات التغذية الراجعة المغلقة.",
+        title: "الحسّاسات والقياس",
+        body: "اختيار الحسّاسات، ودوائر تكييف الإشارة، والمعايرة، وتقدير عدم اليقين في القراءة.",
+      },
+      {
+        title: "أنظمة التحكّم",
+        body: "حلقات تحكّم مغلقة، وضبط المعاملات، واستجابة مستقرّة تحت الاضطراب والتغيّر.",
+      },
+      {
+        title: "التصميم الميكانيكي",
+        body: "نمذجة ثلاثية الأبعاد، وتصميم الأغلفة والتثبيتات، ومراعاة قابلية التصنيع منذ البداية.",
       },
       {
         title: "النمذجة السريعة",
-        body: "تصميم الأغلفة، والطباعة ثلاثية الأبعاد، والتجميع والاختبار التكراري.",
+        body: "طباعة ثلاثية الأبعاد، وتجميع وتكرار سريع يقصّر المسافة بين التصميم والاختبار.",
+      },
+    ],
+  },
+
+  process: {
+    index: "٠٤",
+    label: "المنهجية",
+    heading: "عمليتنا الهندسية",
+    lead: "خمس مراحل نمرّ بها في كل مشروع، بالترتيب نفسه، ومع مخرج واضح لكل مرحلة.",
+    steps: [
+      {
+        index: "01",
+        title: "الاستكشاف",
+        body: "نفهم المشكلة وحدودها: بيئة التشغيل، والقيود المعروفة، ومعايير النجاح القابلة للقياس.",
+      },
+      {
+        index: "02",
+        title: "التصميم",
+        body: "نضع معمارية النظام ونوزّع الوظائف بين الميكانيكا والإلكترونيات والبرمجيات.",
+      },
+      {
+        index: "03",
+        title: "التنفيذ",
+        body: "نُصنّع الأجزاء ونُجهّز الإلكترونيات ونكتب البرمجيات المدمجة كوحدات قابلة للاختبار.",
+      },
+      {
+        index: "04",
+        title: "التكامل",
+        body: "نربط الطبقات معًا ونعالج ما يظهر عند حدودها: التوقيت، والضجيج، والطاقة، والتفاوتات.",
+      },
+      {
+        index: "05",
+        title: "التحقّق",
+        body: "نختبر تحت ظروف قريبة من الواقع، ونقيس، ونُعيد التصميم حتى يستقرّ الأداء.",
       },
     ],
   },
 
   founder: {
-    index: "٠٤",
+    index: "٠٥",
     label: "المؤسس",
     name: "طه جاسم محمد",
-    role: "مؤسس أوميكاترون",
+    role: "المؤسس وكبير مهندسي الميكاترونكس",
     quote: "الفريق الجيّد لا يُقاس بما يعرضه، بل بما يستطيع تشغيله.",
-    body: [
-      "طه جاسم محمد هو مؤسس أوميكاترون. يقود التوجّه الهندسي للفريق، ويشرف على انتقال المشاريع من المتطلّب الأولي إلى نموذج مُختبَر، مع التركيز على تكامل الميكانيكا والإلكترونيات والبرمجيات ضمن نظام واحد.",
-      "إلى جانب العمل الهندسي، يهتم ببناء منهجية عمل واضحة داخل الفريق: توثيق القرارات، ومراجعة التصاميم، والاختبار المنظّم قبل أي عرض.",
+    intro:
+      "طه جاسم محمد هو مؤسس أوميكاترون وكبير مهندسي الميكاترونكس فيه. يقود معمارية الأنظمة التي يبنيها الفريق، ويشرف على مسار كل مشروع من تعريف المتطلّب إلى نموذج مُختبَر.",
+    blocks: [
+      {
+        title: "الرؤية",
+        body: "أن يكون أوميكاترون جهة هندسية عراقية تُبنى فيها الأنظمة كاملةً بدل أن تُجمَّع من مكوّنات جاهزة، وقادرة على العمل مع الصناعة والجامعات ومراكز البحث بمعايير مهنية واضحة.",
+      },
+      {
+        title: "الفلسفة الهندسية",
+        body: "الهندسة الجيّدة تُقاس بما يصمد تحت الاختبار. لذلك يبدأ العمل من متطلّب قابل للقياس، وتُصمَّم الطبقات الثلاث معًا منذ اليوم الأول، ولا يُعرض شيء قبل أن يعمل.",
+      },
+      {
+        title: "منهج القيادة",
+        body: "منهجية عمل واضحة داخل الفريق: توثيق القرارات الهندسية وأسبابها، ومراجعة التصاميم قبل التنفيذ، واختبار منظّم قبل أي عرض.",
+      },
     ],
-    imageAlt: "طه جاسم محمد، مؤسس أوميكاترون.",
+    expertiseTitle: "مجالات الخبرة",
+    expertise: [
+      "هندسة الأنظمة",
+      "الأنظمة المدمجة",
+      "الروبوتات",
+      "الذكاء الاصطناعي",
+      "الحسّاسات الذكية",
+    ],
+    imageAlt: "طه جاسم محمد، مؤسس أوميكاترون وكبير مهندسي الميكاترونكس.",
   },
 
-  cta: {
-    heading: "لديك نظام تريد بناءه؟",
-    body: "أرسل تفاصيل مشروعك. نقرأ كل طلب بأنفسنا، ونردّ برأي هندسي أوّلي وخطوة تالية واضحة.",
-    button: "ابدأ مشروعًا",
+  contact: {
+    index: "٠٦",
+    label: "تواصل",
+    heading: "لديك تحدٍّ هندسي؟ لنبنِ الحل.",
+    lead: "أرسل وصفًا موجزًا للتحدّي. نقرأ كل طلب بأنفسنا، ونردّ برأي هندسي أوّلي وخطوة تالية واضحة.",
+    fullFormPrompt: "تحتاج إلى إرسال ميزانية أو جدول زمني أو ملفات مرفقة؟",
+    fullFormLink: "استخدم نموذج الطلب الكامل",
   },
 
   start: {
-    index: "٠٥",
+    index: "٠٧",
     label: "ابدأ مشروعًا",
     heading: "أخبرنا بما تريد بناءه",
-    lead: "كلما كان الوصف أدقّ، كان الرد الهندسي أوضح. لا حاجة إلى ملف متطلّبات كامل — فكرة محدّدة تكفي للبداية.",
+    lead: "كلما كان الوصف أدقّ، كان الرد الهندسي أوضح. لا حاجة إلى ملف متطلّبات كامل — تحدٍّ محدّد يكفي للبداية.",
     aside: {
       title: "قبل أن ترسل",
       items: [
@@ -210,7 +283,7 @@ const ar = {
         "نردّ عادةً خلال أيام قليلة. الطلبات الناقصة تستغرق وقتًا أطول، لأننا نعود إليك بأسئلة قبل أن نستطيع تقييمها.",
     },
     steps: [
-      { index: "01", title: "ترسل الطلب", body: "تملأ النموذج بتفاصيل المشروع والنتيجة المتوقّعة." },
+      { index: "01", title: "ترسل الطلب", body: "تملأ النموذج بتفاصيل التحدّي والنتيجة المتوقّعة." },
       { index: "02", title: "مراجعة هندسية", body: "نقرأ الطلب ونحدّد الجدوى والقيود الأساسية." },
       { index: "03", title: "رد مباشر", body: "نردّ عبر البريد أو واتساب برأي أوّلي وأسئلة توضيحية." },
       { index: "04", title: "نطاق وخطة", body: "نتفق على النطاق والمراحل والجدول الزمني قبل البدء." },
@@ -228,15 +301,16 @@ const ar = {
       organizationPlaceholder: "شركة، جامعة، أو مشروع شخصي",
       projectType: "نوع المشروع",
       projectTypeOptions: [
-        "روبوت أو نظام متحرّك",
         "نظام مدمج وحسّاسات",
-        "أتمتة وتحكّم",
+        "روبوت أو نظام متحرّك",
+        "أتمتة وأنظمة تحكّم",
         "ذكاء اصطناعي ورؤية حاسوبية",
-        "نمذجة وتصنيع",
+        "إنترنت الأشياء والمراقبة عن بُعد",
+        "تصميم ميكانيكي ونمذجة",
         "استشارة هندسية",
         "أخرى",
       ],
-      description: "وصف المشروع",
+      description: "وصف التحدّي",
       descriptionPlaceholder:
         "ما المشكلة التي تريد حلّها؟ وما البيئة التي سيعمل فيها النظام؟ وما القيود المعروفة لديك؟",
       outcome: "النتيجة المتوقّعة",
@@ -258,14 +332,13 @@ const ar = {
         "أكثر من ٦ أشهر",
         "مرن",
       ],
-      attachments: "مرفقات (اختياري)",
+      attachments: "مرفقات",
       attachmentsHint:
         "حتى ٣ ملفات، بحجم إجمالي لا يتجاوز ٤ ميغابايت. الصيغ المقبولة: PDF، صور، مستندات، مضغوطات.",
       attachmentsButton: "اختر ملفات",
       attachmentsEmpty: "لم تُختَر أي ملفات",
       attachmentsRemove: "إزالة",
       select: "اختر…",
-      required: "مطلوب",
       optional: "اختياري",
       submit: "إرسال الطلب",
       submitting: "جارٍ الإرسال…",
@@ -276,7 +349,7 @@ const ar = {
       email: "يرجى كتابة بريد إلكتروني صحيح.",
       phone: "يرجى كتابة رقم هاتف أو واتساب.",
       projectType: "يرجى اختيار نوع المشروع.",
-      description: "يرجى وصف المشروع بما لا يقل عن ٢٠ حرفًا.",
+      description: "يرجى وصف التحدّي بما لا يقل عن ٢٠ حرفًا.",
       outcome: "يرجى وصف النتيجة المتوقّعة.",
       budget: "يرجى اختيار الميزانية التقديرية.",
       timeline: "يرجى اختيار الإطار الزمني.",
@@ -289,17 +362,16 @@ const ar = {
     },
     success: {
       title: "وصلنا طلبك.",
-      body: "سنراجعه ونردّ عليك عبر البريد الإلكتروني أو واتساب. إن كان الطلب عاجلًا، أعد الإرسال مع كلمة «عاجل» في وصف المشروع.",
+      body: "سنراجعه ونردّ عليك عبر البريد الإلكتروني أو واتساب. إن كان الطلب عاجلًا، أعد الإرسال مع كلمة «عاجل» في وصف التحدّي.",
       again: "إرسال طلب آخر",
     },
     errorTitle: "لم يُرسَل الطلب",
   },
 
   footer: {
-    tagline: "نُهندس أنظمة تستشعر، وتُقرِّر، وتتحرّك.",
+    tagline: "نُصمّم ونبني ونُكامل أنظمة هندسية ذكية.",
     sections: "الأقسام",
     contact: "التواصل",
-    emailLabel: "البريد الإلكتروني",
     startLabel: "طلب مشروع",
     language: "اللغة",
     rights: "جميع الحقوق محفوظة.",
@@ -320,57 +392,61 @@ const en: typeof ar = {
     otherLocaleName: "العربية",
     otherLocaleLabel: "التبديل إلى العربية",
     siteName: "OmegaTron",
-    title: "OmegaTron | Mechatronics Engineering Team",
+    title: "OmegaTron | Integrated Systems Engineering & R&D",
     description:
-      "OmegaTron is a competitive mechatronics team building embedded systems that sense, decide, and act — robotics, AI, embedded systems, automation, and rapid prototyping.",
+      "OmegaTron is an engineering R&D team that designs, builds, and integrates intelligent systems across mechanics, electronics, software, artificial intelligence, and control.",
     keywords: [
-      "OmegaTron",
-      "mechatronics",
+      "mechatronics engineering",
       "robotics",
-      "artificial intelligence",
       "embedded systems",
-      "automation",
-      "engineering",
+      "AI systems",
+      "engineering solutions",
+      "research and development",
+      "IoT systems",
+      "control systems",
+      "sensors and instrumentation",
+      "OmegaTron",
       "Iraq",
       "NURAI",
     ],
   },
 
   nav: {
+    home: "Home",
     about: "About",
-    project: "Project",
+    projects: "Projects",
     capabilities: "Capabilities",
     founder: "Founder",
+    contact: "Contact",
     start: "Start a Project",
     menu: "Menu",
     close: "Close",
     skipToContent: "Skip to content",
-    home: "Home",
+    primary: "Primary",
   },
 
   hero: {
-    eyebrow: "Competitive Mechatronics Team — Iraq",
-    name: "OmegaTron",
+    eyebrow: "Integrated Systems Engineering · R&D",
     wordmark: "OmegaTron",
-    statement: "We engineer systems that sense, decide, and act.",
-    lead: "We bring mechanics, electronics, control, and software together into one coherent system — from the first concept to a prototype that works outside the lab.",
-    primaryCta: "Start a Project",
-    secondaryCta: "See the Project",
+    statement: "We design, build, and integrate intelligent engineering systems.",
+    lead: "OmegaTron is an engineering R&D team that brings mechanics, electronics, software, artificial intelligence, and control together into one working system — from problem definition to a tested prototype.",
+    differentiator: "Design, fabrication, firmware, and testing all happen inside the team.",
+    primaryCta: "Explore Projects",
+    secondaryCta: "Start a Project",
     facts: [
       { value: "3rd Place", label: "Nationally in Iraq — NURAI 2026" },
-      { value: "Four Disciplines", label: "Mechanics · Electronics · Control · Software" },
-      { value: "Built In-House", label: "Designed, fabricated, and tested by the team" },
+      { value: "Five Engineering Layers", label: "Mechanics · Electronics · Control · Software · AI" },
+      { value: "Built In-House", label: "From design through to a tested prototype" },
     ],
-    imageAlt: "The embedded sensing unit developed by the OmegaTron team.",
+    imageAlt: "The embedded sensing and decision unit developed by the OmegaTron team.",
   },
 
   achievement: {
-    label: "Achievement",
+    label: "Recognition",
     place: "3rd Place in Iraq",
     event: "NURAI 2026",
-    year: "2026",
     scope: "National competition",
-    body: "A result earned in national competition with a system designed, built, and tested entirely within the team — from the mechanical enclosure to the embedded software.",
+    body: "A result earned with a system designed, built, and tested entirely within the team — from the mechanical chamber through to the embedded software and the classification model.",
     imageAlt: "The OmegaTron team at the NURAI 2026 competition.",
   },
 
@@ -379,8 +455,8 @@ const en: typeof ar = {
     label: "About",
     heading: "We build systems, not slide decks.",
     body: [
-      "OmegaTron is a competitive engineering team working at the intersection of four disciplines: mechanics, electronics, control systems, and software. That intersection is the definition of mechatronics, and it is where real systems are born.",
-      "We start from a clearly stated requirement, then move through design, fabrication, and testing. Every engineering decision — a sensor choice, an algorithm, a mechanical detail — is made because it serves the system's performance, not because it reads well on paper.",
+      "OmegaTron is an engineering R&D team working at the intersection of five disciplines: mechanics, electronics, control systems, software, and artificial intelligence. A real system is not born inside any one of them — it is born at the boundaries between them.",
+      "We start from a measurable requirement, then move through system architecture, build, integration, and validation. Every engineering decision — a sensor choice, an algorithm, a mechanical detail — is made because it serves the system's performance, not because it reads well on paper.",
       "We fabricate prototypes in-house, write our own embedded software, and test under conditions close to the real thing. What we present is what actually runs.",
     ],
     principles: [
@@ -394,44 +470,44 @@ const en: typeof ar = {
       },
       {
         title: "A Prototype That Runs",
-        body: "The accepted standard is a system that works outside the lab, not a simulation on a screen.",
+        body: "The accepted standard is a system that holds up outside the lab, not a simulation on a screen.",
       },
     ],
   },
 
-  project: {
+  projects: {
     index: "02",
-    label: "The Project",
-    heading: "An Embedded Sensing and Decision System",
-    lead: "An embedded system that pairs a sensor array inside a purpose-designed enclosure with a processing unit that analyses readings locally and issues a real-time decision, without depending on an external connection.",
-    stages: [
+    label: "Projects",
+    heading: "Engineering Case Studies",
+    lead: "We document our projects the way we document the engineering itself: the problem, the approach, the build, and the result.",
+    blockLabels: {
+      problem: "Problem",
+      approach: "Approach",
+      engineering: "Engineering",
+      outcome: "Outcome",
+    },
+    items: [
       {
-        index: "01",
-        title: "Sensing",
-        body: "A sensor array reads the surrounding medium continuously across multiple channels.",
-      },
-      {
-        index: "02",
-        title: "Processing",
-        body: "The signal is conditioned and its features extracted locally on the controller, not on a remote server.",
-      },
-      {
-        index: "03",
-        title: "Decision",
-        body: "A trained model classifies the state and estimates its confidence in that classification.",
-      },
-      {
-        index: "04",
-        title: "Response",
-        body: "An alarm or control command is issued within a bounded, known response time.",
+        id: "sensing-unit",
+        name: "Embedded Sensing and Decision Unit",
+        summary:
+          "A self-contained unit that reads its surroundings across several channels and reaches its decision on the controller itself, with no dependency on an external connection.",
+        status: "Working prototype",
+        badge: "NURAI 2026 — 3rd Place in Iraq",
+        domains: ["Embedded Systems", "Sensors & Instrumentation", "Artificial Intelligence", "Mechanical Design"],
+        problem:
+          "Detecting a hazardous condition in air is a decision that has to land within seconds. Systems that ship their readings to a remote server spend those seconds on the network, and stop working altogether when the link drops — which is the normal state of affairs across many industrial and residential sites.",
+        approach:
+          "Build a self-contained unit that reads its surroundings across several channels and performs both the processing and the decision on the controller itself. Network connectivity becomes an addition for logging and remote alerting, not a precondition for the system to function.",
+        engineering:
+          "A sensor array distributed inside a sensing chamber designed and 3D-printed in-house, with a directed intake path governing how the sample reaches the sensors. Above it, an embedded software layer conditions the signal and extracts its features under real-time constraints, and a classification model sized to fit the controller's memory returns a confidence level with every decision. All three layers were designed together, and the enclosure was revised several times against test results rather than appearance.",
+        outcome:
+          "A working prototype that reaches its decision locally, within a bounded and known response time, with no external connection involved. The system was presented at NURAI 2026 and placed 3rd nationally in Iraq.",
       },
     ],
-    enclosureTitle: "The Enclosure Is Part of the System",
-    enclosureBody:
-      "The enclosure is not a box. The intake path, the internal chamber volume, and the sensor layout within it are design elements that directly affect reading quality and response time. It was designed and 3D-printed in-house, then revised against test results.",
     confidentialTitle: "What We Do Not Publish",
     confidentialBody:
-      "The detailed engineering — array composition, processing method, and training and calibration data — is proprietary and stays unpublished. What appears here is a high-level description of the system.",
+      "The detailed engineering — array composition, the feature-extraction method, training and calibration data, and internal chamber geometry — is proprietary and stays unpublished. What appears here describes the system at the architectural level, and it is the same level we share in any collaboration before an agreement is signed.",
     images: {
       unitAlt: "The complete unit: a 3D-printed enclosure topped by the sensor array.",
       enclosureAlt: "The black 3D-printed enclosure and its side intake port.",
@@ -442,60 +518,129 @@ const en: typeof ar = {
   capabilities: {
     index: "03",
     label: "Capabilities",
-    heading: "What We Can Build",
-    lead: "Six fields we actually work in, with one shared toolset and method.",
+    heading: "What We Build",
+    lead: "Nine fields we actually work in, under one method and a shared toolset.",
     items: [
+      {
+        title: "Embedded Systems",
+        body: "Microcontroller firmware, sensor acquisition, and operation under real-time and limited-power constraints.",
+      },
       {
         title: "Robotics",
         body: "Mobile platforms and manipulators: kinematic design, drivetrain, and path control.",
       },
       {
-        title: "Mechatronics",
-        body: "Merging mechanics, electronics, and control into one consistent system.",
+        title: "IoT Systems",
+        body: "Connected edge devices, power-efficient communication protocols, and remote logging and monitoring.",
       },
       {
         title: "Artificial Intelligence",
-        body: "Classification and prediction models prepared to run on resource-constrained hardware.",
+        body: "Classification, prediction, and computer vision, prepared to run on constrained hardware rather than remote servers.",
       },
       {
-        title: "Embedded Systems",
-        body: "Microcontroller firmware, sensor acquisition, and work under real-time constraints.",
+        title: "Machine Learning",
+        body: "Dataset construction, model training and evaluation, and compression until the model fits on the controller.",
       },
       {
-        title: "Automation",
-        body: "Process automation, logic control, and closed feedback loops.",
+        title: "Sensors & Instrumentation",
+        body: "Sensor selection, signal-conditioning circuits, calibration, and estimating the uncertainty in a reading.",
+      },
+      {
+        title: "Control Systems",
+        body: "Closed control loops, parameter tuning, and stable response under disturbance and drift.",
+      },
+      {
+        title: "Mechanical Design",
+        body: "3D modelling, enclosure and mounting design, and manufacturability considered from the outset.",
       },
       {
         title: "Rapid Prototyping",
-        body: "Enclosure design, 3D printing, and iterative assembly and testing.",
+        body: "3D printing, assembly, and fast iteration that shortens the distance between design and test.",
+      },
+    ],
+  },
+
+  process: {
+    index: "04",
+    label: "Method",
+    heading: "Our Engineering Process",
+    lead: "Five stages we run in every project, in the same order, each with a defined deliverable.",
+    steps: [
+      {
+        index: "01",
+        title: "Discover",
+        body: "We map the problem and its limits: the operating environment, the known constraints, and measurable criteria for success.",
+      },
+      {
+        index: "02",
+        title: "Design",
+        body: "We set the system architecture and allocate functions across mechanics, electronics, and software.",
+      },
+      {
+        index: "03",
+        title: "Build",
+        body: "We fabricate the parts, prepare the electronics, and write the embedded software as testable units.",
+      },
+      {
+        index: "04",
+        title: "Integrate",
+        body: "We bring the layers together and resolve what surfaces at their boundaries: timing, noise, power, and tolerances.",
+      },
+      {
+        index: "05",
+        title: "Validate",
+        body: "We test under conditions close to the real thing, measure, and redesign until performance holds.",
       },
     ],
   },
 
   founder: {
-    index: "04",
-    label: "Founder",
+    index: "05",
+    label: "Leadership",
     name: "Taha Jasim Mohammed",
-    role: "Founder of OmegaTron",
+    role: "Founder & Lead Mechatronics Engineer",
     quote: "A good team is measured not by what it presents, but by what it can actually run.",
-    body: [
-      "Taha Jasim Mohammed is the founder of OmegaTron. He leads the team's engineering direction and oversees the path from an initial requirement to a tested prototype, with an emphasis on integrating mechanics, electronics, and software into a single system.",
-      "Alongside the engineering work, he focuses on establishing a clear working method inside the team: documented decisions, design reviews, and structured testing before anything is presented.",
+    intro:
+      "Taha Jasim Mohammed founded OmegaTron and leads its mechatronics engineering. He owns the architecture of the systems the team builds and oversees each project from requirement definition through to a tested prototype.",
+    blocks: [
+      {
+        title: "Vision",
+        body: "For OmegaTron to be an Iraqi engineering practice where systems are built end to end rather than assembled from off-the-shelf parts — and one that can work with industry, universities, and research centres to a clear professional standard.",
+      },
+      {
+        title: "Engineering Philosophy",
+        body: "Good engineering is measured by what survives testing. So the work starts from a measurable requirement, the three layers are designed together from day one, and nothing is presented before it runs.",
+      },
+      {
+        title: "How the Team Works",
+        body: "A clear working method inside the team: engineering decisions and their reasoning are documented, designs are reviewed before they are built, and testing is structured before anything is shown.",
+      },
     ],
-    imageAlt: "Taha Jasim Mohammed, founder of OmegaTron.",
+    expertiseTitle: "Areas of Expertise",
+    expertise: [
+      "Systems Engineering",
+      "Embedded Systems",
+      "Robotics",
+      "Artificial Intelligence",
+      "Intelligent Sensors",
+    ],
+    imageAlt: "Taha Jasim Mohammed, founder and lead mechatronics engineer at OmegaTron.",
   },
 
-  cta: {
-    heading: "Have a system you want built?",
-    body: "Send us the details. We read every request ourselves and reply with an initial engineering opinion and a clear next step.",
-    button: "Start a Project",
+  contact: {
+    index: "06",
+    label: "Contact",
+    heading: "Have an engineering challenge? Let's build the solution.",
+    lead: "Send us a short description of the challenge. We read every enquiry ourselves and reply with an initial engineering opinion and a clear next step.",
+    fullFormPrompt: "Need to send a budget, a timeline, or attachments?",
+    fullFormLink: "Use the full project request form",
   },
 
   start: {
-    index: "05",
+    index: "07",
     label: "Start a Project",
     heading: "Tell us what you want to build",
-    lead: "The more precise the description, the clearer the engineering reply. You do not need a full requirements document — a well-defined idea is enough to begin.",
+    lead: "The more precise the description, the clearer the engineering reply. You do not need a full requirements document — a well-defined challenge is enough to begin.",
     aside: {
       title: "Before you send",
       items: [
@@ -508,7 +653,7 @@ const en: typeof ar = {
         "We usually reply within a few days. Incomplete requests take longer, because we have to come back with questions before we can assess them.",
     },
     steps: [
-      { index: "01", title: "You Send", body: "Fill in the form with your project details and expected outcome." },
+      { index: "01", title: "You Send", body: "Fill in the form with the details of the challenge and the outcome you expect." },
       { index: "02", title: "Engineering Review", body: "We read the request and assess feasibility and core constraints." },
       { index: "03", title: "Direct Reply", body: "We respond by email or WhatsApp with a first opinion and clarifying questions." },
       { index: "04", title: "Scope and Plan", body: "We agree on scope, milestones, and schedule before any work starts." },
@@ -526,15 +671,16 @@ const en: typeof ar = {
       organizationPlaceholder: "Company, university, or personal project",
       projectType: "Project Type",
       projectTypeOptions: [
-        "Robot or mobile system",
         "Embedded system and sensors",
-        "Automation and control",
+        "Robot or mobile system",
+        "Automation and control systems",
         "AI and computer vision",
-        "Prototyping and fabrication",
+        "IoT and remote monitoring",
+        "Mechanical design and prototyping",
         "Engineering consultation",
         "Other",
       ],
-      description: "Project Description",
+      description: "Describe the Challenge",
       descriptionPlaceholder:
         "What problem are you solving? Where will the system operate? What constraints do you already know about?",
       outcome: "Expected Outcome",
@@ -556,14 +702,13 @@ const en: typeof ar = {
         "More than 6 months",
         "Flexible",
       ],
-      attachments: "Attachments (optional)",
+      attachments: "Attachments",
       attachmentsHint:
         "Up to 3 files, 4 MB total. Accepted formats: PDF, images, documents, and archives.",
       attachmentsButton: "Choose files",
       attachmentsEmpty: "No files selected",
       attachmentsRemove: "Remove",
       select: "Select…",
-      required: "Required",
       optional: "Optional",
       submit: "Send Request",
       submitting: "Sending…",
@@ -574,7 +719,7 @@ const en: typeof ar = {
       email: "Please enter a valid email address.",
       phone: "Please enter a phone or WhatsApp number.",
       projectType: "Please choose a project type.",
-      description: "Please describe the project in at least 20 characters.",
+      description: "Please describe the challenge in at least 20 characters.",
       outcome: "Please describe the expected outcome.",
       budget: "Please choose an estimated budget.",
       timeline: "Please choose a timeline.",
@@ -587,17 +732,16 @@ const en: typeof ar = {
     },
     success: {
       title: "Your request has reached us.",
-      body: "We will review it and reply by email or WhatsApp. If it is urgent, resend it with the word “urgent” in the project description.",
+      body: "We will review it and reply by email or WhatsApp. If it is urgent, resend it with the word “urgent” in the description.",
       again: "Send another request",
     },
     errorTitle: "Request not sent",
   },
 
   footer: {
-    tagline: "We engineer systems that sense, decide, and act.",
+    tagline: "We design, build, and integrate intelligent engineering systems.",
     sections: "Sections",
     contact: "Contact",
-    emailLabel: "Email",
     startLabel: "Project request",
     language: "Language",
     rights: "All rights reserved.",
