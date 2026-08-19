@@ -4,7 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useId, useState } from "react";
 import { Logo, Wordmark } from "./Logo";
-import { LOCALES, otherLocale, type Dictionary, type Locale } from "@/lib/i18n";
+import { ThemeToggle } from "./ThemeToggle";
+import { LOCALES, type Dictionary, type Locale } from "@/lib/i18n";
 
 /** Swap the locale segment of the current path, keeping the rest intact. */
 function localizedPath(pathname: string, locale: Locale): string {
@@ -30,17 +31,12 @@ export function Header({ locale, dict }: { locale: Locale; dict: Dictionary }) {
     { href: `/${locale}#contact`, label: dict.nav.contact },
   ];
 
-  const alt = otherLocale(locale);
-
   return (
     <header className="header">
       <div className="container header__inner">
         <Link href={`/${locale}`} className="brand" aria-label={dict.nav.home} onClick={close}>
           <Logo className="brand__mark" />
-          <span className="brand__text">
-            <Wordmark className="brand__name wordmark" />
-            <span className="brand__sub">{dict.meta.brandSub}</span>
-          </span>
+          <Wordmark className="wordmark" />
         </Link>
 
         <nav className="nav" aria-label={dict.nav.primary}>
@@ -53,21 +49,28 @@ export function Header({ locale, dict }: { locale: Locale; dict: Dictionary }) {
 
         <div className="header__actions">
           <div className="lang-toggle" role="group" aria-label={dict.footer.language}>
-            {LOCALES.map((code) => (
-              <Link
-                key={code}
-                href={localizedPath(pathname, code)}
-                className="lang-toggle__opt"
-                lang={code}
-                hrefLang={code}
-                aria-current={code === locale ? "true" : undefined}
-                aria-label={code === alt ? dict.meta.otherLocaleLabel : undefined}
-                onClick={close}
-              >
-                {code === "ar" ? "العربية" : "EN"}
-              </Link>
+            {LOCALES.map((code, i) => (
+              <span key={code}>
+                {i > 0 ? (
+                  <span className="lang-toggle__sep" aria-hidden="true">
+                    /
+                  </span>
+                ) : null}
+                <Link
+                  href={localizedPath(pathname, code)}
+                  className="lang-toggle__opt"
+                  lang={code}
+                  hrefLang={code}
+                  aria-current={code === locale ? "true" : undefined}
+                  onClick={close}
+                >
+                  {code === "ar" ? "ع" : "EN"}
+                </Link>
+              </span>
             ))}
           </div>
+
+          <ThemeToggle dict={dict} />
 
           <Link href={`/${locale}/start`} className="btn header__cta" onClick={close}>
             {dict.nav.start}

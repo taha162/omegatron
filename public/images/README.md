@@ -1,7 +1,8 @@
 # Images
 
-Every file in this folder is currently a **placeholder plate** in the dark brand
-palette, not real photography. Replace each one with the genuine image, keeping the **exact same
+Every file in this folder is currently a **neutral placeholder plate**, not real
+photography. They are mid-grey so they sit acceptably in both the light and the
+dark theme until the real images land. Replace each one with the genuine image, keeping the **exact same
 filename** — nothing in the code needs to change.
 
 Images are rendered through `next/image` with `fill`, inside a wrapper that
@@ -18,11 +19,11 @@ already reserves the aspect ratio. That means:
 | Filename                | Used in                       | Frame  | Suggested source              |
 | ----------------------- | ----------------------------- | ------ | ----------------------------- |
 | `project-unit.jpg`      | Hero, right column            | 4:5    | The complete unit, top view — sensor array on the printed base |
-| `project-enclosure.jpg` | Case study gallery, plate 1   | 4:5    | The black printed enclosure with its lid and side intake port |
-| `project-chamber.jpg`   | Case study gallery, plate 2   | 4:5    | The view into the sensing chamber through the intake port |
-| `project-array.jpg`     | Case study gallery, plate 3   | 4:5    | A close view of the sensor array |
-| `team-nurai.jpg`        | Achievement band              | 4:3    | Team or competition photo from NURAI 2026 |
-| `founder.jpg`           | Founder section               | 4:5    | Portrait of Taha Jasim Mohammed |
+| `project-enclosure.jpg` | Projects — lead image         | 16:10  | The black printed enclosure with its lid and side intake port |
+| `project-chamber.jpg`   | Projects — supporting, left   | 3:2    | The view into the sensing chamber through the intake port |
+| `project-array.jpg`     | Projects — supporting, right  | 3:2    | A close view of the sensor array |
+| `team-nurai.jpg`        | About section                 | 4:3    | Team or competition photo from NURAI 2026 |
+| `founder.jpg`           | Founder — circular crop       | 1:1    | Portrait of Taha Jasim Mohammed |
 | `og.png`                | Social preview card           | 1200×630 | Replace with a branded share card if you have one |
 
 ## Logo

@@ -37,54 +37,26 @@ export default async function StartPage({ params }: { params: Promise<{ lang: st
     <>
       <section className="start-hero">
         <div className="container">
-          <p className="sec-head__meta mono" style={{ maxWidth: "22rem" }}>
-            <span className="sec-head__index">{dict.start.index}</span>
-            <span>{dict.start.label}</span>
-          </p>
+          <p className="sec-label mono">{dict.start.label}</p>
           <h1 className="start-hero__title">{dict.start.heading}</h1>
           <p className="lead">{dict.start.lead}</p>
         </div>
       </section>
 
-      <section aria-label={dict.start.label}>
-        <div className="container">
-          <ol className="steps">
-            {dict.start.steps.map((step) => (
-              <li className="step" key={step.index}>
-                <span className="step__index mono">
-                  {step.index}
-                </span>
-                <h2 className="step__title">{step.title}</h2>
-                <p className="step__body">{step.body}</p>
+      <div className="container start-grid">
+        <ProjectForm locale={lang} dict={dict} />
+
+        <aside className="start-aside" aria-label={dict.start.aside.title}>
+          <h2 className="start-aside__title">{dict.start.aside.title}</h2>
+          <ul className="start-aside__list">
+            {dict.start.aside.items.map((item) => (
+              <li className="start-aside__item" key={item}>
+                {item}
               </li>
             ))}
-          </ol>
-        </div>
-      </section>
-
-      <section className="section section--flush">
-        <div className="container start-grid">
-          <div className="start-grid__form">
-            <ProjectForm locale={lang} dict={dict} />
-          </div>
-
-          <aside className="start-aside" aria-label={dict.start.aside.title}>
-            <h2 className="start-aside__title">{dict.start.aside.title}</h2>
-            <ul className="start-aside__list">
-              {dict.start.aside.items.map((item) => (
-                <li className="start-aside__item" key={item}>
-                  <span className="start-aside__bullet" aria-hidden="true" />
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-            <div className="start-aside__note">
-              <h3 className="start-aside__note-title mono">{dict.start.aside.noteTitle}</h3>
-              <p className="start-aside__note-body">{dict.start.aside.noteBody}</p>
-            </div>
-          </aside>
-        </div>
-      </section>
+          </ul>
+        </aside>
+      </div>
     </>
   );
 }

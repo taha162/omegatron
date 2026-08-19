@@ -3,14 +3,20 @@ import { Logo, Wordmark } from "./Logo";
 import { LOCALES, type Dictionary, type Locale } from "@/lib/i18n";
 
 /**
- * Public contact address. Set NEXT_PUBLIC_CONTACT_EMAIL to surface it in the
- * footer; when unset the footer simply omits the row rather than showing a
- * placeholder address.
+ * Public contact address. Set NEXT_PUBLIC_CONTACT_EMAIL to surface it here;
+ * when unset the row is simply omitted rather than showing a placeholder.
  */
 const PUBLIC_EMAIL = process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim();
 
 export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
   const year = new Date().getFullYear();
+
+  const sections = [
+    { href: `/${locale}#about`, label: dict.nav.about },
+    { href: `/${locale}#projects`, label: dict.nav.projects },
+    { href: `/${locale}#capabilities`, label: dict.nav.capabilities },
+    { href: `/${locale}#contact`, label: dict.nav.contact },
+  ];
 
   return (
     <footer className="footer">
@@ -19,42 +25,23 @@ export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
           <div>
             <Link href={`/${locale}`} className="brand" aria-label={dict.nav.home}>
               <Logo className="brand__mark brand__mark--lg" />
-              <span className="brand__text">
-                <Wordmark className="brand__name wordmark" />
-                <span className="brand__sub">{dict.meta.tagline}</span>
-              </span>
+              <Wordmark className="wordmark" />
             </Link>
-            <p className="footer__tagline">{dict.footer.tagline}</p>
+            <p className="footer__tagline" lang="en" dir="ltr">
+              {dict.meta.tagline}
+            </p>
           </div>
 
           <div>
             <h2 className="footer__title mono">{dict.footer.sections}</h2>
             <ul className="footer__list">
-              <li>
-                <Link href={`/${locale}#about`} className="footer__link">
-                  {dict.nav.about}
-                </Link>
-              </li>
-              <li>
-                <Link href={`/${locale}#projects`} className="footer__link">
-                  {dict.nav.projects}
-                </Link>
-              </li>
-              <li>
-                <Link href={`/${locale}#capabilities`} className="footer__link">
-                  {dict.nav.capabilities}
-                </Link>
-              </li>
-              <li>
-                <Link href={`/${locale}#founder`} className="footer__link">
-                  {dict.nav.founder}
-                </Link>
-              </li>
-              <li>
-                <Link href={`/${locale}#contact`} className="footer__link">
-                  {dict.nav.contact}
-                </Link>
-              </li>
+              {sections.map((item) => (
+                <li key={item.href}>
+                  <Link href={item.href} className="footer__link">
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -73,15 +60,6 @@ export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
                   </a>
                 </li>
               ) : null}
-              <li>
-                <span className="footer__link">{dict.footer.location}</span>
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h2 className="footer__title mono">{dict.footer.language}</h2>
-            <ul className="footer__list">
               {LOCALES.map((code) => (
                 <li key={code}>
                   <Link
@@ -103,9 +81,7 @@ export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
           <p>
             © {year} {dict.meta.siteName}. {dict.footer.rights}
           </p>
-          <p className="mono" dir="ltr">
-            NURAI 2026 · 3RD PLACE — IRAQ
-          </p>
+          <p>{dict.footer.location}</p>
         </div>
       </div>
     </footer>
