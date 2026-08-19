@@ -214,7 +214,6 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
                     </li>
                   ))}
                 </ul>
-                <p className="project__privacy">{dict.projects.privacy}</p>
               </Reveal>
             </div>
           </article>
@@ -242,30 +241,55 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
         </div>
       </section>
 
+      {/* ------------------------------------------------------------- Process */}
+      <section className="section section--tight" id="process" aria-labelledby="process-title">
+        <div className="container">
+          <Reveal className="sec-head sec-head--tight">
+            <p className="sec-label mono">{dict.process.label}</p>
+            <h2 className="sec-title" id="process-title">
+              {dict.process.heading}
+            </h2>
+          </Reveal>
+
+          <Reveal as="ol" className="flow">
+            {dict.process.steps.map((step, i) => (
+              <li className="flow__step" key={step}>
+                <span className="flow__index mono" lang="en">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <span className="flow__label">{step}</span>
+              </li>
+            ))}
+          </Reveal>
+        </div>
+      </section>
+
       {/* ------------------------------------------------------------- Founder */}
       <section className="section section--tint" id="founder" aria-labelledby="founder-title">
-        <div className="container">
-          <Reveal className="founder">
-            <figure className="founder__figure">
-              <div className="media">
-                <Image
-                  src="/images/founder.jpg"
-                  alt={dict.founder.imageAlt}
-                  fill
-                  loading="lazy"
-                  sizes="(max-width: 620px) 10rem, 13rem"
-                />
-              </div>
-            </figure>
-
-            <div>
-              <p className="sec-label mono">{dict.founder.label}</p>
-              <h2 className="founder__name" id="founder-title">
-                {dict.founder.name}
-              </h2>
-              <p className="founder__role">{dict.founder.role}</p>
-              <p className="founder__body">{dict.founder.body}</p>
+        <div className="container founder">
+          <Reveal className="founder__media">
+            {/* An offset rule behind the portrait — editorial, not decorative. */}
+            <span className="founder__frame" aria-hidden="true" />
+            <div className="media founder__portrait">
+              <Image
+                src="/images/founder.jpg"
+                alt={dict.founder.imageAlt}
+                fill
+                loading="lazy"
+                sizes="(max-width: 1024px) 88vw, 42vw"
+              />
+              <span className="founder__grain" aria-hidden="true" />
+              <span className="founder__scrim" aria-hidden="true" />
             </div>
+          </Reveal>
+
+          <Reveal delay={80}>
+            <p className="sec-label mono">{dict.founder.label}</p>
+            <h2 className="founder__name" id="founder-title">
+              {dict.founder.name}
+            </h2>
+            <p className="founder__role">{dict.founder.role}</p>
+            <p className="founder__body">{dict.founder.body}</p>
           </Reveal>
         </div>
       </section>

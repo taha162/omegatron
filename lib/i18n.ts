@@ -74,7 +74,6 @@ const ar = {
     label: "المشاريع",
     heading: "ما بنيناه",
     oneOf: "هذا واحد من مشاريعنا. البقية قيد التطوير أو تحت اتفاقيات سرية.",
-    privacy: "التفاصيل الداخلية والخوارزميات محفوظة.",
     items: [
       {
         id: "sensing-unit",
@@ -104,27 +103,30 @@ const ar = {
     items: [
       { title: "الأنظمة المدمجة", body: "برمجة المتحكّمات وقراءة الحسّاسات" },
       { title: "الروبوتات", body: "منصّات متحرّكة وأذرع" },
-      { title: "إنترنت الأشياء", body: "أجهزة متصلة ومراقبة عن بُعد" },
       { title: "الذكاء الاصطناعي", body: "تصنيف ورؤية على أجهزة صغيرة" },
-      { title: "تعلّم الآلة", body: "تدريب النماذج وضغطها" },
       { title: "الحسّاسات والقياس", body: "الاختيار والمعايرة وتكييف الإشارة" },
       { title: "أنظمة التحكّم", body: "حلقات مغلقة واستجابة مستقرّة" },
-      { title: "التصميم الميكانيكي", body: "نمذجة ثلاثية الأبعاد وأغلفة" },
-      { title: "النمذجة السريعة", body: "طباعة وتجميع واختبار سريع" },
+      { title: "التصميم والنمذجة", body: "نمذجة ثلاثية الأبعاد وطباعة سريعة" },
     ],
+  },
+
+  process: {
+    label: "المنهجية",
+    heading: "كيف نعمل",
+    steps: ["الاستكشاف", "التصميم", "التنفيذ", "التكامل", "التحقّق"],
   },
 
   founder: {
     label: "المؤسس",
     name: "طه جاسم محمد",
-    role: "المؤسس ومهندس ميكاترونكس",
-    body: "أسّس أوميكاترون ويقود العمل الهندسي فيه. يتابع المشاريع من المتطلّب الأول إلى النموذج المُختبَر.",
+    role: "المؤسس وكبير مهندسي الميكاترونكس",
+    body: "يقود طه التوجّه الهندسي في أوميكاترون. يضع معمارية الأنظمة ويتابع تنفيذها مع الفريق، من الغلاف الميكانيكي إلى البرمجيات المدمجة. عمله أن يحوّل الفكرة إلى نموذج يعمل، ثم يختبره حتى يصمد.",
     imageAlt: "طه جاسم محمد، مؤسس أوميكاترون.",
   },
 
   contact: {
     label: "تواصل",
-    heading: "لديك مشروع؟",
+    heading: "لديك تحدٍّ هندسي؟ لنبنِ الحل.",
     lead: "أرسل وصفًا قصيرًا، ونردّ برأي هندسي أوّلي.",
     fullFormPrompt: "تحتاج إلى إضافة ميزانية أو جدول زمني أو ملفات؟",
     fullFormLink: "النموذج الكامل",
@@ -314,7 +316,6 @@ const en: typeof ar = {
     label: "Projects",
     heading: "What we've built",
     oneOf: "This is one of our projects. The rest are in development or under confidentiality.",
-    privacy: "Internal design and algorithms stay private.",
     items: [
       {
         id: "sensing-unit",
@@ -344,27 +345,30 @@ const en: typeof ar = {
     items: [
       { title: "Embedded Systems", body: "Firmware and sensor acquisition" },
       { title: "Robotics", body: "Mobile platforms and arms" },
-      { title: "IoT", body: "Connected devices and remote monitoring" },
       { title: "Artificial Intelligence", body: "Classification and vision on small hardware" },
-      { title: "Machine Learning", body: "Model training and compression" },
       { title: "Sensors", body: "Selection, calibration, signal conditioning" },
       { title: "Control Systems", body: "Closed loops and stable response" },
-      { title: "Mechanical Design", body: "3D modelling and enclosures" },
-      { title: "Rapid Prototyping", body: "Printing, assembly, fast iteration" },
+      { title: "Design & Prototyping", body: "3D modelling and fast printing" },
     ],
+  },
+
+  process: {
+    label: "Method",
+    heading: "How we work",
+    steps: ["Discover", "Design", "Build", "Integrate", "Validate"],
   },
 
   founder: {
     label: "Founder",
     name: "Taha Jasim Mohammed",
-    role: "Founder & mechatronics engineer",
-    body: "Founded OmegaTron and leads its engineering work. He takes projects from the first requirement through to a tested prototype.",
+    role: "Founder & Lead Mechatronics Engineer",
+    body: "Taha leads the engineering direction at OmegaTron. He sets the system architecture and works through it with the team, from the mechanical enclosure to the embedded software. His job is to turn an idea into a prototype that runs — and then test it until it holds.",
     imageAlt: "Taha Jasim Mohammed, founder of OmegaTron.",
   },
 
   contact: {
     label: "Contact",
-    heading: "Have a project?",
+    heading: "Have an engineering challenge? Let\u2019s build the solution.",
     lead: "Send a short description and we'll reply with a first engineering opinion.",
     fullFormPrompt: "Need to add a budget, a timeline, or files?",
     fullFormLink: "Full form",
