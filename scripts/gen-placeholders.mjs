@@ -23,9 +23,9 @@ const PLATES = [
   { file: "founder.jpg", width: 1200, height: 1600 },
 ];
 
-const PAPER = "#141c27";
-const RULE = "#1f2a38";
-const MARK = "#33445a";
+const PAPER = "#a9aeb5";
+const RULE = "#9ba1a9";
+const MARK = "#7d848d";
 
 function plate(width, height) {
   const step = Math.round(Math.min(width, height) / 8);
@@ -61,8 +61,8 @@ function plate(width, height) {
   <g transform="translate(${tx} ${ty}) scale(${scale / 3.125})">
     <path d="M35.1 63.3 A26 26 0 1 1 64.9 63.3" fill="none" stroke="${MARK}" stroke-width="7"/>
     <path d="M14 66 H40 L50 75 L60 66 H86" fill="none" stroke="${MARK}" stroke-width="6"/>
-    <path d="M50 10 V66" fill="none" stroke="#5a4a24" stroke-width="2.4"/>
-    <circle cx="50" cy="7.5" r="3.2" fill="none" stroke="#5a4a24" stroke-width="2.2"/>
+    <path d="M50 10 V66" fill="none" stroke="#8a7c55" stroke-width="2.4"/>
+    <circle cx="50" cy="7.5" r="3.2" fill="none" stroke="#8a7c55" stroke-width="2.2"/>
   </g>
 </svg>`);
 }

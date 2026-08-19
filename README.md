@@ -31,15 +31,15 @@ npm run typecheck              # tsc --noEmit
 app/
   [lang]/                 ar | en — both prerendered at build time
     layout.tsx            root layout: <html lang dir>, fonts, header, footer
-    page.tsx              home: hero, achievement, about, projects,
-                          capabilities, process, founder, contact
+    page.tsx              home: hero, about, projects, capabilities,
+                          founder, contact
     start/page.tsx        Start a Project — the long-form request
     not-found.tsx
   api/contact/route.ts    server-side form handler and email delivery
   globals.css             the entire design system, one file
   icon.svg                favicon
   robots.ts, sitemap.ts
-components/               Header, Footer, ProjectForm, Reveal, SectionHeading, Logo, Icons
+components/               Header, Footer, ProjectForm, ThemeToggle, Reveal, Logo, Icons
 lib/
   i18n.ts                 every string on the site, in both languages
   mailer.ts               email transport (server-only)
@@ -74,32 +74,36 @@ where its translation is missing.
 - `hreflang` alternates and an `x-default` pointing at Arabic are emitted on
   every page, and the sitemap carries per-language alternates.
 
-## Identity
+## Themes
 
-The palette is taken from the official logo: a deep navy ground (`#0a0e14`),
-brushed-steel type, and a single gold accent (`#d9ae45`) used sparingly. Every
-colour is a CSS custom property in the `:root` block of `app/globals.css`, so
-the whole identity can be re-pitched from one place.
+**Light is the default.** A dark theme is available from the toggle in the
+header; the choice is stored in `localStorage` and re-applied by a tiny inline
+script before first paint, so a returning visitor never sees a flash of the
+wrong theme. The choice survives reloads and language switches.
 
-The mark itself is redrawn as vector art in `components/Logo.tsx` — the open
-omega ring, the gear quadrant, the circuit traces, and the gold needle — so it
-costs no network request, stays crisp at any size, and inherits theme colours.
-`components/Logo.tsx` also exports `Wordmark`, which sets OMEGA in steel and
-TRON in gold exactly as the logo does.
+Both themes take their colours from the official logo — navy ink, brushed
+steel, one gold accent — and are defined as CSS custom properties in two blocks
+at the top of `app/globals.css`: `:root` for light, `:root[data-theme="dark"]`
+for dark. Nothing else in the stylesheet references a raw colour, so re-pitching
+either theme means editing one block.
 
-Measured contrast against the page ground: body text 6.5:1, headings 16.6:1,
-gold accents 9.3:1 — all above WCAG AA.
+The mark itself is vector art in `components/Logo.tsx` — the open omega ring,
+the gear quadrant, the circuit traces, the gold needle — so it costs no network
+request, stays crisp at any size, and inherits theme colour. `Wordmark` sets
+OMEGA in ink and TRON in gold as the logo does.
+
+Measured contrast, worst case per theme: light 5.03:1, dark 6.5:1 — both above
+WCAG AA, checked across headings, body, muted text, accents, and buttons.
 
 ## Scroll-linked motion
 
-Handled entirely with CSS scroll-driven animations (`animation-timeline`), so
-there are no scroll listeners and nothing runs on the main thread:
+Deliberately minimal — two effects, both CSS scroll-driven animations, so there
+are no scroll listeners and nothing runs on the main thread:
 
 - a reading-progress hairline across the top of the viewport,
-- the hero drafting grid drifting and fading as the hero leaves,
-- photographs settling out of a slight over-scale as they enter frame,
-- section rules and the process timeline drawing themselves in,
-- cards lifting into place as they scroll into view.
+- photographs settling out of a slight over-scale as they enter frame.
+
+Plus one short entrance per block, driven by a single IntersectionObserver.
 
 Browsers without support skip the `@supports` block and get the static
 composition. Every "from" state stays partly opaque rather than transparent, so

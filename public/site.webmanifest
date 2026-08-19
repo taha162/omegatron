@@ -1,11 +1,11 @@
 {
   "name": "OmegaTron | أوميكاترون",
   "short_name": "OmegaTron",
-  "description": "Competitive mechatronics engineering team — robotics, AI, embedded systems, automation.",
+  "description": "Mechatronics team in Iraq — embedded systems, robotics, AI, sensors.",
   "start_url": "/ar",
   "display": "standalone",
-  "background_color": "#0a0e14",
-  "theme_color": "#0a0e14",
+  "background_color": "#fbfaf8",
+  "theme_color": "#fbfaf8",
   "icons": [
     {
       "src": "/icon.svg",
