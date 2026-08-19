@@ -27,8 +27,8 @@ export function generateStaticParams() {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#ffffff",
-  colorScheme: "light",
+  themeColor: "#0a0e14",
+  colorScheme: "dark",
 };
 
 export async function generateMetadata({
@@ -109,6 +109,7 @@ export default async function LocaleLayout({
   return (
     <html lang={lang} dir={dir} className={cairo.variable}>
       <body>
+        <div className="scroll-progress" aria-hidden="true" />
         <a href="#main" className="skip-link">
           {dict.nav.skipToContent}
         </a>

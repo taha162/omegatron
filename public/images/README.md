@@ -1,7 +1,7 @@
 # Images
 
-Every file in this folder is currently a **placeholder plate**, not real
-photography. Replace each one with the genuine image, keeping the **exact same
+Every file in this folder is currently a **placeholder plate** in the dark brand
+palette, not real photography. Replace each one with the genuine image, keeping the **exact same
 filename** — nothing in the code needs to change.
 
 Images are rendered through `next/image` with `fill`, inside a wrapper that

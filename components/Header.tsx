@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useId, useState } from "react";
-import { Logo } from "./Logo";
+import { Logo, Wordmark } from "./Logo";
 import { LOCALES, otherLocale, type Dictionary, type Locale } from "@/lib/i18n";
 
 /** Swap the locale segment of the current path, keeping the rest intact. */
@@ -38,8 +38,8 @@ export function Header({ locale, dict }: { locale: Locale; dict: Dictionary }) {
         <Link href={`/${locale}`} className="brand" aria-label={dict.nav.home} onClick={close}>
           <Logo className="brand__mark" />
           <span className="brand__text">
-            <span className="brand__name">{dict.meta.siteName}</span>
-            <span className="brand__sub">Mechatronics</span>
+            <Wordmark className="brand__name wordmark" />
+            <span className="brand__sub">{dict.meta.brandSub}</span>
           </span>
         </Link>
 

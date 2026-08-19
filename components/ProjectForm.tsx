@@ -87,12 +87,14 @@ export function ProjectForm({
 
     if (get("name").length < 2) next.name = v.name;
     if (!EMAIL_RE.test(get("email"))) next.email = v.email;
+    if (get("phone").length < 6) next.phone = v.phone;
     if (!get("projectType")) next.projectType = v.projectType;
     if (get("description").length < 20) next.description = v.description;
     if (get("outcome").length < 5) next.outcome = v.outcome;
 
     if (isFull) {
-      if (get("phone").length < 6) next.phone = v.phone;
+      if (!get("environment")) next.environment = v.environment;
+      if (!get("stage")) next.stage = v.stage;
       if (!get("budget")) next.budget = v.budget;
       if (!get("timeline")) next.timeline = v.timeline;
 
@@ -182,10 +184,16 @@ export function ProjectForm({
   }
 
   const optional = <span className="field__opt">{t.optional}</span>;
+  const req = (
+    <span className="field__req" title={t.required} aria-label={t.required}>
+      *
+    </span>
+  );
 
   const contactFields = (
     <div className="form__row">
-      <Field id={id("name")} label={t.name} error={errors.name}>
+      <Field id={id("name")} label={t.name} error={errors.name}
+        suffix={req}>
         <input
           id={id("name")}
           name="name"
@@ -199,7 +207,8 @@ export function ProjectForm({
         />
       </Field>
 
-      <Field id={id("email")} label={t.email} error={errors.email}>
+      <Field id={id("email")} label={t.email} error={errors.email}
+        suffix={req}>
         <input
           id={id("email")}
           name="email"
@@ -214,23 +223,24 @@ export function ProjectForm({
         />
       </Field>
 
+      <Field id={id("phone")} label={t.phone} error={errors.phone}
+        suffix={req}>
+        <input
+          id={id("phone")}
+          name="phone"
+          type="tel"
+          dir="ltr"
+          className="field__control"
+          placeholder={t.phonePlaceholder}
+          autoComplete="tel"
+          required
+          aria-invalid={errors.phone ? "true" : undefined}
+          aria-describedby={errors.phone ? `${id("phone")}-error` : undefined}
+        />
+      </Field>
+
       {isFull ? (
         <>
-          <Field id={id("phone")} label={t.phone} error={errors.phone}>
-            <input
-              id={id("phone")}
-              name="phone"
-              type="tel"
-              dir="ltr"
-              className="field__control"
-              placeholder={t.phonePlaceholder}
-              autoComplete="tel"
-              required
-              aria-invalid={errors.phone ? "true" : undefined}
-              aria-describedby={errors.phone ? `${id("phone")}-error` : undefined}
-            />
-          </Field>
-
           <Field id={id("organization")} label={t.organization} suffix={optional}>
             <input
               id={id("organization")}
@@ -252,6 +262,7 @@ export function ProjectForm({
         id={id("projectType")}
         label={t.projectType}
         error={errors.projectType}
+        suffix={req}
         full={!isFull}
       >
         <select
@@ -275,7 +286,53 @@ export function ProjectForm({
       </Field>
 
       {isFull ? (
-        <Field id={id("budget")} label={t.budget} error={errors.budget}>
+        <>
+          <Field id={id("environment")} label={t.environment} error={errors.environment}
+        suffix={req}>
+            <select
+              id={id("environment")}
+              name="environment"
+              className="field__control"
+              defaultValue=""
+              required
+              aria-invalid={errors.environment ? "true" : undefined}
+              aria-describedby={errors.environment ? `${id("environment")}-error` : undefined}
+            >
+              <option value="" disabled>
+                {t.select}
+              </option>
+              {t.environmentOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </Field>
+
+          <Field id={id("stage")} label={t.stage} error={errors.stage}
+        suffix={req}>
+            <select
+              id={id("stage")}
+              name="stage"
+              className="field__control"
+              defaultValue=""
+              required
+              aria-invalid={errors.stage ? "true" : undefined}
+              aria-describedby={errors.stage ? `${id("stage")}-error` : undefined}
+            >
+              <option value="" disabled>
+                {t.select}
+              </option>
+              {t.stageOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </Field>
+
+          <Field id={id("budget")} label={t.budget} error={errors.budget}
+        suffix={req}>
           <select
             id={id("budget")}
             name="budget"
@@ -294,10 +351,12 @@ export function ProjectForm({
               </option>
             ))}
           </select>
-        </Field>
+          </Field>
+        </>
       ) : null}
 
-      <Field id={id("description")} label={t.description} error={errors.description} full>
+      <Field id={id("description")} label={t.description} error={errors.description}
+        suffix={req} full>
         <textarea
           id={id("description")}
           name="description"
@@ -310,7 +369,8 @@ export function ProjectForm({
         />
       </Field>
 
-      <Field id={id("outcome")} label={t.outcome} error={errors.outcome} full>
+      <Field id={id("outcome")} label={t.outcome} error={errors.outcome}
+        suffix={req} full>
         <textarea
           id={id("outcome")}
           name="outcome"
@@ -325,7 +385,8 @@ export function ProjectForm({
 
       {isFull ? (
         <>
-          <Field id={id("timeline")} label={t.timeline} error={errors.timeline}>
+          <Field id={id("timeline")} label={t.timeline} error={errors.timeline}
+        suffix={req}>
             <select
               id={id("timeline")}
               name="timeline"
@@ -447,6 +508,12 @@ export function ProjectForm({
       )}
 
       <div className="form__footer">
+        <p className="form__required-note">
+          <span className="field__req" aria-hidden="true">
+            *
+          </span>
+          {t.requiredNote}
+        </p>
         <button type="submit" className="btn" disabled={status === "sending"}>
           {status === "sending" ? t.submitting : t.submit}
           {status === "sending" ? null : <ArrowIcon className="btn__arrow" />}
