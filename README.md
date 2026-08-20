@@ -31,22 +31,23 @@ npm run typecheck              # tsc --noEmit
 app/
   [lang]/                 ar | en — both prerendered at build time
     layout.tsx            root layout: <html lang dir>, fonts, header, footer
-    page.tsx              home: hero, about, projects, capabilities,
-                          founder, contact
+    page.tsx              home: hero, about, projects, film,
+                          capabilities, process, founder, contact
     start/page.tsx        Start a Project — the long-form request
     not-found.tsx
   api/contact/route.ts    server-side form handler and email delivery
   globals.css             the entire design system, one file
   icon.svg                favicon
   robots.ts, sitemap.ts
-components/               Header, Footer, ProjectForm, ThemeToggle, Reveal, Logo, Icons
+components/               Header, Footer, ProjectForm, ScrollVideo, ThemeToggle,
+                          Reveal, Logo, Icons
 lib/
   i18n.ts                 every string on the site, in both languages
   mailer.ts               email transport (server-only)
   upload.ts               attachment limits shared by client and server
   site.ts                 canonical URL resolution
 public/images/            photography — see public/images/README.md
-scripts/                  placeholder generator
+public/media/             the scroll-scrubbed film (two encodes)
 ```
 
 ### Editing content
@@ -94,6 +95,51 @@ OMEGA in ink and TRON in gold as the logo does.
 
 Measured contrast, worst case per theme: light 5.03:1, dark 6.5:1 — both above
 WCAG AA, checked across headings, body, muted text, accents, and buttons.
+
+## Scroll-scrubbed film
+
+`components/ScrollVideo.tsx` renders a short film whose timeline is driven by
+scroll position. It is not a video player: no controls, no autoplay, no audio
+track, and the element is `aria-hidden` and untabbable — the two captions carry
+the meaning and a visually hidden heading names the section.
+
+**How it runs.** The section is a tall runway with a `sticky` stage inside it;
+progress across the runway maps linearly to `video.currentTime`. A single
+`requestAnimationFrame` loop does the seeking, the caption cross-fade, and the
+pointer parallax, and an IntersectionObserver starts that loop only while the
+section is on screen — nothing listens to scroll while the visitor is elsewhere
+on the page. The seek target is eased toward the scroll position and only
+applied when the change is worth at least a frame, so the decoder is not
+thrashed while the page is still.
+
+**How it is encoded.** Two files in `public/media/`, and a browser downloads
+only one of them:
+
+| File | Codec | Size | Why |
+| --- | --- | --- | --- |
+| `circuit.webm` | VP9, GOP 6 | 1.0 MB | Chromium and Firefox |
+| `circuit.mp4` | H.264, all-intra | 1.2 MB | Safari and iOS, where seeking is fussiest — every frame is a keyframe, so every scroll position is an exact, instant seek |
+
+Both are 960x540 at 12 fps for 8 seconds, with no audio stream at all. Neither
+is fetched on page load: an IntersectionObserver with a one-screen margin sets
+`preload` and calls `load()` only as the section approaches. Until then the
+13 KB poster stands in.
+
+**Themes.** Light mode holds the footage in a contained band with a paper wash
+over it, so the dark frame never takes over the page; dark mode drops the inset
+and lets it run edge to edge. Both fade at the top and bottom edges via a mask
+rather than ending on a hard line.
+
+**Reduced motion** collapses the runway to a normal-height section, drops the
+scrub entirely, and shows both captions at once.
+
+To re-cut the film, any full ffmpeg will do:
+
+```bash
+ffmpeg -ss 2 -t 8 -i source.mp4 -vf "fps=12,scale=960:540:flags=lanczos" \
+  -c:v libx264 -g 1 -keyint_min 1 -bf 0 -sc_threshold 0 -crf 33 \
+  -preset slow -pix_fmt yuv420p -movflags +faststart -an public/media/circuit.mp4
+```
 
 ## Scroll-linked motion
 

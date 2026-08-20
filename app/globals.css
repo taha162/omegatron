@@ -108,7 +108,7 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 h1,
@@ -811,6 +811,113 @@ textarea {
 }
 
 /* --------------------------------------------------------------------------
+   Scroll-scrubbed film
+
+   A tall runway with a sticky stage inside it. Light mode holds the footage in
+   a contained, washed panel so the dark frame never takes over the page; dark
+   mode lets it go edge to edge.
+   -------------------------------------------------------------------------- */
+
+.cine {
+  position: relative;
+  height: 280vh;
+}
+
+.cine__stage {
+  position: sticky;
+  inset-block-start: 0;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+}
+
+.cine__frame {
+  position: absolute;
+  inset: clamp(2.5rem, 11vh, 7rem) var(--gutter);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: #0a0e14;
+  /* Dissolves into the page instead of ending on a hard edge. */
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 14%, #000 86%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 14%, #000 86%, transparent);
+}
+
+:root[data-theme="dark"] .cine__frame {
+  inset: 0;
+  border-radius: 0;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 8%, #000 92%, transparent);
+}
+
+.cine__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Over-scaled so the pointer drift never exposes an edge. */
+  transform: translate3d(var(--px, 0px), var(--py, 0px), 0) scale(1.06);
+  filter: saturate(0.88) brightness(1.04);
+}
+
+:root[data-theme="dark"] .cine__video {
+  filter: none;
+}
+
+/* Light mode only: a paper wash that lifts the footage toward the page. */
+.cine__wash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: var(--paper);
+  opacity: 0.2;
+}
+
+:root[data-theme="dark"] .cine__wash {
+  opacity: 0;
+}
+
+.cine__frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(60% 50% at 50% 50%, rgba(6, 9, 14, 0.42), transparent 70%);
+}
+
+.cine__captions {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  padding-inline: var(--gutter);
+  text-align: center;
+}
+
+.cine__caption {
+  grid-area: 1 / 1;
+  opacity: 0;
+  color: #f2f5f8;
+  font-size: clamp(1.5rem, 0.9rem + 2.8vw, 3rem);
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  max-width: 18ch;
+  text-wrap: balance;
+  text-shadow: 0 1px 28px rgba(0, 0, 0, 0.5);
+  will-change: opacity, transform;
+}
+
+[lang="ar"] .cine__caption {
+  letter-spacing: 0;
+  line-height: 1.55;
+  font-weight: 400;
+  max-width: 20ch;
+}
+
+/* --------------------------------------------------------------------------
    Capabilities — a compact list, not nine cards
    -------------------------------------------------------------------------- */
 
@@ -907,6 +1014,10 @@ textarea {
 .founder__portrait {
   aspect-ratio: 4 / 5;
   isolation: isolate;
+}
+
+.founder__portrait img {
+  object-position: 50% 34%;
 }
 
 /* Fine grain, so the portrait reads as printed rather than pasted on. */
@@ -1551,6 +1662,10 @@ select.field__control {
     gap: 2.5rem;
   }
 
+  .cine {
+    height: 240vh;
+  }
+
   /* Five labels stop fitting on one line well before the nav does. */
   .flow {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1641,6 +1756,29 @@ select.field__control {
   }
 
   /* Scroll-driven animations ignore duration; the timeline itself is removed. */
+  .cine {
+    height: auto;
+  }
+
+  .cine__stage {
+    position: static;
+    height: auto;
+    aspect-ratio: 16 / 9;
+  }
+
+  .cine__captions {
+    position: absolute;
+    inset: 0;
+    align-content: center;
+    gap: 0.75rem;
+  }
+
+  .cine__caption {
+    grid-area: auto;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
   .media img,
   .founder__portrait img,
   .scroll-progress {

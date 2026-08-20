@@ -67,7 +67,6 @@ const ar = {
     label: "عن الفريق",
     heading: "نبني الأنظمة كاملةً، لا نجمّعها.",
     body: "أوميكاترون فريق ميكاترونكس يعمل بين الميكانيكا والإلكترونيات والبرمجيات والذكاء الاصطناعي. نصمّم ونصنّع ونختبر داخل الفريق، ولا نعرض شيئًا قبل أن يعمل.",
-    imageAlt: "الفريق أثناء العمل على وحدة الاستشعار.",
   },
 
   projects: {
@@ -92,8 +91,8 @@ const ar = {
     ],
     images: {
       unitAlt: "الوحدة كاملةً: مصفوفة الحسّاسات فوق الغلاف المطبوع.",
-      enclosureAlt: "الغلاف المطبوع ثلاثيّ الأبعاد وفتحة دخول الهواء.",
-      chamberAlt: "منظر داخل غرفة الاستشعار.",
+      enclosureAlt: "الغلاف المطبوع ثلاثيّ الأبعاد وفتحة دخول الهواء الجانبية.",
+      chamberAlt: "منظر داخل غرفة الاستشعار من فتحة الدخول: حسّاسات موزّعة حول الغرفة.",
     },
   },
 
@@ -108,6 +107,11 @@ const ar = {
       { title: "أنظمة التحكّم", body: "حلقات مغلقة واستجابة مستقرّة" },
       { title: "التصميم والنمذجة", body: "نمذجة ثلاثية الأبعاد وطباعة سريعة" },
     ],
+  },
+
+  cine: {
+    title: "من المكوّنات إلى الأنظمة",
+    lines: ["من المكوّنات إلى الأنظمة.", "نحن نُهندس الرابط بينها."],
   },
 
   process: {
@@ -309,7 +313,6 @@ const en: typeof ar = {
     label: "About",
     heading: "We build systems end to end, not from a parts bin.",
     body: "OmegaTron is a mechatronics team working across mechanics, electronics, software, and AI. We design, fabricate, and test in-house, and we don't show anything before it runs.",
-    imageAlt: "The team working on the sensing unit.",
   },
 
   projects: {
@@ -334,8 +337,8 @@ const en: typeof ar = {
     ],
     images: {
       unitAlt: "The complete unit: the sensor array above the printed enclosure.",
-      enclosureAlt: "The 3D-printed enclosure and its air intake port.",
-      chamberAlt: "A view inside the sensing chamber.",
+      enclosureAlt: "The 3D-printed enclosure and its side air intake port.",
+      chamberAlt: "A view inside the sensing chamber through the intake port, sensors set around it.",
     },
   },
 
@@ -350,6 +353,11 @@ const en: typeof ar = {
       { title: "Control Systems", body: "Closed loops and stable response" },
       { title: "Design & Prototyping", body: "3D modelling and fast printing" },
     ],
+  },
+
+  cine: {
+    title: "From components to systems",
+    lines: ["From components to systems.", "We engineer the connection."],
   },
 
   process: {
