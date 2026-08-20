@@ -27,11 +27,8 @@ export function generateStaticParams() {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fbfaf8" },
-    { media: "(prefers-color-scheme: dark)", color: "#0a0e14" },
-  ],
-  colorScheme: "light dark",
+  themeColor: "#070b11",
+  colorScheme: "dark",
 };
 
 export async function generateMetadata({
@@ -112,16 +109,6 @@ export default async function LocaleLayout({
   return (
     <html lang={lang} dir={dir} className={cairo.variable}>
       <body>
-        {/*
-          Re-applies the stored theme before first paint, so a visitor who chose
-          dark never sees a flash of the light default.
-        */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html:
-              "try{var t=localStorage.getItem('omegatron-theme');if(t==='dark')document.documentElement.dataset.theme='dark'}catch(e){}",
-          }}
-        />
         <div className="scroll-progress" aria-hidden="true" />
         <a href="#main" className="skip-link">
           {dict.nav.skipToContent}

@@ -31,15 +31,16 @@ npm run typecheck              # tsc --noEmit
 app/
   [lang]/                 ar | en — both prerendered at build time
     layout.tsx            root layout: <html lang dir>, fonts, header, footer
-    page.tsx              home: hero, about, projects, film,
-                          capabilities, process, founder, contact
+    page.tsx              home: hero, about, projects, capabilities,
+                          process, founder, contact — the first six sit
+                          over the film backdrop
     start/page.tsx        Start a Project — the long-form request
     not-found.tsx
   api/contact/route.ts    server-side form handler and email delivery
   globals.css             the entire design system, one file
   icon.svg                favicon
   robots.ts, sitemap.ts
-components/               Header, Footer, ProjectForm, ScrollVideo, ThemeToggle,
+components/               Header, Footer, ProjectForm, FilmBackdrop,
                           Reveal, Logo, Icons
 lib/
   i18n.ts                 every string on the site, in both languages
@@ -47,7 +48,7 @@ lib/
   upload.ts               attachment limits shared by client and server
   site.ts                 canonical URL resolution
 public/images/            photography — see public/images/README.md
-public/media/             the scroll-scrubbed film (two encodes)
+public/media/             the film backdrop (two sizes x two codecs)
 ```
 
 ### Editing content
@@ -75,70 +76,111 @@ where its translation is missing.
 - `hreflang` alternates and an `x-default` pointing at Arabic are emitted on
   every page, and the sitemap carries per-language alternates.
 
-## Themes
+## Theme and material
 
-**Light is the default.** A dark theme is available from the toggle in the
-header; the choice is stored in `localStorage` and re-applied by a tiny inline
-script before first paint, so a returning visitor never sees a flash of the
-wrong theme. The choice survives reloads and language switches.
+**The site is dark, and only dark.** There is no toggle and no
+`localStorage` read: the palette is one `:root` block at the top of
+`app/globals.css` with `color-scheme: dark`. Nothing else in the stylesheet
+references a raw colour, so re-pitching the whole site means editing that one
+block.
 
-Both themes take their colours from the official logo — navy ink, brushed
-steel, one gold accent — and are defined as CSS custom properties in two blocks
-at the top of `app/globals.css`: `:root` for light, `:root[data-theme="dark"]`
-for dark. Nothing else in the stylesheet references a raw colour, so re-pitching
-either theme means editing one block.
+The colours come from the official logo — deep navy ground, brushed steel, one
+gold accent. The mark itself is vector art in `components/Logo.tsx` — the open
+omega ring, the gear quadrant, the circuit traces, the gold needle — so it costs
+no network request and stays crisp at any size. `Wordmark` sets OMEGA in steel
+and TRON in gold as the logo does.
 
-The mark itself is vector art in `components/Logo.tsx` — the open omega ring,
-the gear quadrant, the circuit traces, the gold needle — so it costs no network
-request, stays crisp at any size, and inherits theme colour. `Wordmark` sets
-OMEGA in ink and TRON in gold as the logo does.
+### Liquid glass
 
-Measured contrast, worst case per theme: light 5.03:1, dark 6.5:1 — both above
-WCAG AA, checked across headings, body, muted text, accents, and buttons.
+Surfaces that sit over the film are glass rather than filled panels. The
+material is two utilities:
 
-## Scroll-scrubbed film
+- **`.glass`** — a translucent gradient, `backdrop-filter: blur(22px)
+  saturate(180%)`, a one-pixel inset specular rim top and bottom, a soft drop
+  shadow, and a `::before` radial rake that gives the pane a light source. Used
+  where there are few of them and the blur is worth it: the header pill, the
+  About panel, the founder copy, the mobile menu.
+- **`.glass--lite`** — the same look with the blur dropped. Used for the many
+  small panes (capability cards, project points, chips), because compositing a
+  dozen backdrop filters over a seeking video costs far more than it shows.
 
-`components/ScrollVideo.tsx` renders a short film whose timeline is driven by
-scroll position. It is not a video player: no controls, no autoplay, no audio
-track, and the element is `aria-hidden` and untabbable — the two captions carry
-the meaning and a visually hidden heading names the section.
+Every token is a custom property (`--glass-bg`, `--glass-blur`,
+`--glass-border`, `--glass-rim`, `--glass-drop`, `--radius-glass`), so the
+material is tunable in one place.
 
-**How it runs.** The section is a tall runway with a `sticky` stage inside it;
-progress across the runway maps linearly to `video.currentTime`. A single
-`requestAnimationFrame` loop does the seeking, the caption cross-fade, and the
-pointer parallax, and an IntersectionObserver starts that loop only while the
-section is on screen — nothing listens to scroll while the visitor is elsewhere
-on the page. The seek target is eased toward the scroll position and only
-applied when the change is worth at least a frame, so the decoder is not
-thrashed while the page is still.
+The header is a floating pill: the bar is padded away from the viewport edge and
+the inner row is a fully rounded `.glass` element, so the content scrolls
+visibly beneath it.
 
-**How it is encoded.** Two files in `public/media/`, and a browser downloads
-only one of them:
+Measured contrast over the film, worst case: **4.89:1** on capability body copy,
+against an assumed worst-case ground of `rgb(38,44,56)` — the scrim over the
+brightest patch of footage — rather than a sampled pixel. Headings run 12:1 and
+body copy 7.81:1 against the same ground.
 
-| File | Codec | Size | Why |
+## The film
+
+`components/FilmBackdrop.tsx` runs the circuit-board film as the page's
+**backdrop**, not as a section. It is fixed to the viewport and sits behind
+everything from the hero down to the founder; scroll position across that range
+drives `video.currentTime`, so the board advances as the visitor reads the site
+over it. It is not a player: no controls, no autoplay, no audio track,
+`aria-hidden`, untabbable.
+
+**How it runs.** `app/[lang]/page.tsx` wraps those six sections in
+`<div className="film-range" id="film-range">`; the component measures that
+element and maps `-rect.top / (height - viewportHeight)` to 0..1. A single
+`requestAnimationFrame` loop does the seeking, the hand-off fade over the last
+10% of the range, and the pointer drift. An IntersectionObserver runs that loop
+only while the range is on screen, and the layer's `visibility` is dropped
+entirely once the visitor scrolls past it, so the contact section and footer
+composite against a plain background. The seek target is eased toward the scroll
+position and applied only when the change is worth at least a frame, so a still
+page does not keep the decoder busy. Sections below the range carry
+`.section--solid`, which restores an opaque ground.
+
+Because scroll is the only input, touch works exactly as the mouse wheel does.
+The pointer parallax is gated on `(hover: hover) and (pointer: fine)` and moves
+the frame by at most 22px, inside a 6% overscale, so it can never expose an edge.
+
+**How it is encoded.** Four files in `public/media/`, and a browser downloads
+exactly **one**:
+
+| File | Codec | Size | Served to |
 | --- | --- | --- | --- |
-| `circuit.webm` | VP9, GOP 6 | 1.0 MB | Chromium and Firefox |
-| `circuit.mp4` | H.264, all-intra | 1.2 MB | Safari and iOS, where seeking is fussiest — every frame is a keyframe, so every scroll position is an exact, instant seek |
+| `circuit-1080.mp4` | H.264 high, GOP 6 | 2.8 MB | ≥900px viewports |
+| `circuit-720.mp4` | H.264 high, GOP 6 | 1.6 MB | narrow viewports |
+| `circuit-1080.webm` | VP9, GOP 6 | 3.1 MB | browsers without H.264 |
+| `circuit-720.webm` | VP9, GOP 6 | 2.0 MB | browsers without H.264 |
 
-Both are 960x540 at 12 fps for 8 seconds, with no audio stream at all. Neither
-is fetched on page load: an IntersectionObserver with a one-screen margin sets
-`preload` and calls `load()` only as the section approaches. Until then the
-13 KB poster stands in.
+The component asks `canPlayType` and assigns `video.src` itself rather than
+listing `<source>` elements — a fallthrough list makes the browser fetch the
+MP4, fail to decode it, and fetch the WebM as well, doubling the bytes. Every
+real browser takes the MP4.
 
-**Themes.** Light mode holds the footage in a contained band with a paper wash
-over it, so the dark frame never takes over the page; dark mode drops the inset
-and lets it run edge to edge. Both fade at the top and bottom edges via a mask
-rather than ending on a hard line.
+All four are 8 seconds at 15 fps with no audio stream. The short GOP is the
+point: scrubbing lands on an arbitrary time, and a six-frame group means the
+decoder is never more than a few frames from a keyframe. A 21 KB poster covers
+the moment before the first frame decodes.
 
-**Reduced motion** collapses the runway to a normal-height section, drops the
-scrub entirely, and shows both captions at once.
+**The chip carries our name.** "OmegaTron" is composited into the footage at
+34% alpha, rotated to match the die, so the processor reads as ours without
+looking like an overlay.
 
-To re-cut the film, any full ffmpeg will do:
+**Reduced motion** shows a single frame and never scrubs — the loop simply never
+starts, and the layer stays visible so the composition is intact.
+
+To re-cut the film, any full ffmpeg will do (`wordmark.png` is white text on
+transparency):
 
 ```bash
-ffmpeg -ss 2 -t 8 -i source.mp4 -vf "fps=12,scale=960:540:flags=lanczos" \
-  -c:v libx264 -g 1 -keyint_min 1 -bf 0 -sc_threshold 0 -crf 33 \
-  -preset slow -pix_fmt yuv420p -movflags +faststart -an public/media/circuit.mp4
+ffmpeg -ss 2 -t 8 -i source.mp4 -i wordmark.png -filter_complex \
+  "[0:v]fps=15,scale=1920:1080:flags=lanczos[bg]; \
+   [1:v]format=rgba,scale=470:58,rotate=-13*PI/180:c=none:ow=rotw(-13*PI/180):oh=roth(-13*PI/180), \
+   colorchannelmixer=aa=0.34[mk]; \
+   [bg][mk]overlay=x=W*0.482-w/2:y=H*0.468-h/2" \
+  -c:v libx264 -profile:v high -pix_fmt yuv420p -g 6 -keyint_min 6 -bf 0 \
+  -sc_threshold 0 -crf 26 -preset slow -movflags +faststart -an \
+  public/media/circuit-1080.mp4
 ```
 
 ## Scroll-linked motion
@@ -243,10 +285,13 @@ generated `*.vercel.app` hostname.
 ## Performance and accessibility
 
 - **Static by default.** Both languages of both pages are prerendered.
-- **Motion costs nothing.** All scroll effects are CSS scroll-driven animations; the only client JavaScript is the mobile menu, the forms, and a small entrance observer.
-- **Minimal client JavaScript.** Only three components are interactive: the
-  mobile menu, the form, and a small scroll-reveal. Everything else — including
-  the language toggle — is server-rendered HTML.
+- **Motion is nearly free.** The progress hairline and the image settle are CSS
+  scroll-driven animations, so they never touch the main thread. The film is the
+  one exception: a single `requestAnimationFrame` loop, gated by an
+  IntersectionObserver, and no scroll listener anywhere on the page.
+- **Minimal client JavaScript.** Only four components are interactive: the
+  mobile menu, the form, the entrance observer, and the film. Everything else —
+  including the language toggle — is server-rendered HTML.
 - **No layout shift.** Every image sits in a wrapper with a declared aspect
   ratio and renders with `fill`; fonts carry fallback metrics.
 - **Images** are served as AVIF/WebP at responsive sizes by the Next optimiser.
@@ -261,8 +306,7 @@ generated `*.vercel.app` hostname.
 
 ## Images
 
-Every file in `public/images/` is currently a placeholder plate. Replace them
-with the real photography using the same filenames — see
+`public/images/` holds the team's own photography. See
 [`public/images/README.md`](public/images/README.md) for the mapping of each
-file to the section it appears in, and for how to swap the inline omega
-monogram for the official logo.
+file to the section it appears in — including two files whose names are the
+opposite way round to what they show.

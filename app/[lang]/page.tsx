@@ -6,7 +6,7 @@ import type { Metadata } from "next";
 import { Reveal } from "@/components/Reveal";
 import { ArrowIcon } from "@/components/Icons";
 import { ProjectForm } from "@/components/ProjectForm";
-import { ScrollVideo } from "@/components/ScrollVideo";
+import { FilmBackdrop } from "@/components/FilmBackdrop";
 import { DEFAULT_LOCALE, getDictionary, isLocale } from "@/lib/i18n";
 import { FOUNDER_NAME_AR, FOUNDER_NAME_EN, ORG_NAME_AR, ORG_NAME_EN, SITE_URL } from "@/lib/site";
 
@@ -69,6 +69,10 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
+      {/* The film runs behind everything from here down to the founder. */}
+      <div className="film-range" id="film-range">
+        <FilmBackdrop rangeId="film-range" />
+
       {/* ---------------------------------------------------------------- Hero */}
       <section className="hero">
         <div className="container hero__inner">
@@ -114,7 +118,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
                 {dict.about.heading}
               </h2>
             </div>
-            <p className="about__body">{dict.about.body}</p>
+            <p className="about__body glass">{dict.about.body}</p>
           </Reveal>
         </div>
       </section>
@@ -186,7 +190,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
                 <p className="project__summary">{project.summary}</p>
                 <ul className="project__domains">
                   {project.domains.map((domain) => (
-                    <li className="chip" key={domain}>
+                    <li className="chip glass--lite" key={domain}>
                       {domain}
                     </li>
                   ))}
@@ -194,7 +198,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
               </Reveal>
 
               <Reveal delay={80}>
-                <ul className="project__points">
+                <ul className="project__points glass--lite">
                   {project.points.map((point) => (
                     <li className="project__point" key={point}>
                       <span>{point}</span>
@@ -206,9 +210,6 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
           </article>
         </div>
       </section>
-
-      {/* ---------------------------------------------------- Scroll-scrubbed */}
-      <ScrollVideo dict={dict} />
 
       {/* -------------------------------------------------------- Capabilities */}
       <section className="section" id="capabilities" aria-labelledby="capabilities-title">
@@ -222,7 +223,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
 
           <Reveal as="ul" className="caps">
             {dict.capabilities.items.map((item) => (
-              <li className="cap" key={item.title}>
+              <li className="cap glass--lite" key={item.title}>
                 <h3 className="cap__title">{item.title}</h3>
                 <p className="cap__body">{item.body}</p>
               </li>
@@ -284,8 +285,10 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
         </div>
       </section>
 
+      </div>
+
       {/* ------------------------------------------------------------- Contact */}
-      <section className="section" id="contact" aria-labelledby="contact-title">
+      <section className="section section--solid" id="contact" aria-labelledby="contact-title">
         <div className="container contact">
           <div>
             <p className="sec-label mono">{dict.contact.label}</p>
