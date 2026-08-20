@@ -17,7 +17,7 @@ const OUT = path.join(process.cwd(), "public", "images");
 const PLATES = [
   { file: "project-unit.jpg", width: 1200, height: 1500 },
   { file: "project-enclosure.jpg", width: 1600, height: 1067 },
-  { file: "project-chamber.jpg", width: 1600, height: 1067 },
+  { file: "IMG_20260820_115933_632.JPG", width: 1600, height: 1067 },
   { file: "project-array.jpg", width: 1600, height: 1067 },
   { file: "team-nurai.jpg", width: 1600, height: 1200 },
   { file: "founder.jpg", width: 1200, height: 1600 },
