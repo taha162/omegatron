@@ -6,6 +6,7 @@ import type { Metadata } from "next";
 import { Reveal } from "@/components/Reveal";
 import { ArrowIcon } from "@/components/Icons";
 import { ProjectForm } from "@/components/ProjectForm";
+import { ScrollVideo } from "@/components/ScrollVideo";
 import { DEFAULT_LOCALE, getDictionary, isLocale } from "@/lib/i18n";
 import { FOUNDER_NAME_AR, FOUNDER_NAME_EN, ORG_NAME_AR, ORG_NAME_EN, SITE_URL } from "@/lib/site";
 
@@ -89,9 +90,9 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
           </div>
 
           <figure className="hero__figure">
-            <div className="media media--4x5">
+            <div className="media media--4x3">
               <Image
-                src="/images/project-unit.jpg"
+                src="/images/project-array.jpg"
                 alt={dict.hero.imageAlt}
                 fill
                 priority
@@ -105,29 +106,15 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
 
       {/* --------------------------------------------------------------- About */}
       <section className="section" id="about" aria-labelledby="about-title">
-        <div className="container about">
-          <Reveal>
-            <p className="sec-label mono">{dict.about.label}</p>
-            <h2 className="sec-title" id="about-title">
-              {dict.about.heading}
-            </h2>
-            <p className="about__body" style={{ marginBlockStart: "1.25rem" }}>
-              {dict.about.body}
-            </p>
-          </Reveal>
-
-          <Reveal delay={80}>
-            <figure>
-              <div className="media media--4x3">
-                <Image
-                  src="/images/team-nurai.jpg"
-                  alt={dict.about.imageAlt}
-                  fill
-                  loading="lazy"
-                  sizes="(max-width: 1024px) 92vw, 44vw"
-                />
-              </div>
-            </figure>
+        <div className="container">
+          <Reveal className="about">
+            <div>
+              <p className="sec-label mono">{dict.about.label}</p>
+              <h2 className="sec-title" id="about-title">
+                {dict.about.heading}
+              </h2>
+            </div>
+            <p className="about__body">{dict.about.body}</p>
           </Reveal>
         </div>
       </section>
@@ -153,7 +140,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
                 <div className="media media--16x10">
                   <Image
                     src="/images/project-enclosure.jpg"
-                    alt={dict.projects.images.enclosureAlt}
+                    alt={dict.projects.images.chamberAlt}
                     fill
                     loading="lazy"
                     sizes="(max-width: 1200px) 94vw, 1180px"
@@ -166,7 +153,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
                   <div className="media media--3x2">
                     <Image
                       src="/images/project-chamber.jpg"
-                      alt={dict.projects.images.chamberAlt}
+                      alt={dict.projects.images.enclosureAlt}
                       fill
                       loading="lazy"
                       sizes="(max-width: 620px) 46vw, 47vw"
@@ -219,6 +206,9 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
           </article>
         </div>
       </section>
+
+      {/* ---------------------------------------------------- Scroll-scrubbed */}
+      <ScrollVideo dict={dict} />
 
       {/* -------------------------------------------------------- Capabilities */}
       <section className="section" id="capabilities" aria-labelledby="capabilities-title">
