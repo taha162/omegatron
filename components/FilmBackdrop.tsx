@@ -49,14 +49,17 @@ export function FilmBackdrop({ rangeId }: { rangeId: string }) {
       if (!active) return;
 
       const target = progress();
-      eased += (target - eased) * 0.1;
+      // Enough smoothing to take the jitter out of a trackpad, not so much
+      // that the film lags behind the thumb.
+      eased += (target - eased) * 0.18;
 
       const duration = video!.duration;
       if (ready && Number.isFinite(duration) && duration > 0) {
         const time = eased * duration;
-        // Only seek when the move is worth a frame, so a still page does not
-        // keep the decoder busy.
-        if (Math.abs(video!.currentTime - time) > 1 / 30) {
+        // Only seek when the move is worth half a frame, so a still page does
+        // not keep the decoder busy. Every frame is a keyframe, so the seek
+        // itself costs one decode.
+        if (Math.abs(video!.currentTime - time) > 1 / 40) {
           video!.currentTime = time;
         }
       }
@@ -89,8 +92,8 @@ export function FilmBackdrop({ rangeId }: { rangeId: string }) {
 
     function onPointerMove(event: PointerEvent) {
       if (!finePointer.matches) return;
-      pointerX = (event.clientX / window.innerWidth - 0.5) * -22;
-      pointerY = (event.clientY / window.innerHeight - 0.5) * -14;
+      pointerX = (event.clientX / window.innerWidth - 0.5) * -16;
+      pointerY = (event.clientY / window.innerHeight - 0.5) * -10;
     }
 
     const onLoaded = () => {
@@ -104,7 +107,7 @@ export function FilmBackdrop({ rangeId }: { rangeId: string }) {
     // and fetch the WebM as well. Asking canPlayType first means exactly one
     // request, and the smaller H.264 file everywhere it is supported.
     const wide = window.matchMedia("(min-width: 900px)").matches;
-    const base = wide ? "/media/circuit-1080" : "/media/circuit-720";
+    const base = wide ? "/media/circuit-1280" : "/media/circuit-854";
     const h264 = video.canPlayType('video/mp4; codecs="avc1.640028"');
     video.src = h264 ? `${base}.mp4` : `${base}.webm`;
     video.load();

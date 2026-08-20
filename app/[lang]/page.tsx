@@ -76,35 +76,20 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
       {/* ---------------------------------------------------------------- Hero */}
       <section className="hero">
         <div className="container hero__inner">
-          <div>
-            <p className="hero__wordmark" lang="en">
-              {dict.hero.wordmark}
-            </p>
-            <h1 className="hero__statement">{dict.hero.statement}</h1>
-            <p className="hero__lead">{dict.hero.lead}</p>
-            <div className="hero__actions">
-              <a href="#projects" className="btn">
-                {dict.hero.primaryCta}
-                <ArrowIcon className="btn__arrow" />
-              </a>
-              <Link href={`/${lang}/start`} className="btn btn--ghost">
-                {dict.hero.secondaryCta}
-              </Link>
-            </div>
+          <p className="hero__wordmark" lang="en">
+            {dict.hero.wordmark}
+          </p>
+          <h1 className="hero__statement">{dict.hero.statement}</h1>
+          <p className="hero__lead">{dict.hero.lead}</p>
+          <div className="hero__actions">
+            <a href="#projects" className="btn">
+              {dict.hero.primaryCta}
+              <ArrowIcon className="btn__arrow" />
+            </a>
+            <Link href={`/${lang}/start`} className="btn btn--ghost">
+              {dict.hero.secondaryCta}
+            </Link>
           </div>
-
-          <figure className="hero__figure">
-            <div className="media media--4x3">
-              <Image
-                src="/images/project-array.jpg"
-                alt={dict.hero.imageAlt}
-                fill
-                priority
-                fetchPriority="high"
-                sizes="(max-width: 1024px) 92vw, 40vw"
-              />
-            </div>
-          </figure>
         </div>
       </section>
 

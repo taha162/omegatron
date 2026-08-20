@@ -92,30 +92,54 @@ and TRON in gold as the logo does.
 
 ### Liquid glass
 
-Surfaces that sit over the film are glass rather than filled panels. The
-material is two utilities:
+Surfaces that sit over the film are glass rather than filled panels. Three
+layers make the material, and all three matter — a translucent box with a flat
+border reads as grey plastic, not glass:
 
-- **`.glass`** — a translucent gradient, `backdrop-filter: blur(22px)
-  saturate(180%)`, a one-pixel inset specular rim top and bottom, a soft drop
-  shadow, and a `::before` radial rake that gives the pane a light source. Used
-  where there are few of them and the blur is worth it: the header pill, the
-  About panel, the founder copy, the mobile menu.
-- **`.glass--lite`** — the same look with the blur dropped. Used for the many
-  small panes (capability cards, project points, chips), because compositing a
-  dozen backdrop filters over a seeking video costs far more than it shows.
+1. **A refraction.** `backdrop-filter: blur() saturate(200%) brightness()`
+   lifts and re-saturates whatever is behind the pane, so the board is still
+   legible through it.
+2. **A specular sheen.** A `::before` with two radial gradients — a strong one
+   off the top-left shoulder, a faint bounce at the bottom-right — gives the
+   pane a light source instead of a uniform tint.
+3. **A light-catching rim.** A `::after` masked down to a one-pixel ring, filled
+   with a diagonal gradient, so the edge is bright where the light lands and
+   nearly invisible where it does not.
 
-Every token is a custom property (`--glass-bg`, `--glass-blur`,
-`--glass-border`, `--glass-rim`, `--glass-drop`, `--radius-glass`), so the
-material is tunable in one place.
+Two weights: **`.glass`** (26px blur) for the header, the About panel, the
+founder copy and the mobile sheet; **`.glass--lite`** (14px) for the many small
+panes — capability cards, project points, chips, the ghost button — so a dozen
+of them can composite over a seeking video.
 
-The header is a floating pill: the bar is padded away from the viewport edge and
-the inner row is a fully rounded `.glass` element, so the content scrolls
-visibly beneath it.
+Every value is a custom property (`--glass-bg`, `--glass-filter`,
+`--glass-filter-lite`, `--glass-rim`, `--glass-inner`, `--glass-drop`,
+`--radius-glass`), so the material is tunable in one place.
+
+The header is a floating bar: padded away from the viewport edge, with corners
+rounded to `--radius-glass` rather than to a full pill, so it reads as a panel
+of glass rather than a capsule. Its three tracks are `auto 1fr auto`, which
+centres the nav against the bar rather than against whatever the brand and the
+actions happen to measure.
+
+**Corners.** One scale, all of it generous: `--radius` 12px for controls,
+`--radius-lg` 20px for photography, `--radius-glass` 24px for panes.
+
+**The mobile sheet** hangs off the bar rather than sitting in the flow, so a
+closed menu costs no layout and an open one covers the page instead of pushing
+it down. It stays in the document and animates in both directions — the sheet
+eases down and the rows arrive behind it, 40ms apart — and `visibility: hidden`
+keeps the links out of the tab order while it is shut.
 
 Measured contrast over the film, worst case: **4.89:1** on capability body copy,
 against an assumed worst-case ground of `rgb(38,44,56)` — the scrim over the
 brightest patch of footage — rather than a sampled pixel. Headings run 12:1 and
 body copy 7.81:1 against the same ground.
+
+## The hero
+
+No photograph — the film is the picture. The hero is a statement, a lead, and
+two actions, vertically centred in a viewport-height block so the board reads
+behind it.
 
 ## The film
 
@@ -140,47 +164,49 @@ page does not keep the decoder busy. Sections below the range carry
 
 Because scroll is the only input, touch works exactly as the mouse wheel does.
 The pointer parallax is gated on `(hover: hover) and (pointer: fine)` and moves
-the frame by at most 22px, inside a 6% overscale, so it can never expose an edge.
+the frame by at most 16px — well inside the masked edge, so it can never expose
+a hard boundary.
 
 **How it is encoded.** Four files in `public/media/`, and a browser downloads
 exactly **one**:
 
 | File | Codec | Size | Served to |
 | --- | --- | --- | --- |
-| `circuit-1080.mp4` | H.264 high, GOP 6 | 2.8 MB | ≥900px viewports |
-| `circuit-720.mp4` | H.264 high, GOP 6 | 1.6 MB | narrow viewports |
-| `circuit-1080.webm` | VP9, GOP 6 | 3.1 MB | browsers without H.264 |
-| `circuit-720.webm` | VP9, GOP 6 | 2.0 MB | browsers without H.264 |
+| `circuit-1280.mp4` | H.264 high, all-intra | 3.9 MB | ≥900px viewports |
+| `circuit-854.mp4` | H.264 high, all-intra | 2.4 MB | narrow viewports |
+| `circuit-1280.webm` | VP9 | 3.7 MB | browsers without H.264 |
+| `circuit-854.webm` | VP9 | 2.5 MB | browsers without H.264 |
 
 The component asks `canPlayType` and assigns `video.src` itself rather than
 listing `<source>` elements — a fallthrough list makes the browser fetch the
 MP4, fail to decode it, and fetch the WebM as well, doubling the bytes. Every
 real browser takes the MP4.
 
-All four are 8 seconds at 15 fps with no audio stream. The short GOP is the
-point: scrubbing lands on an arbitrary time, and a six-frame group means the
-decoder is never more than a few frames from a keyframe. A 21 KB poster covers
-the moment before the first frame decodes.
+All four are 12 seconds at 20 fps with no audio stream. **Every frame is a
+keyframe** — that is what makes the scrub feel attached to the thumb rather
+than lagging behind it. Scrubbing lands on an arbitrary time, and with an
+inter-frame group the decoder has to walk forward from the last keyframe to get
+there; all-intra means one decode per seek, at any position, in any direction.
+240 frames across the range works out at roughly one frame per 17px of scroll.
+A 28 KB poster covers the moment before the first frame decodes.
 
-**The chip carries our name.** "OmegaTron" is composited into the footage at
-34% alpha, rotated to match the die, so the processor reads as ours without
-looking like an overlay.
+**Framing.** The element is given the footage's own 16:9 ratio and sized to the
+viewport width, rather than stretched to the viewport and cropped with `cover`.
+Cover turned the board into a macro shot — brutally so on a phone, where the
+viewport is more than twice as tall as the frame. Because the box now matches
+the picture exactly, a radial mask fades the picture's real edges into the page
+instead of ending on a rectangle.
 
 **Reduced motion** shows a single frame and never scrubs — the loop simply never
 starts, and the layer stays visible so the composition is intact.
 
-To re-cut the film, any full ffmpeg will do (`wordmark.png` is white text on
-transparency):
+To re-cut the film, any full ffmpeg will do:
 
 ```bash
-ffmpeg -ss 2 -t 8 -i source.mp4 -i wordmark.png -filter_complex \
-  "[0:v]fps=15,scale=1920:1080:flags=lanczos[bg]; \
-   [1:v]format=rgba,scale=470:58,rotate=-13*PI/180:c=none:ow=rotw(-13*PI/180):oh=roth(-13*PI/180), \
-   colorchannelmixer=aa=0.34[mk]; \
-   [bg][mk]overlay=x=W*0.482-w/2:y=H*0.468-h/2" \
-  -c:v libx264 -profile:v high -pix_fmt yuv420p -g 6 -keyint_min 6 -bf 0 \
-  -sc_threshold 0 -crf 26 -preset slow -movflags +faststart -an \
-  public/media/circuit-1080.mp4
+ffmpeg -ss 2 -t 12 -i source.mp4 -vf "fps=20,scale=1280:720:flags=lanczos" \
+  -c:v libx264 -profile:v high -pix_fmt yuv420p -g 1 -keyint_min 1 -bf 0 \
+  -sc_threshold 0 -crf 33 -preset slow -movflags +faststart -an \
+  public/media/circuit-1280.mp4
 ```
 
 ## Scroll-linked motion
