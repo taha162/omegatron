@@ -49,9 +49,6 @@ const ar = {
     close: "إغلاق",
     skipToContent: "تخطَّ إلى المحتوى",
     primary: "التنقّل الرئيسي",
-    theme: "المظهر",
-    themeLight: "فاتح",
-    themeDark: "داكن",
   },
 
   hero: {
@@ -107,11 +104,6 @@ const ar = {
       { title: "أنظمة التحكّم", body: "حلقات مغلقة واستجابة مستقرّة" },
       { title: "التصميم والنمذجة", body: "نمذجة ثلاثية الأبعاد وطباعة سريعة" },
     ],
-  },
-
-  cine: {
-    title: "من المكوّنات إلى الأنظمة",
-    lines: ["من المكوّنات إلى الأنظمة.", "نحن نُهندس الرابط بينها."],
   },
 
   process: {
@@ -295,9 +287,6 @@ const en: typeof ar = {
     close: "Close",
     skipToContent: "Skip to content",
     primary: "Primary",
-    theme: "Theme",
-    themeLight: "Light",
-    themeDark: "Dark",
   },
 
   hero: {
@@ -353,11 +342,6 @@ const en: typeof ar = {
       { title: "Control Systems", body: "Closed loops and stable response" },
       { title: "Design & Prototyping", body: "3D modelling and fast printing" },
     ],
-  },
-
-  cine: {
-    title: "From components to systems",
-    lines: ["From components to systems.", "We engineer the connection."],
   },
 
   process: {

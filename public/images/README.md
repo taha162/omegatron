@@ -22,11 +22,14 @@ follows the actual content, not the filename.
 
 ## Video
 
-`public/media/` holds the scroll-scrubbed film — see the "Scroll-scrubbed film"
-section of the root README for how it is encoded and why.
+`public/media/` holds the film that runs behind the page from the hero to the
+founder — four encodes (1080/720 x H.264/VP9) plus a poster. See "The film" in
+the root README for how it is cut, why the GOP is six frames, and how the
+browser is made to fetch exactly one of the four.
 
 ## Logo
 
 The header, footer, and favicon use inline SVG (`components/Logo.tsx`,
 `app/icon.svg`, `public/icon.svg`), redrawn from the official mark so it costs
-no request and inherits theme colour.
+no request and inherits its colour from the palette. The same wordmark is
+composited onto the processor in the film.

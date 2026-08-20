@@ -4,8 +4,8 @@
   "description": "Mechatronics team in Iraq — embedded systems, robotics, AI, sensors.",
   "start_url": "/ar",
   "display": "standalone",
-  "background_color": "#fbfaf8",
-  "theme_color": "#fbfaf8",
+  "background_color": "#070b11",
+  "theme_color": "#070b11",
   "icons": [
     {
       "src": "/icon.svg",

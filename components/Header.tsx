@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useId, useState } from "react";
 import { Logo, Wordmark } from "./Logo";
-import { ThemeToggle } from "./ThemeToggle";
 import { LOCALES, type Dictionary, type Locale } from "@/lib/i18n";
 
 /** Swap the locale segment of the current path, keeping the rest intact. */
@@ -33,7 +32,7 @@ export function Header({ locale, dict }: { locale: Locale; dict: Dictionary }) {
 
   return (
     <header className="header">
-      <div className="container header__inner">
+      <div className="container header__inner glass">
         <Link href={`/${locale}`} className="brand" aria-label={dict.nav.home} onClick={close}>
           <Logo className="brand__mark" />
           <Wordmark className="wordmark" />
@@ -70,8 +69,6 @@ export function Header({ locale, dict }: { locale: Locale; dict: Dictionary }) {
             ))}
           </div>
 
-          <ThemeToggle dict={dict} />
-
           <Link href={`/${locale}/start`} className="btn header__cta" onClick={close}>
             {dict.nav.start}
           </Link>
@@ -94,8 +91,8 @@ export function Header({ locale, dict }: { locale: Locale; dict: Dictionary }) {
       </div>
 
       {open ? (
-        <div className="mobile-nav" id={menuId}>
-          <div className="container">
+        <div className="container">
+          <div className="mobile-nav glass" id={menuId}>
             <ul className="mobile-nav__list">
               {links.map((link) => (
                 <li key={link.href}>
