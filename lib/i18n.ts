@@ -57,7 +57,6 @@ const ar = {
     lead: "فريق ميكاترونكس في العراق. نصمّم ونصنّع ونبرمج داخل الفريق.",
     primaryCta: "شاهد المشاريع",
     secondaryCta: "ابدأ مشروعًا",
-    imageAlt: "وحدة الاستشعار التي طوّرها فريق أوميكاترون.",
   },
 
   about: {
@@ -295,7 +294,6 @@ const en: typeof ar = {
     lead: "A mechatronics team in Iraq. We design, fabricate, and program in-house.",
     primaryCta: "See our work",
     secondaryCta: "Start a project",
-    imageAlt: "The sensing unit developed by the OmegaTron team.",
   },
 
   about: {

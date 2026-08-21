@@ -75,8 +75,8 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
 
       {/* ---------------------------------------------------------------- Hero */}
       <section className="hero">
-        <div className="container hero__inner">
-          <div>
+        <div className="hero__pin">
+          <div className="container hero__inner">
             <p className="hero__wordmark" lang="en">
               {dict.hero.wordmark}
             </p>
@@ -92,19 +92,6 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
               </Link>
             </div>
           </div>
-
-          <figure className="hero__figure">
-            <div className="media media--4x3">
-              <Image
-                src="/images/project-array.jpg"
-                alt={dict.hero.imageAlt}
-                fill
-                priority
-                fetchPriority="high"
-                sizes="(max-width: 1024px) 92vw, 40vw"
-              />
-            </div>
-          </figure>
         </div>
       </section>
 
@@ -274,7 +261,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
             </div>
           </Reveal>
 
-          <Reveal delay={80}>
+          <Reveal delay={80} className="founder__copy glass">
             <p className="sec-label mono">{dict.founder.label}</p>
             <h2 className="founder__name" id="founder-title">
               {dict.founder.name}

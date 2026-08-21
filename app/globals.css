@@ -22,22 +22,58 @@
   --steel: #c3ccd6;
 
   /*
-   * Liquid glass. A translucent pane that blurs and lifts what is behind it,
-   * with a bright specular rim along the top edge and a soft drop to separate
-   * it from the film. `--glass-blur` is kept modest on purpose: every pane is
-   * compositing over a seeking video.
+   * Liquid glass. Not a translucent box — an optical stack, because that is
+   * what the eye is actually reading when it calls something glass:
+   *
+   *   1. a frosted body that blurs and re-saturates the backdrop,
+   *   2. a lens band at the edge, where a thick pane bends and brightens what
+   *      is behind it before the border,
+   *   3. a rim whose brightness travels around the perimeter rather than
+   *      sitting at one uniform value,
+   *   4. specular highlights from a light source off the top-left shoulder.
+   *
+   * Kept dark, so it belongs to this palette rather than Apple's white one.
    */
-  --glass-bg: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.1) 0%,
-    rgba(255, 255, 255, 0.045) 55%,
-    rgba(255, 255, 255, 0.025) 100%
+  --glass-tint: linear-gradient(
+      152deg,
+      rgba(255, 255, 255, 0.17) 0%,
+      rgba(255, 255, 255, 0.07) 30%,
+      rgba(255, 255, 255, 0.028) 58%,
+      rgba(255, 255, 255, 0.06) 84%,
+      rgba(255, 255, 255, 0.12) 100%
+    ),
+    linear-gradient(180deg, rgba(10, 16, 24, 0.34) 0%, rgba(10, 16, 24, 0.5) 100%);
+  --glass-specular: radial-gradient(
+      86% 62% at 6% -12%,
+      rgba(255, 255, 255, 0.3) 0%,
+      rgba(255, 255, 255, 0.08) 42%,
+      transparent 70%
+    ),
+    radial-gradient(70% 52% at 102% 112%, rgba(255, 255, 255, 0.13), transparent 66%);
+  --glass-body: blur(30px) saturate(210%) brightness(0.88) contrast(1.06);
+  --glass-body-lite: blur(18px) saturate(195%) brightness(0.9) contrast(1.04);
+  /* The lens band: what is behind the edge, lifted and re-saturated relative
+     to what is behind the middle. Kept restrained — over near-black footage a
+     strong lift stops reading as refraction and starts reading as a second
+     frame drawn inside the first. */
+  --glass-lens: blur(2px) saturate(240%) brightness(1.22);
+  --glass-lens-w: 11px;
+  /* Light travelling round the rim: bright at the top-left shoulder, gone at
+     the opposite corner, picked back up as a bounce at the bottom. */
+  --glass-rim: conic-gradient(
+    from 216deg at 50% 50%,
+    rgba(255, 255, 255, 0.78) 0deg,
+    rgba(255, 255, 255, 0.26) 42deg,
+    rgba(255, 255, 255, 0.05) 104deg,
+    rgba(255, 255, 255, 0.03) 172deg,
+    rgba(255, 255, 255, 0.22) 232deg,
+    rgba(255, 255, 255, 0.5) 296deg,
+    rgba(255, 255, 255, 0.78) 360deg
   );
-  --glass-blur: 22px;
-  --glass-border: rgba(255, 255, 255, 0.14);
-  --glass-rim: inset 0 1px 0 rgba(255, 255, 255, 0.24),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.05);
-  --glass-drop: 0 14px 44px rgba(0, 0, 0, 0.4);
+  --glass-inner: inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 0 24px -6px rgba(255, 255, 255, 0.1);
+  --glass-drop: 0 26px 62px -24px rgba(0, 0, 0, 0.85),
+    0 4px 14px -8px rgba(0, 0, 0, 0.6);
 
   /* Type */
   --font-sans: var(--font-cairo), "Cairo", "Segoe UI", system-ui, -apple-system,
@@ -59,52 +95,118 @@
   --max-width: 74rem;
   --measure: 58ch;
 
-  --radius: 3px;
-  --radius-lg: 6px;
-  --radius-glass: 18px;
+  /* Corners are generously rounded — roughly a quarter of the short side. */
+  --radius: 16px;
+  --radius-lg: 26px;
+  --radius-glass: 30px;
 
-  --header-h: 4.25rem;
+  /* Panes are given room to breathe; a glass pane with tight padding reads as
+     a border round the text rather than a surface under it. */
+  --pane-pad: clamp(1.75rem, 1.3rem + 2vw, 3rem);
+  --pane-pad-sm: clamp(1.375rem, 1.1rem + 1.2vw, 2rem);
+
+  --header-h: 4.75rem;
 }
 
 /* --------------------------------------------------------------------------
    Liquid glass
    -------------------------------------------------------------------------- */
 
-.glass {
+/* Layer 1 — the frosted body, plus the specular highlights painted straight
+   into the element's own background stack. */
+.glass,
+.glass--lite {
   position: relative;
-  background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur)) saturate(180%);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
-  border: 1px solid var(--glass-border);
+  isolation: isolate;
+  background: var(--glass-specular), var(--glass-tint);
+  backdrop-filter: var(--glass-body);
+  border: 0;
   border-radius: var(--radius-glass);
-  box-shadow: var(--glass-rim), var(--glass-drop);
+  box-shadow: var(--glass-inner), var(--glass-drop);
 }
 
-/* A single soft highlight raking across the top of the pane. */
-.glass::before {
+/* Thinner glass for the many small panes — the same optics, less depth of
+   field, so a dozen of them can sit over a seeking video. */
+.glass--lite {
+  --glass-body: var(--glass-body-lite);
+  --glass-lens-w: 9px;
+  box-shadow: var(--glass-inner), 0 14px 32px -18px rgba(0, 0, 0, 0.7);
+}
+
+/*
+ * Layer 2 — the lens band. A second backdrop filter, masked to a band just
+ * inside the border and faded inward, so the backdrop reappears sharper and
+ * brighter at the edge than it is through the middle of the pane. This is the
+ * cue that separates thick glass from a sheet of tinted plastic.
+ */
+.glass::before,
+.glass--lite::before {
   content: "";
   position: absolute;
   inset: 0;
+  z-index: -1;
   border-radius: inherit;
   pointer-events: none;
-  background: radial-gradient(
-    120% 80% at 12% -20%,
-    rgba(255, 255, 255, 0.16),
-    transparent 60%
-  );
+  backdrop-filter: var(--glass-lens);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  padding: var(--glass-lens-w);
+  opacity: 0.6;
 }
 
-.glass--lite {
-  position: relative;
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-glass);
-  box-shadow: var(--glass-rim);
+/* Layer 3 — the rim. A 1.5px ring carrying a conic gradient, so the light
+   travels around the perimeter instead of sitting flat on four borders. */
+.glass::after,
+.glass--lite::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  padding: 1.5px;
+  pointer-events: none;
+  background: var(--glass-rim);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
 }
 
-@supports not (backdrop-filter: blur(1px)) {
-  .glass {
+/*
+ * The prefixed property gets its own rule. Written beside the standard one it
+ * is merged away by the build's minifier — which keeps exactly one of the pair
+ * — and Safari before 18 has only the prefixed form, so losing it would mean
+ * losing the material on every one of those devices.
+ */
+@supports (-webkit-backdrop-filter: blur(1px)) {
+  .glass,
+  .glass--lite {
+    -webkit-backdrop-filter: var(--glass-body);
+  }
+
+  .glass::before,
+  .glass--lite::before {
+    -webkit-backdrop-filter: var(--glass-lens);
+  }
+
+  .btn--ghost {
+    -webkit-backdrop-filter: var(--glass-body-lite);
+  }
+}
+
+/* Without backdrop-filter there is nothing to refract; fall back to a solid
+   panel rather than a washed-out ghost. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass,
+  .glass--lite {
     background: rgba(16, 24, 35, 0.92);
+  }
+
+  .glass::before,
+  .glass--lite::before {
+    display: none;
   }
 }
 
@@ -355,7 +457,7 @@ textarea {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.875rem 1.625rem;
+  padding: 1rem 1.875rem;
   background: var(--btn-bg);
   color: var(--btn-fg);
   border: 1px solid var(--btn-bd);
@@ -447,14 +549,16 @@ textarea {
   padding-block: 0.75rem;
 }
 
+/* Three tracks, so the nav is centred against the bar rather than against
+   whatever the brand and the actions happen to measure. */
 .header__inner {
   height: var(--header-h);
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
-  justify-content: space-between;
-  gap: 1.5rem;
-  border-radius: 999px;
-  padding-inline: clamp(1rem, 0.6rem + 1.2vw, 1.75rem);
+  gap: 1rem;
+  border-radius: var(--radius-glass);
+  padding-inline: clamp(1.125rem, 0.7rem + 1.5vw, 1.875rem);
 }
 
 .header__inner > * {
@@ -467,6 +571,7 @@ textarea {
   align-items: center;
   gap: 0.625rem;
   flex: none;
+  justify-self: start;
 }
 
 .brand__mark {
@@ -505,7 +610,8 @@ textarea {
 .nav {
   display: flex;
   align-items: center;
-  gap: clamp(0.875rem, 0.3rem + 1.5vw, 1.875rem);
+  justify-content: center;
+  gap: clamp(0.75rem, 0.2rem + 1.4vw, 1.625rem);
 }
 
 .nav__link {
@@ -523,8 +629,9 @@ textarea {
 .header__actions {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 0.5rem;
-  flex: none;
+  justify-self: end;
 }
 
 .lang-toggle {
@@ -556,7 +663,7 @@ textarea {
 }
 
 .header__cta {
-  padding: 0.5625rem 1rem;
+  padding: 0.6875rem 1.25rem;
   font-size: 0.875rem;
 }
 
@@ -596,24 +703,72 @@ textarea {
   transform: translateY(-5.5px) rotate(-45deg);
 }
 
+/* The sheet hangs off the bar rather than sitting in the flow, so a closed
+   menu takes up no space and an open one covers the page instead of pushing
+   it down. */
+.mobile-nav-wrap {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: 100%;
+}
+
+/* The sheet stays in the document and animates open, so both directions are
+   eased. `visibility` keeps the links out of the tab order while it is shut. */
 .mobile-nav {
   display: none;
-  margin-block-start: 0.75rem;
-  padding: 0.5rem 1.25rem 1.25rem;
+  margin-block-start: 0.625rem;
+  padding: 0.75rem var(--pane-pad-sm) var(--pane-pad-sm);
+  transform-origin: top center;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-0.75rem) scale(0.97);
+  transition: opacity 0.24s ease, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s linear 0.4s;
+}
+
+.mobile-nav.is-open {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition: opacity 0.26s ease, transform 0.44s cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s;
 }
 
 .mobile-nav__list {
   display: grid;
 }
 
+/* Each row arrives just behind the one above it. */
+.mobile-nav__list > li,
+.mobile-nav__cta {
+  opacity: 0;
+  transform: translateY(0.5rem);
+  transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.mobile-nav.is-open .mobile-nav__list > li,
+.mobile-nav.is-open .mobile-nav__cta {
+  opacity: 1;
+  transform: none;
+}
+
+.mobile-nav.is-open .mobile-nav__list > li:nth-child(1) { transition-delay: 0.06s; }
+.mobile-nav.is-open .mobile-nav__list > li:nth-child(2) { transition-delay: 0.1s; }
+.mobile-nav.is-open .mobile-nav__list > li:nth-child(3) { transition-delay: 0.14s; }
+.mobile-nav.is-open .mobile-nav__list > li:nth-child(4) { transition-delay: 0.18s; }
+.mobile-nav.is-open .mobile-nav__list > li:nth-child(5) { transition-delay: 0.22s; }
+.mobile-nav.is-open .mobile-nav__list > li:nth-child(6) { transition-delay: 0.26s; }
+.mobile-nav.is-open .mobile-nav__cta { transition-delay: 0.3s; }
+
 .mobile-nav__link {
+  display: block;
   padding-block: 0.875rem;
   font-size: 1.0625rem;
   font-weight: 500;
   border-block-end: 1px solid var(--line);
 }
 
-.mobile-nav__link:last-child {
+.mobile-nav__list > li:last-child .mobile-nav__link {
   border-block-end: 0;
 }
 
@@ -658,24 +813,64 @@ textarea {
   visibility: visible;
 }
 
+/*
+ * The element is given the footage's own ratio and sized to the viewport
+ * width, rather than stretched to the viewport and cropped with `cover`.
+ * Cover turned the board into a macro shot — brutally so on a phone, where
+ * the viewport is more than twice as tall as the frame is — and because the
+ * box now matches the picture exactly, a mask fades the picture's real edges
+ * into the page instead of ending on a rectangle.
+ */
 .film__video {
-  width: 100%;
-  height: 100%;
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  /* Nearly fills a landscape viewport — the 0.94 leaves a shallow band top and
+     bottom for the mask to work on, so the frame ends on a fade rather than a
+     hard edge. `max-width` has to be released; the reset caps media at 100%. */
+  width: max(100%, calc(100svh * 16 / 9 * 0.94));
+  max-width: none;
+  height: auto;
+  aspect-ratio: 16 / 9;
   object-fit: cover;
-  /* Over-scaled so the pointer drift never exposes an edge. */
-  transform: translate3d(var(--px, 0px), var(--py, 0px), 0) scale(1.06);
+  transform: translate3d(var(--px, 0px), var(--py, 0px), 0) scale(1.02);
+  /* The radii are percentages of the box, so they have to stay near 50% for
+     the fade to land on the frame's own edges rather than beyond them. */
+  -webkit-mask-image: radial-gradient(
+    76% 72% at 50% 50%,
+    #000 48%,
+    rgba(0, 0, 0, 0.55) 78%,
+    transparent 100%
+  );
+  mask-image: radial-gradient(
+    76% 72% at 50% 50%,
+    #000 48%,
+    rgba(0, 0, 0, 0.55) 78%,
+    transparent 100%
+  );
+}
+
+/* A phone is more than twice as tall as the frame is; filling it would mean
+   the macro crop all over again. The frame is sized to the width and opened up
+   instead — still well under the magnification `cover` was forcing. */
+@media (max-aspect-ratio: 3 / 4) {
+  .film__video {
+    width: 100%;
+    transform: translate3d(var(--px, 0px), var(--py, 0px), 0) scale(1.8);
+  }
 }
 
 .film__scrim {
   position: absolute;
   inset: 0;
   background: linear-gradient(
-    180deg,
-    rgba(7, 11, 17, 0.82) 0%,
-    rgba(7, 11, 17, 0.6) 22%,
-    rgba(7, 11, 17, 0.62) 70%,
-    rgba(7, 11, 17, 0.9) 100%
-  );
+      180deg,
+      rgba(7, 11, 17, 0.8) 0%,
+      rgba(7, 11, 17, 0.52) 24%,
+      rgba(7, 11, 17, 0.56) 68%,
+      rgba(7, 11, 17, 0.88) 100%
+    ),
+    radial-gradient(72% 58% at 50% 46%, transparent 30%, rgba(7, 11, 17, 0.5) 100%);
 }
 
 /* Sections after the film need their own ground to cover the fixed layer. */
@@ -690,16 +885,49 @@ textarea {
    Hero — a statement, one line, two actions, one photograph
    -------------------------------------------------------------------------- */
 
+/* No photograph here any more — the film is the picture, and the statement
+   stands on it. */
 .hero {
   position: relative;
-  padding-block: clamp(3rem, 2rem + 5vw, 5.5rem) clamp(3rem, 2rem + 4vw, 5rem);
+  display: grid;
+  align-items: center;
+  min-height: min(84vh, 46rem);
+  padding-block: clamp(4rem, 2.5rem + 7vw, 8rem) clamp(3.5rem, 2.5rem + 5vw, 6.5rem);
 }
 
+/*
+ * The hold. The hero is given a runway and its content pinned inside it, so
+ * the first stretch of scrolling moves the film and not the page — the weight
+ * the visitor feels at the top of the site. The runway is declared in CSS
+ * rather than added by script, so there is no reflow after hydration, and only
+ * where there is a script to fade the pinned content out again.
+ */
+@media (scripting: enabled) {
+  .hero {
+    display: block;
+    min-height: 0;
+    height: 220vh;
+    padding-block: 0;
+  }
+
+  .hero__pin {
+    position: sticky;
+    inset-block-start: 0;
+    display: grid;
+    align-items: center;
+    min-height: 100vh;
+    min-height: 100svh;
+    padding-block: calc(var(--header-h) + 2rem) clamp(3.5rem, 2.5rem + 5vw, 6.5rem);
+    /* Driven from the scroll loop; the pinned hero has to be gone before the
+       section below it scrolls over the same patch of film. */
+    opacity: var(--hero-opacity, 1);
+  }
+}
+
+/* Kept on the container's own measure so the hero starts on the same edge as
+   every section below it. The statement and lead carry their own widths. */
 .hero__inner {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr);
-  gap: clamp(2.5rem, 1rem + 5vw, 4.5rem);
-  align-items: center;
+  display: block;
 }
 
 .hero__wordmark {
@@ -821,7 +1049,7 @@ textarea {
 }
 
 .chip {
-  padding: 0.3125rem 0.75rem;
+  padding: 0.4375rem 1rem;
   border: 1px solid var(--line);
   border-radius: 999px;
   font-size: 0.8125rem;
@@ -866,113 +1094,6 @@ textarea {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: clamp(0.75rem, 0.6rem + 0.8vw, 1.25rem);
   margin-block-start: clamp(0.75rem, 0.6rem + 0.8vw, 1.25rem);
-}
-
-/* --------------------------------------------------------------------------
-   Scroll-scrubbed film
-
-   A tall runway with a sticky stage inside it. Light mode holds the footage in
-   a contained, washed panel so the dark frame never takes over the page; dark
-   mode lets it go edge to edge.
-   -------------------------------------------------------------------------- */
-
-.cine {
-  position: relative;
-  height: 280vh;
-}
-
-.cine__stage {
-  position: sticky;
-  inset-block-start: 0;
-  height: 100vh;
-  height: 100svh;
-  overflow: hidden;
-  display: grid;
-  place-items: center;
-}
-
-.cine__frame {
-  position: absolute;
-  inset: clamp(2.5rem, 11vh, 7rem) var(--gutter);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  background: #0a0e14;
-  /* Dissolves into the page instead of ending on a hard edge. */
-  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 14%, #000 86%, transparent);
-  mask-image: linear-gradient(to bottom, transparent, #000 14%, #000 86%, transparent);
-}
-
-.cine__frame {
-  inset: 0;
-  border-radius: 0;
-  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 8%, #000 92%, transparent);
-  mask-image: linear-gradient(to bottom, transparent, #000 8%, #000 92%, transparent);
-}
-
-.cine__video {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  /* Over-scaled so the pointer drift never exposes an edge. */
-  transform: translate3d(var(--px, 0px), var(--py, 0px), 0) scale(1.06);
-  filter: saturate(0.88) brightness(1.04);
-}
-
-.cine__video {
-  filter: none;
-}
-
-/* Light mode only: a paper wash that lifts the footage toward the page. */
-.cine__wash {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: var(--paper);
-  opacity: 0.2;
-}
-
-.cine__wash {
-  opacity: 0;
-}
-
-.cine__frame::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: radial-gradient(60% 50% at 50% 50%, rgba(6, 9, 14, 0.42), transparent 70%);
-}
-
-.cine__captions {
-  position: relative;
-  z-index: 2;
-  display: grid;
-  place-items: center;
-  padding-inline: var(--gutter);
-  text-align: center;
-}
-
-.cine__caption {
-  grid-area: 1 / 1;
-  opacity: 0;
-  color: #f2f5f8;
-  font-size: clamp(1.5rem, 0.9rem + 2.8vw, 3rem);
-  font-weight: 300;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
-  max-width: 18ch;
-  text-wrap: balance;
-  text-shadow: 0 1px 28px rgba(0, 0, 0, 0.5);
-  will-change: opacity, transform;
-}
-
-[lang="ar"] .cine__caption {
-  letter-spacing: 0;
-  line-height: 1.55;
-  font-weight: 400;
-  max-width: 20ch;
 }
 
 /* --------------------------------------------------------------------------
@@ -1169,17 +1290,16 @@ textarea {
    -------------------------------------------------------------------------- */
 
 .about__body.glass {
-  padding: clamp(1.5rem, 1.2rem + 1.2vw, 2.25rem);
-  margin-block-start: 1.5rem;
+  padding: var(--pane-pad);
+  margin-block-start: 1.75rem;
 }
 
 .cap.glass--lite {
-  padding: 1.25rem clamp(1rem, 0.8rem + 0.8vw, 1.5rem);
-  border-block-start: 1px solid var(--glass-border);
+  padding: var(--pane-pad-sm);
 }
 
 .project__points.glass--lite {
-  padding: 0.25rem clamp(1rem, 0.8rem + 0.8vw, 1.5rem);
+  padding: 0.5rem var(--pane-pad-sm);
 }
 
 .project__point:first-child {
@@ -1197,15 +1317,15 @@ textarea {
 }
 
 .founder__copy.glass {
-  padding: clamp(1.5rem, 1.2rem + 1.5vw, 2.5rem);
+  padding: var(--pane-pad);
 }
 
+/* The ghost button is a small pane of the same glass. */
 .btn--ghost {
-  background: var(--glass-bg);
-  backdrop-filter: blur(14px) saturate(160%);
-  -webkit-backdrop-filter: blur(14px) saturate(160%);
-  border-color: var(--glass-border);
-  box-shadow: var(--glass-rim);
+  background: var(--glass-specular), var(--glass-tint);
+  backdrop-filter: var(--glass-body-lite);
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: var(--glass-inner);
 }
 
 .contact__panel,
@@ -1707,7 +1827,6 @@ select.field__control {
    -------------------------------------------------------------------------- */
 
 @media (max-width: 1024px) {
-  .hero__inner,
   .about,
   .project__body,
   .contact {
@@ -1716,10 +1835,6 @@ select.field__control {
 
   .caps {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .hero__figure {
-    max-width: 26rem;
   }
 
   .footer__grid {
@@ -1753,10 +1868,6 @@ select.field__control {
   .founder {
     grid-template-columns: minmax(0, 1fr);
     gap: 2.5rem;
-  }
-
-  .cine {
-    height: 240vh;
   }
 
   /* Five labels stop fitting on one line well before the nav does. */
@@ -1848,30 +1959,22 @@ select.field__control {
     transform: none;
   }
 
-  /* Scroll-driven animations ignore duration; the timeline itself is removed. */
-  .cine {
+  /* No hold and no damping: the hero is a section like any other, and nothing
+     is left pinned that the script would otherwise have faded out. */
+  .hero {
     height: auto;
+    min-height: min(84vh, 46rem);
+    padding-block: clamp(4rem, 2.5rem + 7vw, 8rem) clamp(3.5rem, 2.5rem + 5vw, 6.5rem);
   }
 
-  .cine__stage {
+  .hero__pin {
     position: static;
-    height: auto;
-    aspect-ratio: 16 / 9;
-  }
-
-  .cine__captions {
-    position: absolute;
-    inset: 0;
-    align-content: center;
-    gap: 0.75rem;
-  }
-
-  .cine__caption {
-    grid-area: auto;
+    min-height: 0;
+    padding-block: 0;
     opacity: 1 !important;
-    transform: none !important;
   }
 
+  /* Scroll-driven animations ignore duration; the timeline itself is removed. */
   .media img,
   .founder__portrait img,
   .scroll-progress {

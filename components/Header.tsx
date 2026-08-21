@@ -90,24 +90,35 @@ export function Header({ locale, dict }: { locale: Locale; dict: Dictionary }) {
         </div>
       </div>
 
-      {open ? (
-        <div className="container">
-          <div className="mobile-nav glass" id={menuId}>
-            <ul className="mobile-nav__list">
-              {links.map((link) => (
-                <li key={link.href}>
-                  <Link href={link.href} className="mobile-nav__link" onClick={close}>
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-            <Link href={`/${locale}/start`} className="btn mobile-nav__cta" onClick={close}>
-              {dict.nav.start}
-            </Link>
-          </div>
+      {/* Kept in the document so it can ease both open and shut; while it is
+          closed CSS sets `visibility: hidden`, which also takes the links out
+          of the tab order. */}
+      <div className="container mobile-nav-wrap">
+        <div className={`mobile-nav glass${open ? " is-open" : ""}`} id={menuId}>
+          <ul className="mobile-nav__list">
+            {links.map((link) => (
+              <li key={link.href}>
+                <Link
+                  href={link.href}
+                  className="mobile-nav__link"
+                  tabIndex={open ? undefined : -1}
+                  onClick={close}
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <Link
+            href={`/${locale}/start`}
+            className="btn mobile-nav__cta"
+            tabIndex={open ? undefined : -1}
+            onClick={close}
+          >
+            {dict.nav.start}
+          </Link>
         </div>
-      ) : null}
+      </div>
     </header>
   );
 }
