@@ -22,9 +22,10 @@ follows the actual content, not the filename.
 ## Video
 
 `public/media/` holds the film that runs behind the page from the hero to the
-founder — 1080p and 540p H.264, one 720p VP9 fallback, plus a poster. See "The
-film" in the root README for how it is cut, why every frame is a keyframe, and
-how the browser is made to fetch exactly one of the three.
+founder — one 1080p H.264 encode served to every device, one 720p VP9 fallback
+for browsers without H.264, plus a poster. See "The film" in the root README for
+how it is cut, why every frame is a keyframe, and how the browser is made to
+fetch exactly one of the two.
 
 The hero no longer carries a photograph; the film is the picture there.
 

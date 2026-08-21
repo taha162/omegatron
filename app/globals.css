@@ -25,55 +25,66 @@
    * Liquid glass. Not a translucent box — an optical stack, because that is
    * what the eye is actually reading when it calls something glass:
    *
-   *   1. a frosted body that blurs and re-saturates the backdrop,
-   *   2. a lens band at the edge, where a thick pane bends and brightens what
-   *      is behind it before the border,
-   *   3. a rim whose brightness travels around the perimeter rather than
-   *      sitting at one uniform value,
-   *   4. specular highlights from a light source off the top-left shoulder.
+   *   1. a frosted body that blurs, brightens and re-saturates the backdrop,
+   *   2. a lens band at the edge, where a thick pane bends what is behind it
+   *      before the border,
+   *   3. a rim that catches light where the light is and goes to a soft shadow
+   *      where it is not, rather than a flat border on four sides,
+   *   4. specular highlights from a source off the top-left shoulder.
    *
-   * Kept dark, so it belongs to this palette rather than Apple's white one.
+   * It is Apple's light material: the panes are frosted white and carry dark
+   * type, which is the only way glass reads as glass over footage this close to
+   * black — a dark pane over a dark ground has nothing to refract and can only
+   * ever look like tinted plastic.
    */
   --glass-tint: linear-gradient(
-      152deg,
-      rgba(255, 255, 255, 0.17) 0%,
-      rgba(255, 255, 255, 0.07) 30%,
-      rgba(255, 255, 255, 0.028) 58%,
-      rgba(255, 255, 255, 0.06) 84%,
-      rgba(255, 255, 255, 0.12) 100%
-    ),
-    linear-gradient(180deg, rgba(10, 16, 24, 0.34) 0%, rgba(10, 16, 24, 0.5) 100%);
+    152deg,
+    rgba(255, 255, 255, 0.78) 0%,
+    rgba(255, 255, 255, 0.62) 38%,
+    rgba(255, 255, 255, 0.58) 64%,
+    rgba(255, 255, 255, 0.68) 100%
+  );
   --glass-specular: radial-gradient(
-      86% 62% at 6% -12%,
-      rgba(255, 255, 255, 0.3) 0%,
-      rgba(255, 255, 255, 0.08) 42%,
-      transparent 70%
+      88% 64% at 6% -14%,
+      rgba(255, 255, 255, 0.42) 0%,
+      rgba(255, 255, 255, 0.1) 46%,
+      transparent 74%
     ),
-    radial-gradient(70% 52% at 102% 112%, rgba(255, 255, 255, 0.13), transparent 66%);
-  --glass-body: blur(30px) saturate(210%) brightness(0.88) contrast(1.06);
-  --glass-body-lite: blur(18px) saturate(195%) brightness(0.9) contrast(1.04);
-  /* The lens band: what is behind the edge, lifted and re-saturated relative
-     to what is behind the middle. Kept restrained — over near-black footage a
-     strong lift stops reading as refraction and starts reading as a second
-     frame drawn inside the first. */
-  --glass-lens: blur(2px) saturate(240%) brightness(1.22);
-  --glass-lens-w: 11px;
-  /* Light travelling round the rim: bright at the top-left shoulder, gone at
-     the opposite corner, picked back up as a bounce at the bottom. */
+    radial-gradient(72% 54% at 102% 112%, rgba(255, 255, 255, 0.2), transparent 70%);
+  --glass-body: blur(28px) saturate(210%) brightness(1.3);
+  --glass-body-lite: blur(18px) saturate(200%) brightness(1.24);
+  /* The lens band: what is behind the edge, drawn back toward the footage's
+     own colour so the border reads as thickness rather than as a printed
+     outline. */
+  --glass-lens: blur(4px) saturate(220%) brightness(0.9);
+  --glass-lens-w: 12px;
+  /* Light round the rim: a bright catch at the top-left shoulder, a soft
+     shadow at the bottom-right where the pane lifts off the page. */
   --glass-rim: conic-gradient(
     from 216deg at 50% 50%,
-    rgba(255, 255, 255, 0.78) 0deg,
-    rgba(255, 255, 255, 0.26) 42deg,
-    rgba(255, 255, 255, 0.05) 104deg,
-    rgba(255, 255, 255, 0.03) 172deg,
-    rgba(255, 255, 255, 0.22) 232deg,
-    rgba(255, 255, 255, 0.5) 296deg,
-    rgba(255, 255, 255, 0.78) 360deg
+    rgba(255, 255, 255, 0.95) 0deg,
+    rgba(255, 255, 255, 0.55) 46deg,
+    rgba(255, 255, 255, 0.2) 100deg,
+    rgba(16, 22, 31, 0.16) 176deg,
+    rgba(16, 22, 31, 0.1) 236deg,
+    rgba(255, 255, 255, 0.6) 300deg,
+    rgba(255, 255, 255, 0.95) 360deg
   );
-  --glass-inner: inset 0 1px 0 rgba(255, 255, 255, 0.16),
-    inset 0 0 24px -6px rgba(255, 255, 255, 0.1);
-  --glass-drop: 0 26px 62px -24px rgba(0, 0, 0, 0.85),
-    0 4px 14px -8px rgba(0, 0, 0, 0.6);
+  --glass-inner: inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    inset 0 -14px 28px -22px rgba(16, 22, 31, 0.22);
+  --glass-drop: 0 26px 62px -22px rgba(0, 0, 0, 0.7),
+    0 4px 12px -6px rgba(0, 0, 0, 0.45);
+
+  /*
+   * Inside a light pane the whole ink scale flips. Every rule in this file
+   * reads its colour from these tokens, so re-pointing them on `.glass` turns
+   * the pane's contents over without touching a single component rule.
+   */
+  --glass-ink: #0b1119;
+  --glass-ink-2: #222e3c;
+  --glass-ink-3: #35414f;
+  --glass-accent: #4f3a05;
+  --glass-steel: #2c3846;
 
   /* Type */
   --font-sans: var(--font-cairo), "Cairo", "Segoe UI", system-ui, -apple-system,
@@ -95,10 +106,10 @@
   --max-width: 74rem;
   --measure: 58ch;
 
-  /* Corners are generously rounded — roughly a quarter of the short side. */
+  /* One radius for every box on the site, taken from the hero buttons. */
   --radius: 16px;
-  --radius-lg: 26px;
-  --radius-glass: 30px;
+  --radius-lg: 16px;
+  --radius-glass: 16px;
 
   /* Panes are given room to breathe; a glass pane with tight padding reads as
      a border round the text rather than a surface under it. */
@@ -123,6 +134,26 @@
   border: 0;
   border-radius: var(--radius-glass);
   box-shadow: var(--glass-inner), var(--glass-drop);
+}
+
+/* The pane is a light island: every token the components read is re-pointed on
+   it, so their own rules need no knowledge of where they are sitting. Anything
+   else wearing the material takes the same flip. */
+.glass,
+.glass--lite,
+.btn--ghost {
+  --ink: var(--glass-ink);
+  --ink-2: var(--glass-ink-2);
+  --ink-3: var(--glass-ink-3);
+  --ink-inverse: #ffffff;
+  --paper: #ffffff;
+  --steel: var(--glass-steel);
+  --accent: var(--glass-accent);
+  --accent-line: rgba(122, 92, 13, 0.45);
+  --accent-tint: rgba(122, 92, 13, 0.12);
+  --line: rgba(16, 23, 32, 0.12);
+  --line-strong: rgba(16, 23, 32, 0.26);
+  color: var(--ink);
 }
 
 /* Thinner glass for the many small panes — the same optics, less depth of
@@ -546,11 +577,16 @@ textarea {
   position: sticky;
   inset-block-start: 0;
   z-index: 50;
-  padding-block: 0.75rem;
+  padding-block: 0.875rem;
 }
 
-/* Three tracks, so the nav is centred against the bar rather than against
-   whatever the brand and the actions happen to measure. */
+/*
+ * Three tracks, so the nav is centred against the bar rather than against
+ * whatever the brand and the actions happen to measure — and each item is
+ * placed in its track by name. Left to auto-placement, hiding the nav on a
+ * phone took it out of the grid and dropped the actions into the middle
+ * column, which is what put them in the centre of the bar.
+ */
 .header__inner {
   height: var(--header-h);
   display: grid;
@@ -558,7 +594,7 @@ textarea {
   align-items: center;
   gap: 1rem;
   border-radius: var(--radius-glass);
-  padding-inline: clamp(1.125rem, 0.7rem + 1.5vw, 1.875rem);
+  padding-inline: clamp(1.25rem, 0.85rem + 1.6vw, 2.125rem);
 }
 
 .header__inner > * {
@@ -567,6 +603,7 @@ textarea {
 }
 
 .brand {
+  grid-column: 1;
   display: inline-flex;
   align-items: center;
   gap: 0.625rem;
@@ -608,6 +645,7 @@ textarea {
 }
 
 .nav {
+  grid-column: 2;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -627,6 +665,7 @@ textarea {
 }
 
 .header__actions {
+  grid-column: 3;
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -865,12 +904,43 @@ textarea {
   inset: 0;
   background: linear-gradient(
       180deg,
-      rgba(7, 11, 17, 0.8) 0%,
-      rgba(7, 11, 17, 0.52) 24%,
-      rgba(7, 11, 17, 0.56) 68%,
-      rgba(7, 11, 17, 0.88) 100%
+      rgba(7, 11, 17, 0.74) 0%,
+      rgba(7, 11, 17, 0.4) 26%,
+      rgba(7, 11, 17, 0.44) 68%,
+      rgba(7, 11, 17, 0.84) 100%
     ),
-    radial-gradient(72% 58% at 50% 46%, transparent 30%, rgba(7, 11, 17, 0.5) 100%);
+    radial-gradient(74% 60% at 50% 46%, transparent 34%, rgba(7, 11, 17, 0.46) 100%);
+}
+
+/* --------------------------------------------------------------------------
+   The holds
+
+   Every section over the film carries a run of empty scroll at its end, with
+   its content pinned inside that run: scrolling through the gap advances the
+   film without moving the page, then the section releases and the next one
+   climbs in behind it.
+
+   The two lengths come from `components/ScrollHolds.tsx`, which measures each
+   section against the viewport — `--hold-run` is how long the section holds,
+   `--hold-top` centres the pinned content. A section taller than the screen is
+   marked off and left to scroll normally, since pinning it would park part of
+   it where it could not be read.
+   -------------------------------------------------------------------------- */
+
+@media (scripting: enabled) {
+  .hold[data-hold="on"] {
+    padding-block-end: calc(var(--section-y) + var(--hold-run, 0px));
+  }
+
+  .hold[data-hold="on"] > :first-child {
+    position: sticky;
+    inset-block-start: var(--hold-top, 0px);
+  }
+
+  /* The hero's own padding lives on the pinned element, not the section. */
+  .hero.hold[data-hold="on"] {
+    padding-block-end: var(--hold-run, 0px);
+  }
 }
 
 /* Sections after the film need their own ground to cover the fixed layer. */
@@ -895,31 +965,21 @@ textarea {
   padding-block: clamp(4rem, 2.5rem + 7vw, 8rem) clamp(3.5rem, 2.5rem + 5vw, 6.5rem);
 }
 
-/*
- * The hold. The hero is given a runway and its content pinned inside it, so
- * the first stretch of scrolling moves the film and not the page — the weight
- * the visitor feels at the top of the site. The runway is declared in CSS
- * rather than added by script, so there is no reflow after hydration, and only
- * where there is a script to fade the pinned content out again.
- */
 @media (scripting: enabled) {
   .hero {
     display: block;
     min-height: 0;
-    height: 220vh;
     padding-block: 0;
   }
 
   .hero__pin {
-    position: sticky;
-    inset-block-start: 0;
     display: grid;
     align-items: center;
     min-height: 100vh;
     min-height: 100svh;
     padding-block: calc(var(--header-h) + 2rem) clamp(3.5rem, 2.5rem + 5vw, 6.5rem);
-    /* Driven from the scroll loop; the pinned hero has to be gone before the
-       section below it scrolls over the same patch of film. */
+    /* Driven from the scroll loop, as insurance against the hero and the
+       section behind it ever being on screen together. */
     opacity: var(--hero-opacity, 1);
   }
 }
@@ -1051,7 +1111,7 @@ textarea {
 .chip {
   padding: 0.4375rem 1rem;
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: var(--radius);
   font-size: 0.8125rem;
   color: var(--ink-3);
 }
@@ -1311,7 +1371,7 @@ textarea {
 }
 
 .chip.glass--lite {
-  border-radius: 999px;
+  border-radius: var(--radius);
   box-shadow: none;
   color: var(--ink-2);
 }
@@ -1846,6 +1906,16 @@ select.field__control {
   .nav,
   .header__cta {
     display: none;
+  }
+
+  /* The middle track carries nothing here, so it is dropped rather than left
+     to contribute its gaps. */
+  .header__inner {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .header__actions {
+    grid-column: 2;
   }
 
   .nav-toggle {
