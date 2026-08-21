@@ -85,6 +85,11 @@ const ar = {
         domains: ["أنظمة مدمجة", "حسّاسات", "ذكاء اصطناعي", "تصميم ميكانيكي"],
       },
     ],
+    spec: {
+      status: "الحالة",
+      award: "الجائزة",
+      domains: "المجالات",
+    },
     images: {
       unitAlt: "الوحدة كاملةً: مصفوفة الحسّاسات فوق الغلاف المطبوع.",
       enclosureAlt: "الغلاف المطبوع ثلاثيّ الأبعاد وفتحة دخول الهواء الجانبية.",
@@ -115,7 +120,8 @@ const ar = {
     label: "المؤسس",
     name: "طه جاسم محمد",
     role: "المؤسس وكبير مهندسي الميكاترونكس",
-    body: "يقود طه التوجّه الهندسي في أوميكاترون. يضع معمارية الأنظمة ويتابع تنفيذها مع الفريق، من الغلاف الميكانيكي إلى البرمجيات المدمجة. عمله أن يحوّل الفكرة إلى نموذج يعمل، ثم يختبره حتى يصمد.",
+    lead: "يقود طه التوجّه الهندسي في أوميكاترون.",
+    body: "يضع معمارية الأنظمة ويتابع تنفيذها مع الفريق، من الغلاف الميكانيكي إلى البرمجيات المدمجة. عمله أن يحوّل الفكرة إلى نموذج يعمل، ثم يختبره حتى يصمد.",
     imageAlt: "طه جاسم محمد، مؤسس أوميكاترون.",
   },
 
@@ -322,6 +328,11 @@ const en: typeof ar = {
         domains: ["Embedded", "Sensors", "AI", "Mechanical design"],
       },
     ],
+    spec: {
+      status: "Status",
+      award: "Award",
+      domains: "Domains",
+    },
     images: {
       unitAlt: "The complete unit: the sensor array above the printed enclosure.",
       enclosureAlt: "The 3D-printed enclosure and its side air intake port.",
@@ -352,7 +363,8 @@ const en: typeof ar = {
     label: "Founder",
     name: "Taha Jasim Mohammed",
     role: "Founder & Lead Mechatronics Engineer",
-    body: "Taha leads the engineering direction at OmegaTron. He sets the system architecture and works through it with the team, from the mechanical enclosure to the embedded software. His job is to turn an idea into a prototype that runs — and then test it until it holds.",
+    lead: "Taha leads the engineering direction at OmegaTron.",
+    body: "He sets the system architecture and works through it with the team, from the mechanical enclosure to the embedded software. His job is to turn an idea into a prototype that runs — and then test it until it holds.",
     imageAlt: "Taha Jasim Mohammed, founder of OmegaTron.",
   },
 

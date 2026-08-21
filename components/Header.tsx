@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useCallback, useId, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { Logo, Wordmark } from "./Logo";
 import { LOCALES, type Dictionary, type Locale } from "@/lib/i18n";
 
@@ -18,8 +18,33 @@ export function Header({ locale, dict }: { locale: Locale; dict: Dictionary }) {
   const pathname = usePathname() || `/${locale}`;
   const [open, setOpen] = useState(false);
   const menuId = useId();
+  const toggleRef = useRef<HTMLButtonElement>(null);
 
   const close = useCallback(() => setOpen(false), []);
+
+  /*
+   * While the sheet is open it owns the screen: Escape shuts it and hands
+   * focus back to the control that opened it, and the page behind it stops
+   * scrolling so a finger on the sheet cannot drag the document underneath.
+   */
+  useEffect(() => {
+    if (!open) return;
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key !== "Escape") return;
+      setOpen(false);
+      toggleRef.current?.focus();
+    }
+
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    document.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      document.body.style.overflow = previous;
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [open]);
 
   const links = [
     { href: `/${locale}`, label: dict.nav.home },
@@ -32,11 +57,8 @@ export function Header({ locale, dict }: { locale: Locale; dict: Dictionary }) {
 
   return (
     <header className="header">
-      {/* The container supplies the gutter the bar floats inside; the bar
-          itself is the glass, with its own padding. Putting both on one
-          element left it flush to the screen edges on a phone. */}
       <div className="container">
-        <div className="header__inner glass">
+        <div className="header__inner">
           <Link href={`/${locale}`} className="brand" aria-label={dict.nav.home} onClick={close}>
             <Logo className="brand__mark" />
             <Wordmark className="wordmark" />
@@ -64,7 +86,7 @@ export function Header({ locale, dict }: { locale: Locale; dict: Dictionary }) {
                     className="lang-toggle__opt"
                     lang={code}
                     hrefLang={code}
-                    aria-current={code === locale ? "true" : undefined}
+                    aria-current={code === locale ? "page" : undefined}
                     onClick={close}
                   >
                     {code === "ar" ? "ع" : "EN"}
@@ -78,6 +100,7 @@ export function Header({ locale, dict }: { locale: Locale; dict: Dictionary }) {
             </Link>
 
             <button
+              ref={toggleRef}
               type="button"
               className="nav-toggle"
               aria-expanded={open}
@@ -95,11 +118,23 @@ export function Header({ locale, dict }: { locale: Locale; dict: Dictionary }) {
         </div>
       </div>
 
+      {/* The page dims under the open sheet, so the sheet is plainly the thing
+          in front and its actions cannot be confused with the ones behind it.
+          Tapping the dimmed page shuts the menu, as a tap outside a sheet
+          should. */}
+      <button
+        type="button"
+        className={`nav-scrim${open ? " is-open" : ""}`}
+        aria-hidden="true"
+        tabIndex={-1}
+        onClick={close}
+      />
+
       {/* Kept in the document so it can ease both open and shut; while it is
           closed CSS sets `visibility: hidden`, which also takes the links out
           of the tab order. */}
-      <div className="container mobile-nav-wrap">
-        <div className={`mobile-nav glass${open ? " is-open" : ""}`} id={menuId}>
+      <div className="mobile-nav-wrap">
+        <div className={`mobile-nav${open ? " is-open" : ""}`} id={menuId}>
           <ul className="mobile-nav__list">
             {links.map((link) => (
               <li key={link.href}>

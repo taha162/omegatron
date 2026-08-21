@@ -3,17 +3,17 @@
 import { useEffect, useRef } from "react";
 
 /**
- * The circuit film, running as the page's backdrop rather than a section.
+ * The circuit film, as the hero's instrument display.
  *
- * It is fixed to the viewport and sits behind the content from the hero down to
- * the founder; scroll position across that range drives `currentTime`, so the
- * board advances as the visitor reads. It is not a player: no controls, no
- * autoplay, no audio track, `aria-hidden` and untabbable.
+ * The picture is always there: `.film` paints the 48 KB poster as its own
+ * background, so the hero has its image in the first frame the browser draws,
+ * with no video element involved. The footage is an enhancement laid over that
+ * poster, and it is only ever fetched when it is worth the bytes.
  *
- * One requestAnimationFrame loop does the seeking, the fade-out at the end of
- * the range, and the pointer parallax. An IntersectionObserver runs that loop
- * only while the range is on screen, and the layer is taken out of compositing
- * entirely once the visitor scrolls past it.
+ * When it does run, scroll across the hero's exit drives `currentTime`, and
+ * the same 0..1 figure is written to `--film-progress` so the scale along the
+ * hero's bottom edge can mark it. The film is not a player: no controls, no
+ * sound, no autoplay, `aria-hidden` and untabbable.
  */
 export function FilmBackdrop({ rangeId }: { rangeId: string }) {
   const layerRef = useRef<HTMLDivElement>(null);
@@ -26,45 +26,57 @@ export function FilmBackdrop({ rangeId }: { rangeId: string }) {
     if (!layer || !video || !range) return;
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
+
+    /*
+     * Whether to spend the bytes at all.
+     *
+     * The footage is all-intra — every frame a keyframe, which is what makes
+     * the scrub feel attached to the scroll — and that is why it costs 9.3 MB.
+     * It is an enhancement over a poster that already shows the same picture,
+     * so it is only ever fetched where it is genuinely worth that:
+     *
+     *   - never for somebody who has asked for less motion,
+     *   - never on a connection the browser has told us is metered or slow,
+     *   - never on a narrow viewport. This is the split the project always
+     *     intended; there was simply never a small encode to serve, and
+     *     sending the full one to a phone is not a substitute for having one.
+     *     A visitor on mobile data gets the same frame at 48 KB.
+     *
+     * Where the browser will not say — Safari and Firefox expose no Network
+     * Information API — a wide viewport is taken as good enough.
+     */
+    const WIDE_ENOUGH = 900;
+
+    function worthFetching(): boolean {
+      if (reduced.matches) return false;
+      if (window.innerWidth < WIDE_ENOUGH) return false;
+
+      const conn = (
+        navigator as Navigator & {
+          connection?: { saveData?: boolean; effectiveType?: string };
+        }
+      ).connection;
+      if (!conn) return true;
+      if (conn.saveData) return false;
+      return conn.effectiveType === "4g" || conn.effectiveType === undefined;
+    }
 
     let raf = 0;
     let active = false;
-    let last = 0;
-    let eased = 0;
-    let pointerX = 0;
-    let pointerY = 0;
-    let driftX = 0;
-    let driftY = 0;
     let ready = false;
+    let eased = 0;
+    let last = 0;
 
-    /** How far the reader is through the film range, 0..1. */
+    /** How far the hero has scrolled out of frame, 0..1. */
     function progress(): number {
       const rect = range!.getBoundingClientRect();
-      const runway = rect.height - window.innerHeight;
-      if (runway <= 0) return 0;
-      return Math.min(1, Math.max(0, -rect.top / runway));
+      if (rect.height <= 0) return 0;
+      return Math.min(1, Math.max(0, -rect.top / rect.height));
     }
 
-    /*
-     * The hero dissolves as its hold runs out, so the release reads as a
-     * hand-off to the film rather than the statement being dragged off the top
-     * of the screen.
-     */
-    const hero = document.querySelector<HTMLElement>(".hero");
-    function fadeHero() {
-      if (!hero) return;
-      const rect = hero.getBoundingClientRect();
-      const runway = rect.height - window.innerHeight;
-      if (runway <= 0) return;
-      const through = Math.min(1, Math.max(0, -rect.top / runway));
-      const out = Math.min(1, Math.max(0, (through - 0.72) / 0.28));
-      hero.style.setProperty("--hero-opacity", String(1 - out));
-    }
-
-    /* Per-frame fractions make the easing depend on the frame rate; converting
-       them to a share of the elapsed time keeps the same glide on a 120Hz
-       screen and on a phone dropping frames while it decodes. */
+    /* A fixed fraction per frame would settle in half the time on a 120Hz
+       screen and take three times as long on a machine dropping frames. This
+       converts it to a share of however long the frame actually took. */
     function share(dt: number, perFrame: number): number {
       return 1 - Math.pow(1 - perFrame, Math.min(dt, 100) / (1000 / 60));
     }
@@ -75,11 +87,9 @@ export function FilmBackdrop({ rangeId }: { rangeId: string }) {
       last = now;
 
       const target = progress();
-      // The page itself is already smoothed by the scroll damper, so this only
-      // has to take the last of the jitter out.
-      eased += (target - eased) * share(dt, 0.3);
+      eased += (target - eased) * share(dt, 0.18);
 
-      fadeHero();
+      range!.style.setProperty("--film-progress", eased.toFixed(4));
 
       const duration = video!.duration;
       if (ready && Number.isFinite(duration) && duration > 0) {
@@ -92,22 +102,11 @@ export function FilmBackdrop({ rangeId }: { rangeId: string }) {
         }
       }
 
-      // Hand the film back to the page over the last stretch of the range.
-      const fade = eased > 0.9 ? Math.max(0, 1 - (eased - 0.9) / 0.1) : 1;
-      layer!.style.opacity = String(fade);
-
-      driftX += (pointerX - driftX) * share(dt, 0.05);
-      driftY += (pointerY - driftY) * share(dt, 0.05);
-      layer!.style.setProperty("--px", `${driftX.toFixed(2)}px`);
-      layer!.style.setProperty("--py", `${driftY.toFixed(2)}px`);
-
       raf = requestAnimationFrame(frame);
     }
 
     function start() {
-      if (active) return;
-      layer!.classList.add("is-live");
-      if (reduced.matches) return;
+      if (active || reduced.matches) return;
       active = true;
       last = 0;
       raf = requestAnimationFrame(frame);
@@ -116,31 +115,55 @@ export function FilmBackdrop({ rangeId }: { rangeId: string }) {
     function stop() {
       active = false;
       cancelAnimationFrame(raf);
-      layer!.classList.remove("is-live");
-    }
-
-    function onPointerMove(event: PointerEvent) {
-      if (!finePointer.matches) return;
-      pointerX = (event.clientX / window.innerWidth - 0.5) * -16;
-      pointerY = (event.clientY / window.innerHeight - 0.5) * -10;
     }
 
     const onLoaded = () => {
       ready = true;
       video.pause();
+      layer.classList.add("is-live");
     };
     video.addEventListener("loadeddata", onLoaded);
 
-    // Choose the file ourselves rather than letting the browser fall through a
-    // list of <source> elements — that would fetch the MP4, fail to decode it,
-    // and fetch the WebM as well. Asking canPlayType first means exactly one
-    // request. Full 1080p goes to every device, phones included: a deliberate
-    // trade of 7.5 MB for sharpness, since the film is the only picture on the
-    // page above the fold.
-    const h264 = video.canPlayType('video/mp4; codecs="avc1.640028"');
-    video.src = h264 ? "/media/circuit-1080.mp4" : "/media/circuit-720.webm";
-    video.load();
+    /*
+     * Choose the file rather than listing <source> elements: a fallthrough
+     * list makes the browser fetch the MP4, fail to decode it, and fetch the
+     * WebM as well, doubling the bytes. Asking canPlayType first means exactly
+     * one request.
+     */
+    function fetchFilm() {
+      if (video!.src) return;
+      const h264 = video!.canPlayType('video/mp4; codecs="avc1.640028"');
+      video!.src = h264 ? "/media/circuit-1080.mp4" : "/media/circuit-720.webm";
+      video!.load();
+    }
 
+    /* Never in front of the page's own load. The poster is already showing,
+       so nothing is waiting on this.
+       These are called through `window` rather than through a detached
+       reference: a bare `ric(fetchFilm)` is an unbound WebIDL operation, and
+       some engines reject that as an illegal invocation. */
+    let idle = 0;
+    let idleIsTimeout = false;
+    function scheduleFetch() {
+      if (!worthFetching()) return;
+      const go = () => {
+        const w = window as Window & {
+          requestIdleCallback?: (cb: () => void) => number;
+        };
+        if (typeof w.requestIdleCallback === "function") {
+          idle = w.requestIdleCallback(fetchFilm);
+        } else {
+          idleIsTimeout = true;
+          idle = window.setTimeout(fetchFilm, 600);
+        }
+      };
+      if (document.readyState === "complete") go();
+      else window.addEventListener("load", go, { once: true });
+    }
+    scheduleFetch();
+
+    // The loop only runs while the hero is on screen. Once it is gone the film
+    // has nothing left to report.
     const runner = new IntersectionObserver(
       (entries) => {
         if (entries.some((e) => e.isIntersecting)) start();
@@ -150,13 +173,20 @@ export function FilmBackdrop({ rangeId }: { rangeId: string }) {
     );
     runner.observe(range);
 
-    window.addEventListener("pointermove", onPointerMove, { passive: true });
-
     return () => {
       stop();
       runner.disconnect();
+      if (idle) {
+        const w = window as Window & {
+          cancelIdleCallback?: (handle: number) => void;
+        };
+        if (!idleIsTimeout && typeof w.cancelIdleCallback === "function") {
+          w.cancelIdleCallback(idle);
+        } else {
+          window.clearTimeout(idle);
+        }
+      }
       video.removeEventListener("loadeddata", onLoaded);
-      window.removeEventListener("pointermove", onPointerMove);
     };
   }, [rangeId]);
 
@@ -165,8 +195,7 @@ export function FilmBackdrop({ rangeId }: { rangeId: string }) {
       <video
         ref={videoRef}
         className="film__video"
-        poster="/media/circuit-poster.jpg"
-        preload="auto"
+        preload="none"
         muted
         playsInline
         disablePictureInPicture

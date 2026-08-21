@@ -32,8 +32,8 @@ app/
   [lang]/                 ar | en — both prerendered at build time
     layout.tsx            root layout: <html lang dir>, fonts, header, footer
     page.tsx              home: hero, about, projects, capabilities,
-                          process, founder, contact — the first six sit
-                          over the film backdrop
+                          process, founder, contact — the film runs in
+                          the hero and nowhere else
     start/page.tsx        Start a Project — the long-form request
     not-found.tsx
   api/contact/route.ts    server-side form handler and email delivery
@@ -41,14 +41,14 @@ app/
   icon.svg                favicon
   robots.ts, sitemap.ts
 components/               Header, Footer, ProjectForm, FilmBackdrop,
-                          SmoothScroll, ScrollHolds, Reveal, Logo, Icons
+                          Reveal, Logo, Icons
 lib/
   i18n.ts                 every string on the site, in both languages
   mailer.ts               email transport (server-only)
   upload.ts               attachment limits shared by client and server
   site.ts                 canonical URL resolution
 public/images/            photography — see public/images/README.md
-public/media/             the film backdrop (one H.264, one VP9)
+public/media/             the hero film (one H.264, one VP9, one poster)
 ```
 
 ### Editing content
@@ -90,214 +90,135 @@ omega ring, the gear quadrant, the circuit traces, the gold needle — so it cos
 no network request and stays crisp at any size. `Wordmark` sets OMEGA in steel
 and TRON in gold as the logo does.
 
-### Liquid glass
+### The sheet
 
-Surfaces that sit over the film are glass rather than filled panels.
+Surfaces are drawn, not stacked. The vernacular this team actually works in is
+the datasheet and the engineering drawing, so that is the material: a near-black
+ground, hairlines in three weights, and one accent.
 
-**It is the light material, and that is a finding rather than a preference.**
-Glass only reads as glass when there is something behind it to bend. The film is
-close to black; a dark pane over a dark ground has nothing to refract and can
-only ever look like tinted plastic, however the gradients are tuned. So the
-panes are frosted white and carry dark type, and the scrim over the film was
-lifted (0.52 → 0.40 in the mid-range) to give them something to work with — the
-type on the panes no longer depends on that scrim for its contrast.
+**The rail.** Every section is a narrow title block beside a wide content
+column (`.sec` / `.sec__rail` / `.sec__body`). A hairline runs the height of the
+rail on its leading edge, and a short gold segment sits at the top of it — the
+needle from the logo mark. It is the same skeleton on every section, which is
+what makes the page read as one document rather than six blocks. On a phone the
+rail turns over: the needle runs across the top of the label instead of down its
+edge.
 
-Four layers:
+**One accent, spent four times.** Gold is the only colour in the interface, and
+it appears on the rail segment, the award, the current state of a control, and
+the index mark on the hero scale. Everything else is greyscale, so the
+photographs and the film are the only saturated things on the page — the
+hardware is the only thing that glows.
 
-1. **The body.** `backdrop-filter: blur(28px) saturate(210%) brightness(1.3)` on
-   the pane, under a white tint that runs 0.58–0.78 down a diagonal. Opaque
-   enough to carry small dark type, translucent enough that the board is visibly
-   moving behind it.
-2. **The lens band.** A `::before` carrying a *second* backdrop filter, masked to
-   a 12px band just inside the border, pulling what is behind the edge back
-   toward the footage's own colour so the border reads as thickness rather than
-   as a printed outline.
-3. **The rim.** A `::after` masked down to a 1.5px ring carrying a **conic**
-   gradient: a bright catch at the top-left shoulder, a soft shadow at the
-   bottom-right where the pane lifts off the page — light travelling round the
-   perimeter instead of sitting at one value on four borders.
-4. **The speculars.** Two radial gradients painted into the pane's own
-   `background` stack.
+**Ink.** `--ink` / `--ink-2` / `--ink-3` are 16.5:1, 8.5:1 and 5.0:1 against
+`--paper`, so every text token clears WCAG AA for normal text on its own,
+without having to reason about what is behind it.
 
-**The ink flips with the material.** Every rule in the stylesheet reads its
-colour from tokens, so `.glass` re-points `--ink`, `--ink-2`, `--ink-3`,
-`--paper`, `--steel`, `--accent` and the line colours on itself, and the pane's
-contents turn over without a single component rule knowing where it is sitting.
-`.btn--ghost` wears the material, so it takes the same flip — it was the one
-element that did not, and it spent a build as light type on a light pane.
+**Radius is 2px.** Machined, not rounded, and not the zero-radius broadsheet
+look either.
 
-Two weights: **`.glass`** (28px blur, 12px lens) for the header, the About panel,
-the founder copy and the mobile sheet; **`.glass--lite`** (18px, 9px) for the
-many small panes — capability cards, project points, chips, the ghost button —
-so a dozen of them can composite over a seeking video.
+An earlier revision used a light frosted "liquid glass" material over the film.
+It was removed: three stacked `backdrop-filter` layers over a seeking video are
+expensive on a phone, dark type on a translucent pane has a contrast ratio that
+depends on whatever video frame happens to be behind it, and white frosted
+panes read as a generic product UI rather than as this team.
 
-Every value is a custom property (`--glass-tint`, `--glass-specular`,
-`--glass-body`, `--glass-body-lite`, `--glass-lens`, `--glass-lens-w`,
-`--glass-rim`, `--glass-inner`, `--glass-drop`, `--glass-ink*`,
-`--radius-glass`), so the material is tunable in one place.
 
-**One build note worth keeping.** The prefixed `-webkit-backdrop-filter` is
-declared in its own `@supports` rule rather than beside the standard property.
-Written as a neighbouring pair, the build's CSS minifier keeps exactly one of
-the two — and Safari before 18 has only the prefixed form, so losing it would
-mean losing the material outright on those devices.
+## Motion
 
-**The header** is a floating bar. Two things about it are worth writing down,
-because both were bugs first:
+Four things move, and each of them is doing a job.
 
-- The gutter and the bar's own padding are on **different elements**. Putting
-  `.container` and the glass on one element meant the container's padding served
-  as internal padding and the bar itself ran flush to the screen edges — visible
-  on a phone, hidden on a desktop only because the container's `max-width` was
-  narrower than the viewport.
-- Its three tracks are `auto 1fr auto` with each item **placed by name**
-  (`grid-column: 1 | 2 | 3`). Left to auto-placement, hiding the nav below 860px
-  took it out of the grid, and the actions fell into the middle column — which
-  is what parked them in the centre of the bar with empty space either side.
+**The film across the hero's exit.** Scroll drives `video.currentTime`, and the
+same 0..1 figure is written to `--film-progress`, which places a gold index mark
+on the scale along the hero's bottom edge. The mechanism shows itself rather
+than being asserted.
 
-**Corners and room.** One radius for every box on the site — `--radius`, 16px,
-taken from the hero buttons and used by panes, photography, controls and chips
-alike. Padding is a scale — `--pane-pad` and `--pane-pad-sm` — because a glass
-pane with tight padding reads as a border round the text rather than a surface
-under it.
+**One entrance per block.** A single IntersectionObserver adds `.is-in`; the
+transition is 0.4s over 8px. It never delays content — the starting state is
+only applied under `@media (scripting: enabled)`, so a browser with JavaScript
+off renders everything visible.
 
-**The mobile sheet** hangs off the bar rather than sitting in the flow, so a
-closed menu costs no layout and an open one covers the page instead of pushing
-it down. It stays in the document and animates in both directions — the sheet
-eases down and the rows arrive behind it, 40ms apart — and `visibility: hidden`
-keeps the links out of the tab order while it is shut.
+**Photographs settle** out of a slight over-scale as they enter frame, and a
+**reading hairline** crosses the top of the viewport. Both are CSS
+scroll-driven animations, so they never touch the main thread.
 
-**Contrast is measured, not estimated.** The panes are translucent, so what sits
-behind a glyph is a blend of the tint, the specular, the lens and whatever frame
-of the film happens to be underneath — there is no ground to reason about on
-paper. `scripts` is not the place for it, so the check lives with the other
-Playwright verification: it screenshots the page, samples a glyph-free patch of
-the pane behind each target, and computes the ratio against the element's
-computed colour. All 17 targets pass at their WCAG AA threshold. The tightest
-are the gold section label over the film at **4.92:1** (worst of 21 scroll
-positions, as the film moves under it) and the gold half of the wordmark on the
-header pane at **5.52:1**; body copy on the panes runs 5.9–8.5:1.
+Everything else is a state change on a hairline: a tick drawn under a nav item,
+a rule extending in the capabilities register, the founder's portrait coming out
+of monochrome.
 
-## Weight
+`prefers-reduced-motion` removes the timelines outright rather than shortening
+them, and no footage is fetched at all.
 
-Two mechanisms, and they are separate on purpose.
+### What was removed, and why
 
-**The holds.** Every section over the film carries a run of empty scroll at its
-end with its content pinned inside it, so scrolling through the gap advances the
-film without moving the page. The section then releases and the next one climbs
-in behind it. That resistance, six times over, is the weight in the site.
+Two mechanisms were taken out in the process, because both cost the visitor more
+than they returned:
 
-`components/ScrollHolds.tsx` does the arithmetic, because it depends on how tall
-each section's content turns out to be against the viewport — which CSS cannot
-ask:
+- **The scroll damper** took the wheel *and* touch off the document and eased
+  the scroll position toward a target, replacing the platform's own momentum. It
+  put roughly 1.8 seconds between a wheel notch and the page settling, and on a
+  phone it `preventDefault`ed `touchmove` and reimplemented fling physics.
+- **The holds** appended a run of empty scroll to every section with the content
+  pinned inside it. Measured on the built site, they made the home page **11
+  viewport-heights tall** on a 1440x900 screen for six short sections, about 2.9
+  of which were empty; whole screens had nothing on them but the film, and
+  sections released into the sticky header and into each other.
 
-| Case | Pinned at | Why |
-| --- | --- | --- |
-| The hero | the top, for 115vh | It fills the screen by construction and has nothing above it, so it holds longest. |
-| Content shorter than the screen | centred, for 42vh | Centring is what makes a section let go while its own bottom edge is still above the fold, so it is gone before the next one arrives. |
-| Content taller than the screen | its last line, for 42vh | It scrolls up until its bottom is in view and holds there. Pinning its top would park the rest below the fold for the whole hold. |
-
-That last column is the load-bearing part. Two sections over the film are both
-transparent, so if a pinned one were still on screen when the next arrived they
-would read through each other. Verified by walking the page in 61 steps and
-checking that no two held sections' content boxes ever share a pixel.
-
-The pinning itself lives in CSS under `@media (scripting: enabled)`, so the
-no-JS render has no holds to unpin, and `prefers-reduced-motion` drops them.
-
-**The damper.** `components/SmoothScroll.tsx` takes the wheel off the document.
-Each notch adds to a target position and a `requestAnimationFrame` loop eases
-the real scroll position toward it, so the page takes the movement up and puts
-it down again. It drives the *native* scroll position rather than transforming
-the page, which is what keeps `position: sticky` — and therefore the hold above
-— along with anchors, IntersectionObserver, the scrollbar and find-in-page all
-working. Anything that moves the page from outside the loop is detected and the
-loop resynchronises to it instead of fighting it. A 900px wheel notch settles in
-about 1.8 seconds.
-
-Touch is taken over too. The finger drags the target directly — 1:1, at a much
-lighter easing, because a drag is direct manipulation and the page has to stay
-under the thumb — and on release the velocity it was carrying is projected
-forward and handed to the same easing the wheel uses, so a flick coasts to a
-stop with the weight of the rest of the site. That does replace the platform's
-own momentum, which is the trade for having one feel on every device. A second
-finger is left alone, and so is anything inside a control that scrolls itself.
-
-**Both easings are measured in time, not in frames.** A fixed fraction per frame
-means the page settles in half the time on a 120Hz screen and takes three times
-as long on a machine dropping to 20fps — the feel would be whatever the hardware
-happened to be doing. The per-frame figure is converted into the equivalent
-share of however long the frame actually took.
+The page is now 6.9 viewport-heights on the same screen, and scrolling is the
+platform's.
 
 ## The hero
 
-No photograph — the film is the picture. The hero is a statement, a lead, and
-two actions, pinned over the board for the longest hold on the page.
+No photograph — the film is the picture. A statement, a lead, two actions that
+do not look alike, and a measured bottom edge.
 
 ## The film
 
-`components/FilmBackdrop.tsx` runs the circuit-board film as the page's
-**backdrop**, not as a section. It is fixed to the viewport and sits behind
-everything from the hero down to the founder; scroll position across that range
-drives `video.currentTime`, so the board advances as the visitor reads the site
-over it. It is not a player: no controls, no autoplay, no audio track,
-`aria-hidden`, untabbable.
+`components/FilmBackdrop.tsx` runs the circuit-board film as the hero's
+**instrument display** — full-bleed inside the hero and nowhere else. It is not
+a player: no controls, no sound, no autoplay, `aria-hidden`, untabbable.
 
-**How it runs.** `app/[lang]/page.tsx` wraps those six sections in
-`<div className="film-range" id="film-range">`; the component measures that
-element and maps `-rect.top / (height - viewportHeight)` to 0..1. A single
-`requestAnimationFrame` loop does the seeking, the hand-off fade over the last
-10% of the range, and the pointer drift. An IntersectionObserver runs that loop
-only while the range is on screen, and the layer's `visibility` is dropped
-entirely once the visitor scrolls past it, so the contact section and footer
-composite against a plain background. The seek target is eased toward the scroll
-position and applied only when the change is worth at least a frame, so a still
-page does not keep the decoder busy. Sections below the range carry
-`.section--solid`, which restores an opaque ground.
+**The picture is always there.** `.film` paints `circuit-poster.jpg` (48 KB) as
+its own CSS background, so the hero has its image in the first frame the browser
+draws, with no video element involved. The footage is an enhancement laid over
+that poster and only fades in once it has decoded a frame.
 
-Because scroll is the only input, touch works exactly as the mouse wheel does.
-The pointer parallax is gated on `(hover: hover) and (pointer: fine)` and moves
-the frame by at most 16px — well inside the masked edge, so it can never expose
-a hard boundary.
+**When the footage is fetched.** The encode is all-intra — every frame a
+keyframe, which is what makes the scrub feel attached to the scroll, and also
+why it costs 9.3 MB. It is therefore only fetched when it is worth that:
 
-**How it is encoded.** Four files in `public/media/`, and a browser downloads
-exactly **one**:
+| Condition | Footage |
+| --- | --- |
+| `prefers-reduced-motion: reduce` | never |
+| `Save-Data`, or `effectiveType` below 4g | never |
+| viewport narrower than 900px | never |
+| otherwise | after `load`, on an idle callback |
+
+The narrow-viewport rule is the split this project always intended; there was
+simply never a small encode to serve, and sending the full one to a phone is not
+a substitute for having one. A visitor on mobile data gets the same frame at
+48 KB. **Measured on the built site, that takes the home page on a 390px
+viewport from 4.55 MB to 0.32 MB.** Re-cutting a ~540p encode and lowering that
+threshold is the one obvious win still on the table.
+
+**The two files.** A browser downloads exactly one:
 
 | File | Codec | Size | Served to |
 | --- | --- | --- | --- |
-| `circuit-1080.mp4` | 1920x1080 H.264, all-intra | 7.5 MB | ≥900px viewports |
-| `circuit-540.mp4` | 960x540 H.264, all-intra | 2.8 MB | narrow viewports |
-| `circuit-720.webm` | 1280x720 VP9 | 3.7 MB | browsers without H.264 |
+| `circuit-1080.mp4` | 1920x1080 H.264, all-intra | 9.3 MB | everything that can decode H.264 |
+| `circuit-720.webm` | 1280x720 VP9 | 4.6 MB | browsers that cannot |
 
 The component asks `canPlayType` and assigns `video.src` itself rather than
 listing `<source>` elements — a fallthrough list makes the browser fetch the
-MP4, fail to decode it, and fetch the WebM as well, doubling the bytes. Every
-real browser takes the MP4.
+MP4, fail to decode it, and fetch the WebM as well, doubling the bytes.
 
-All three are 12 seconds at 20 fps with no audio stream. Desktop is served at
-full 1080p — a deliberate trade of weight for sharpness, since the film is the
-only picture on the page above the fold; the phone gets a quarter of the
-pixels. The WebM exists for browsers without H.264, which is now a rare enough
-case that one encode covers both viewports. **Every frame is a
-keyframe** — that is what makes the scrub feel attached to the thumb rather
-than lagging behind it. Scrubbing lands on an arbitrary time, and with an
-inter-frame group the decoder has to walk forward from the last keyframe to get
-there; all-intra means one decode per seek, at any position, in any direction.
-240 frames across the range works out at roughly one frame per 17px of scroll.
-A 28 KB poster covers the moment before the first frame decodes.
-
-**Framing.** The element is given the footage's own 16:9 ratio rather than
-being stretched to the viewport and cropped with `cover` — cover turned the
-board into a macro shot, brutally so on a phone, where the viewport is more
-than twice as tall as the frame. On a landscape screen it is then sized to
-`100svh * 16/9 * 0.94`, so it nearly fills the viewport with only a shallow
-band left top and bottom; on a portrait one it is sized to the width instead
-and opened up, which is a fraction of the magnification cover was forcing.
-Because the box matches the picture exactly either way, a radial mask fades the
-picture's real edges into the page instead of ending on a rectangle.
-
-**Reduced motion** shows a single frame and never scrubs — the loop simply never
-starts, and the layer stays visible so the composition is intact.
+15 seconds at 20 fps, no audio stream. **Every frame is a keyframe** — scrubbing
+lands on an arbitrary time, and with an inter-frame group the decoder would have
+to walk forward from the last keyframe to get there; all-intra means one decode
+per seek, at any position, in any direction. The seek target is eased toward the
+scroll position and applied only when the change is worth at least a frame, so a
+still page does not keep the decoder busy, and an IntersectionObserver runs the
+loop only while the hero is on screen.
 
 To re-cut the film, any full ffmpeg will do:
 
@@ -308,20 +229,6 @@ ffmpeg -ss 2 -t 15 -i source.mp4 -vf "fps=20,scale=1920:1080:flags=lanczos" \
   public/media/circuit-1080.mp4
 ```
 
-## Scroll-linked motion
-
-Deliberately minimal — two effects, both CSS scroll-driven animations, so there
-are no scroll listeners and nothing runs on the main thread:
-
-- a reading-progress hairline across the top of the viewport,
-- photographs settling out of a slight over-scale as they enter frame.
-
-Plus one short entrance per block, driven by a single IntersectionObserver.
-
-Browsers without support skip the `@supports` block and get the static
-composition. Every "from" state stays partly opaque rather than transparent, so
-a failure can never blank the content. `prefers-reduced-motion` removes the
-timelines outright rather than just shortening durations.
 
 ## Typography
 
@@ -414,9 +321,12 @@ generated `*.vercel.app` hostname.
   scroll-driven animations, so they never touch the main thread. The film is the
   one exception: a single `requestAnimationFrame` loop, gated by an
   IntersectionObserver, and no scroll listener anywhere on the page.
-- **Minimal client JavaScript.** Only four components are interactive: the
-  mobile menu, the form, the entrance observer, and the film. Everything else —
-  including the language toggle — is server-rendered HTML.
+- **Minimal client JavaScript.** Only three components are interactive: the
+  mobile menu, the form, and the film — plus the entrance observer. Everything
+  else, including the language toggle, is server-rendered HTML.
+- **The film is opt-in.** See "The film" above for the conditions. On a 390px
+  viewport the home page transfers **0.32 MB**; with reduced motion, or on a
+  metered connection, the footage is never requested at all.
 - **No layout shift.** Every image sits in a wrapper with a declared aspect
   ratio and renders with `fill`; fonts carry fallback metrics.
 - **Images** are served as AVIF/WebP at responsive sizes by the Next optimiser.
@@ -424,9 +334,11 @@ generated `*.vercel.app` hostname.
 - **Accessibility:** a skip link, one `<h1>` per page, labelled landmarks and
   form controls, `aria-invalid` plus `role="alert"` on validation errors, a
   visible focus ring on every interactive element, and a full
-  `prefers-reduced-motion` path that removes the reveal entirely.
-- **SEO:** per-language metadata, canonical and `hreflang` alternates, Open
-  Graph and Twitter cards, `robots.txt`, `sitemap.xml`, and JSON-LD for the
+  `prefers-reduced-motion` path that removes the reveal entirely. The mobile
+  menu closes on Escape and returns focus to the control that opened it, locks
+  the page behind it, and dims it.
+- **SEO:** per-language metadata, canonical and `hreflang` alternates, a
+  per-language Open Graph card, `robots.txt`, `sitemap.xml`, and JSON-LD for the
   organisation, its founder, and the award.
 
 ## Images

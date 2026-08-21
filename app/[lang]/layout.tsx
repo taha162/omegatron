@@ -5,7 +5,6 @@ import "../globals.css";
 
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { SmoothScroll } from "@/components/SmoothScroll";
 import { DEFAULT_LOCALE, LOCALES, dirOf, getDictionary, isLocale } from "@/lib/i18n";
 import { SITE_URL } from "@/lib/site";
 
@@ -28,7 +27,7 @@ export function generateStaticParams() {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#070b11",
+  themeColor: "#06090e",
   colorScheme: "dark",
 };
 
@@ -72,7 +71,11 @@ export async function generateMetadata({
       alternateLocale: locale === "ar" ? "en_US" : "ar_IQ",
       images: [
         {
-          url: "/images/og.png",
+          // One card per language: a share of the Arabic site should not
+          // unfurl in English. Metadata images are served raw — no optimiser
+          // sits in front of them — so these are drawn as flat colour and type
+          // rather than exported from a photograph.
+          url: `/images/og-${locale}.png`,
           width: 1200,
           height: 630,
           alt: dict.meta.siteName,
@@ -83,7 +86,7 @@ export async function generateMetadata({
       card: "summary_large_image",
       title: dict.meta.title,
       description: dict.meta.description,
-      images: ["/images/og.png"],
+      images: [`/images/og-${locale}.png`],
     },
     robots: {
       index: true,
@@ -110,7 +113,6 @@ export default async function LocaleLayout({
   return (
     <html lang={lang} dir={dir} className={cairo.variable}>
       <body>
-        <SmoothScroll />
         <div className="scroll-progress" aria-hidden="true" />
         <a href="#main" className="skip-link">
           {dict.nav.skipToContent}

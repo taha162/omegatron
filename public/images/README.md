@@ -12,22 +12,28 @@ automatically.
 | `project-chamber.jpg` | Projects — supporting, left | 3:2 | The printed enclosure and its side intake port |
 | `project-array.jpg` | Projects — supporting, right | 3:2 | The unit on the bench |
 | `founder.jpg` | Founder portrait | 4:5, focus 50%/34% | Taha at the whiteboard |
-| `team-nurai.jpg` | Source for `og.png` | — | The official logo artwork |
-| `og.png` | Social share card | 1200x630 | Generated from `team-nurai.jpg` |
+| `team-nurai.jpg` | not rendered on the site | — | The official logo artwork, kept as a source file |
+| `og-ar.png` | Arabic social share card | 1200x630 | Drawn as flat colour and type — 29 KB |
+| `og-en.png` | English social share card | 1200x630 | Drawn as flat colour and type — 36 KB |
 
 Note that `project-enclosure.jpg` and `project-chamber.jpg` are named the
 opposite way round to what they show; the alt text in `app/[lang]/page.tsx`
 follows the actual content, not the filename.
 
+The share cards are metadata images: nothing optimises them on the way out, so
+they are drawn rather than exported from a photograph. Both are rendered from
+the same design as the site — the needle rail, the graticule, the wordmark. To
+change them, edit the copy and re-render at 1200x630.
+
 ## Video
 
-`public/media/` holds the film that runs behind the page from the hero to the
-founder — one 1080p H.264 encode served to every device, one 720p VP9 fallback
-for browsers without H.264, plus a poster. See "The film" in the root README for
-how it is cut, why every frame is a keyframe, and how the browser is made to
-fetch exactly one of the two.
+`public/media/` holds the film that runs in the hero — one 1080p H.264 encode,
+one 720p VP9 fallback for browsers without H.264, and a 48 KB poster. The poster
+is the picture by default; the footage is only fetched on a wide viewport, on an
+unmetered connection, and never under reduced motion. See "The film" in the root
+README.
 
-The hero no longer carries a photograph; the film is the picture there.
+The hero carries no photograph; the film is the picture there.
 
 ## Logo
 
