@@ -41,14 +41,14 @@ app/
   icon.svg                favicon
   robots.ts, sitemap.ts
 components/               Header, Footer, ProjectForm, FilmBackdrop,
-                          SmoothScroll, Reveal, Logo, Icons
+                          SmoothScroll, ScrollHolds, Reveal, Logo, Icons
 lib/
   i18n.ts                 every string on the site, in both languages
   mailer.ts               email transport (server-only)
   upload.ts               attachment limits shared by client and server
   site.ts                 canonical URL resolution
 public/images/            photography — see public/images/README.md
-public/media/             the film backdrop (two H.264 sizes, one VP9)
+public/media/             the film backdrop (one H.264, one VP9)
 ```
 
 ### Editing content
@@ -92,37 +92,49 @@ and TRON in gold as the logo does.
 
 ### Liquid glass
 
-Surfaces that sit over the film are glass rather than filled panels. It is an
-optical stack, not a translucent box, because a translucent box with a flat
-border reads as tinted plastic no matter how it is tuned:
+Surfaces that sit over the film are glass rather than filled panels.
 
-1. **The body.** `backdrop-filter: blur(30px) saturate(210%) brightness(0.88)
-   contrast(1.06)` on the pane itself — the board stays legible through it, and
-   the slight darkening keeps the material in this palette rather than Apple's
-   white one.
-2. **The lens band.** A `::before` carrying a *second* backdrop filter, masked
-   to an 11px band just inside the border, lifting and re-saturating what is
-   behind the edge relative to what is behind the middle. This is the cue that
-   separates thick glass from a sheet of film. It is deliberately restrained:
-   pushed harder, over near-black footage, it stops reading as refraction and
-   starts reading as a second frame drawn inside the first.
+**It is the light material, and that is a finding rather than a preference.**
+Glass only reads as glass when there is something behind it to bend. The film is
+close to black; a dark pane over a dark ground has nothing to refract and can
+only ever look like tinted plastic, however the gradients are tuned. So the
+panes are frosted white and carry dark type, and the scrim over the film was
+lifted (0.52 → 0.40 in the mid-range) to give them something to work with — the
+type on the panes no longer depends on that scrim for its contrast.
+
+Four layers:
+
+1. **The body.** `backdrop-filter: blur(28px) saturate(210%) brightness(1.3)` on
+   the pane, under a white tint that runs 0.58–0.78 down a diagonal. Opaque
+   enough to carry small dark type, translucent enough that the board is visibly
+   moving behind it.
+2. **The lens band.** A `::before` carrying a *second* backdrop filter, masked to
+   a 12px band just inside the border, pulling what is behind the edge back
+   toward the footage's own colour so the border reads as thickness rather than
+   as a printed outline.
 3. **The rim.** A `::after` masked down to a 1.5px ring carrying a **conic**
-   gradient, so the light travels around the perimeter — bright at the top-left
-   shoulder, gone at the opposite corner, picked up again as a bounce along the
-   bottom — instead of sitting at one value on four borders.
+   gradient: a bright catch at the top-left shoulder, a soft shadow at the
+   bottom-right where the pane lifts off the page — light travelling round the
+   perimeter instead of sitting at one value on four borders.
 4. **The speculars.** Two radial gradients painted into the pane's own
-   `background` stack, giving it a light source off the top-left shoulder and a
-   faint bounce at the bottom-right.
+   `background` stack.
 
-Two weights: **`.glass`** (30px blur, 11px lens) for the header, the About
-panel, the founder copy and the mobile sheet; **`.glass--lite`** (18px, 9px) for
-the many small panes — capability cards, project points, chips, the ghost
-button — so a dozen of them can composite over a seeking video.
+**The ink flips with the material.** Every rule in the stylesheet reads its
+colour from tokens, so `.glass` re-points `--ink`, `--ink-2`, `--ink-3`,
+`--paper`, `--steel`, `--accent` and the line colours on itself, and the pane's
+contents turn over without a single component rule knowing where it is sitting.
+`.btn--ghost` wears the material, so it takes the same flip — it was the one
+element that did not, and it spent a build as light type on a light pane.
+
+Two weights: **`.glass`** (28px blur, 12px lens) for the header, the About panel,
+the founder copy and the mobile sheet; **`.glass--lite`** (18px, 9px) for the
+many small panes — capability cards, project points, chips, the ghost button —
+so a dozen of them can composite over a seeking video.
 
 Every value is a custom property (`--glass-tint`, `--glass-specular`,
 `--glass-body`, `--glass-body-lite`, `--glass-lens`, `--glass-lens-w`,
-`--glass-rim`, `--glass-inner`, `--glass-drop`, `--radius-glass`), so the
-material is tunable in one place.
+`--glass-rim`, `--glass-inner`, `--glass-drop`, `--glass-ink*`,
+`--radius-glass`), so the material is tunable in one place.
 
 **One build note worth keeping.** The prefixed `-webkit-backdrop-filter` is
 declared in its own `@supports` rule rather than beside the standard property.
@@ -130,16 +142,23 @@ Written as a neighbouring pair, the build's CSS minifier keeps exactly one of
 the two — and Safari before 18 has only the prefixed form, so losing it would
 mean losing the material outright on those devices.
 
-The header is a floating bar: padded away from the viewport edge, with corners
-rounded to `--radius-glass` rather than to a full pill, so it reads as a panel
-of glass rather than a capsule. Its three tracks are `auto 1fr auto`, which
-centres the nav against the bar rather than against whatever the brand and the
-actions happen to measure.
+**The header** is a floating bar. Two things about it are worth writing down,
+because both were bugs first:
 
-**Corners and room.** One scale, all of it generous: `--radius` 16px for
-controls, `--radius-lg` 26px for photography, `--radius-glass` 30px for panes.
-Padding is a scale too — `--pane-pad` and `--pane-pad-sm` — because a glass pane
-with tight padding reads as a border round the text rather than a surface
+- The gutter and the bar's own padding are on **different elements**. Putting
+  `.container` and the glass on one element meant the container's padding served
+  as internal padding and the bar itself ran flush to the screen edges — visible
+  on a phone, hidden on a desktop only because the container's `max-width` was
+  narrower than the viewport.
+- Its three tracks are `auto 1fr auto` with each item **placed by name**
+  (`grid-column: 1 | 2 | 3`). Left to auto-placement, hiding the nav below 860px
+  took it out of the grid, and the actions fell into the middle column — which
+  is what parked them in the centre of the bar with empty space either side.
+
+**Corners and room.** One radius for every box on the site — `--radius`, 16px,
+taken from the hero buttons and used by panes, photography, controls and chips
+alike. Padding is a scale — `--pane-pad` and `--pane-pad-sm` — because a glass
+pane with tight padding reads as a border round the text rather than a surface
 under it.
 
 **The mobile sheet** hangs off the bar rather than sitting in the flow, so a
@@ -148,23 +167,43 @@ it down. It stays in the document and animates in both directions — the sheet
 eases down and the rows arrive behind it, 40ms apart — and `visibility: hidden`
 keeps the links out of the tab order while it is shut.
 
-Measured contrast over the film, worst case: **4.89:1** on capability body copy,
-against an assumed worst-case ground of `rgb(38,44,56)` — the scrim over the
-brightest patch of footage — rather than a sampled pixel. Headings run 12:1 and
-body copy 7.81:1 against the same ground.
+**Contrast is measured, not estimated.** The panes are translucent, so what sits
+behind a glyph is a blend of the tint, the specular, the lens and whatever frame
+of the film happens to be underneath — there is no ground to reason about on
+paper. `scripts` is not the place for it, so the check lives with the other
+Playwright verification: it screenshots the page, samples a glyph-free patch of
+the pane behind each target, and computes the ratio against the element's
+computed colour. All 17 targets pass at their WCAG AA threshold. The tightest
+are the gold section label over the film at **4.92:1** (worst of 21 scroll
+positions, as the film moves under it) and the gold half of the wordmark on the
+header pane at **5.52:1**; body copy on the panes runs 5.9–8.5:1.
 
 ## Weight
 
 Two mechanisms, and they are separate on purpose.
 
-**The hold.** The hero is given a 220vh runway with its content pinned inside
-it, so the first stretch of scrolling moves the film and not the page. That
-resistance is the weight at the top of the site. The statement dissolves over
-the last quarter of the runway, so the release reads as a hand-off to the film
-rather than the words being dragged off the top of the screen. The runway is
-declared in CSS under `@media (scripting: enabled)` rather than added by script,
-so there is no reflow after hydration, and only where there is a script to fade
-the pinned content out again.
+**The holds.** Every section over the film carries a run of empty scroll at its
+end with its content pinned inside it, so scrolling through the gap advances the
+film without moving the page. The section then releases and the next one climbs
+in behind it. That resistance, six times over, is the weight in the site.
+
+`components/ScrollHolds.tsx` does the arithmetic, because it depends on how tall
+each section's content turns out to be against the viewport — which CSS cannot
+ask:
+
+| Case | Pinned at | Why |
+| --- | --- | --- |
+| The hero | the top, for 115vh | It fills the screen by construction and has nothing above it, so it holds longest. |
+| Content shorter than the screen | centred, for 42vh | Centring is what makes a section let go while its own bottom edge is still above the fold, so it is gone before the next one arrives. |
+| Content taller than the screen | its last line, for 42vh | It scrolls up until its bottom is in view and holds there. Pinning its top would park the rest below the fold for the whole hold. |
+
+That last column is the load-bearing part. Two sections over the film are both
+transparent, so if a pinned one were still on screen when the next arrived they
+would read through each other. Verified by walking the page in 61 steps and
+checking that no two held sections' content boxes ever share a pixel.
+
+The pinning itself lives in CSS under `@media (scripting: enabled)`, so the
+no-JS render has no holds to unpin, and `prefers-reduced-motion` drops them.
 
 **The damper.** `components/SmoothScroll.tsx` takes the wheel off the document.
 Each notch adds to a target position and a `requestAnimationFrame` loop eases
@@ -173,8 +212,16 @@ it down again. It drives the *native* scroll position rather than transforming
 the page, which is what keeps `position: sticky` — and therefore the hold above
 — along with anchors, IntersectionObserver, the scrollbar and find-in-page all
 working. Anything that moves the page from outside the loop is detected and the
-loop resynchronises to it instead of fighting it. Off for touch, where the
-platform's own momentum is better than anything we would put in front of it.
+loop resynchronises to it instead of fighting it. A 900px wheel notch settles in
+about 1.8 seconds.
+
+Touch is taken over too. The finger drags the target directly — 1:1, at a much
+lighter easing, because a drag is direct manipulation and the page has to stay
+under the thumb — and on release the velocity it was carrying is projected
+forward and handed to the same easing the wheel uses, so a flick coasts to a
+stop with the weight of the rest of the site. That does replace the platform's
+own momentum, which is the trade for having one feel on every device. A second
+finger is left alone, and so is anything inside a control that scrolls itself.
 
 **Both easings are measured in time, not in frames.** A fixed fraction per frame
 means the page settles in half the time on a 120Hz screen and takes three times
@@ -185,7 +232,7 @@ share of however long the frame actually took.
 ## The hero
 
 No photograph — the film is the picture. The hero is a statement, a lead, and
-two actions, pinned and centred over the board.
+two actions, pinned over the board for the longest hold on the page.
 
 ## The film
 
@@ -255,7 +302,7 @@ starts, and the layer stays visible so the composition is intact.
 To re-cut the film, any full ffmpeg will do:
 
 ```bash
-ffmpeg -ss 2 -t 12 -i source.mp4 -vf "fps=20,scale=1920:1080:flags=lanczos" \
+ffmpeg -ss 2 -t 15 -i source.mp4 -vf "fps=20,scale=1920:1080:flags=lanczos" \
   -c:v libx264 -profile:v high -pix_fmt yuv420p -g 1 -keyint_min 1 -bf 0 \
   -sc_threshold 0 -crf 32 -preset slow -movflags +faststart -an \
   public/media/circuit-1080.mp4

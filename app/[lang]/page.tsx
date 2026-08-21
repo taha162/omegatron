@@ -7,6 +7,7 @@ import { Reveal } from "@/components/Reveal";
 import { ArrowIcon } from "@/components/Icons";
 import { ProjectForm } from "@/components/ProjectForm";
 import { FilmBackdrop } from "@/components/FilmBackdrop";
+import { ScrollHolds } from "@/components/ScrollHolds";
 import { DEFAULT_LOCALE, getDictionary, isLocale } from "@/lib/i18n";
 import { FOUNDER_NAME_AR, FOUNDER_NAME_EN, ORG_NAME_AR, ORG_NAME_EN, SITE_URL } from "@/lib/site";
 
@@ -72,9 +73,10 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
       {/* The film runs behind everything from here down to the founder. */}
       <div className="film-range" id="film-range">
         <FilmBackdrop rangeId="film-range" />
+        <ScrollHolds />
 
       {/* ---------------------------------------------------------------- Hero */}
-      <section className="hero">
+      <section className="hero hold">
         <div className="hero__pin">
           <div className="container hero__inner">
             <p className="hero__wordmark" lang="en">
@@ -96,7 +98,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
       </section>
 
       {/* --------------------------------------------------------------- About */}
-      <section className="section" id="about" aria-labelledby="about-title">
+      <section className="section hold" id="about" aria-labelledby="about-title">
         <div className="container">
           <Reveal className="about">
             <div>
@@ -112,7 +114,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
 
       {/* ------------------------------------------------------------ Projects */}
       <section
-        className="section section--tint"
+        className="section section--tint hold"
         id="projects"
         aria-labelledby="projects-title"
       >
@@ -199,7 +201,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
       </section>
 
       {/* -------------------------------------------------------- Capabilities */}
-      <section className="section" id="capabilities" aria-labelledby="capabilities-title">
+      <section className="section hold" id="capabilities" aria-labelledby="capabilities-title">
         <div className="container">
           <Reveal className="sec-head">
             <p className="sec-label mono">{dict.capabilities.label}</p>
@@ -220,7 +222,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
       </section>
 
       {/* ------------------------------------------------------------- Process */}
-      <section className="section section--tight" id="process" aria-labelledby="process-title">
+      <section className="section section--tight hold" id="process" aria-labelledby="process-title">
         <div className="container">
           <Reveal className="sec-head sec-head--tight">
             <p className="sec-label mono">{dict.process.label}</p>
@@ -243,7 +245,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
       </section>
 
       {/* ------------------------------------------------------------- Founder */}
-      <section className="section section--tint" id="founder" aria-labelledby="founder-title">
+      <section className="section section--tint hold" id="founder" aria-labelledby="founder-title">
         <div className="container founder">
           <Reveal className="founder__media">
             {/* An offset rule behind the portrait — editorial, not decorative. */}

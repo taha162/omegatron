@@ -134,14 +134,11 @@ export function FilmBackdrop({ rangeId }: { rangeId: string }) {
     // Choose the file ourselves rather than letting the browser fall through a
     // list of <source> elements — that would fetch the MP4, fail to decode it,
     // and fetch the WebM as well. Asking canPlayType first means exactly one
-    // request, and the smaller H.264 file everywhere it is supported.
-    const wide = window.matchMedia("(min-width: 900px)").matches;
+    // request. Full 1080p goes to every device, phones included: a deliberate
+    // trade of 7.5 MB for sharpness, since the film is the only picture on the
+    // page above the fold.
     const h264 = video.canPlayType('video/mp4; codecs="avc1.640028"');
-    video.src = h264
-      ? wide
-        ? "/media/circuit-1080.mp4"
-        : "/media/circuit-540.mp4"
-      : "/media/circuit-720.webm";
+    video.src = h264 ? "/media/circuit-1080.mp4" : "/media/circuit-720.webm";
     video.load();
 
     const runner = new IntersectionObserver(

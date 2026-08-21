@@ -32,61 +32,66 @@ export function Header({ locale, dict }: { locale: Locale; dict: Dictionary }) {
 
   return (
     <header className="header">
-      <div className="container header__inner glass">
-        <Link href={`/${locale}`} className="brand" aria-label={dict.nav.home} onClick={close}>
-          <Logo className="brand__mark" />
-          <Wordmark className="wordmark" />
-        </Link>
-
-        <nav className="nav" aria-label={dict.nav.primary}>
-          {links.map((link) => (
-            <Link key={link.href} href={link.href} className="nav__link">
-              {link.label}
-            </Link>
-          ))}
-        </nav>
-
-        <div className="header__actions">
-          <div className="lang-toggle" role="group" aria-label={dict.footer.language}>
-            {LOCALES.map((code, i) => (
-              <span key={code}>
-                {i > 0 ? (
-                  <span className="lang-toggle__sep" aria-hidden="true">
-                    /
-                  </span>
-                ) : null}
-                <Link
-                  href={localizedPath(pathname, code)}
-                  className="lang-toggle__opt"
-                  lang={code}
-                  hrefLang={code}
-                  aria-current={code === locale ? "true" : undefined}
-                  onClick={close}
-                >
-                  {code === "ar" ? "ع" : "EN"}
-                </Link>
-              </span>
-            ))}
-          </div>
-
-          <Link href={`/${locale}/start`} className="btn header__cta" onClick={close}>
-            {dict.nav.start}
+      {/* The container supplies the gutter the bar floats inside; the bar
+          itself is the glass, with its own padding. Putting both on one
+          element left it flush to the screen edges on a phone. */}
+      <div className="container">
+        <div className="header__inner glass">
+          <Link href={`/${locale}`} className="brand" aria-label={dict.nav.home} onClick={close}>
+            <Logo className="brand__mark" />
+            <Wordmark className="wordmark" />
           </Link>
 
-          <button
-            type="button"
-            className="nav-toggle"
-            aria-expanded={open}
-            aria-controls={menuId}
-            aria-label={open ? dict.nav.close : dict.nav.menu}
-            onClick={() => setOpen((v) => !v)}
-          >
-            <span className="nav-toggle__bars" aria-hidden="true">
-              <span />
-              <span />
-              <span />
-            </span>
-          </button>
+          <nav className="nav" aria-label={dict.nav.primary}>
+            {links.map((link) => (
+              <Link key={link.href} href={link.href} className="nav__link">
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+
+          <div className="header__actions">
+            <div className="lang-toggle" role="group" aria-label={dict.footer.language}>
+              {LOCALES.map((code, i) => (
+                <span key={code}>
+                  {i > 0 ? (
+                    <span className="lang-toggle__sep" aria-hidden="true">
+                      /
+                    </span>
+                  ) : null}
+                  <Link
+                    href={localizedPath(pathname, code)}
+                    className="lang-toggle__opt"
+                    lang={code}
+                    hrefLang={code}
+                    aria-current={code === locale ? "true" : undefined}
+                    onClick={close}
+                  >
+                    {code === "ar" ? "ع" : "EN"}
+                  </Link>
+                </span>
+              ))}
+            </div>
+
+            <Link href={`/${locale}/start`} className="btn header__cta" onClick={close}>
+              {dict.nav.start}
+            </Link>
+
+            <button
+              type="button"
+              className="nav-toggle"
+              aria-expanded={open}
+              aria-controls={menuId}
+              aria-label={open ? dict.nav.close : dict.nav.menu}
+              onClick={() => setOpen((v) => !v)}
+            >
+              <span className="nav-toggle__bars" aria-hidden="true">
+                <span />
+                <span />
+                <span />
+              </span>
+            </button>
+          </div>
         </div>
       </div>
 
