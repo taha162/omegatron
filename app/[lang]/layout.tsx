@@ -5,6 +5,7 @@ import "../globals.css";
 
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { SmoothScroll } from "@/components/SmoothScroll";
 import { DEFAULT_LOCALE, LOCALES, dirOf, getDictionary, isLocale } from "@/lib/i18n";
 import { SITE_URL } from "@/lib/site";
 
@@ -109,6 +110,7 @@ export default async function LocaleLayout({
   return (
     <html lang={lang} dir={dir} className={cairo.variable}>
       <body>
+        <SmoothScroll />
         <div className="scroll-progress" aria-hidden="true" />
         <a href="#main" className="skip-link">
           {dict.nav.skipToContent}

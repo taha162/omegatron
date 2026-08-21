@@ -75,20 +75,22 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
 
       {/* ---------------------------------------------------------------- Hero */}
       <section className="hero">
-        <div className="container hero__inner">
-          <p className="hero__wordmark" lang="en">
-            {dict.hero.wordmark}
-          </p>
-          <h1 className="hero__statement">{dict.hero.statement}</h1>
-          <p className="hero__lead">{dict.hero.lead}</p>
-          <div className="hero__actions">
-            <a href="#projects" className="btn">
-              {dict.hero.primaryCta}
-              <ArrowIcon className="btn__arrow" />
-            </a>
-            <Link href={`/${lang}/start`} className="btn btn--ghost">
-              {dict.hero.secondaryCta}
-            </Link>
+        <div className="hero__pin">
+          <div className="container hero__inner">
+            <p className="hero__wordmark" lang="en">
+              {dict.hero.wordmark}
+            </p>
+            <h1 className="hero__statement">{dict.hero.statement}</h1>
+            <p className="hero__lead">{dict.hero.lead}</p>
+            <div className="hero__actions">
+              <a href="#projects" className="btn">
+                {dict.hero.primaryCta}
+                <ArrowIcon className="btn__arrow" />
+              </a>
+              <Link href={`/${lang}/start`} className="btn btn--ghost">
+                {dict.hero.secondaryCta}
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -259,7 +261,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
             </div>
           </Reveal>
 
-          <Reveal delay={80}>
+          <Reveal delay={80} className="founder__copy glass">
             <p className="sec-label mono">{dict.founder.label}</p>
             <h2 className="founder__name" id="founder-title">
               {dict.founder.name}

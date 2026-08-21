@@ -22,30 +22,58 @@
   --steel: #c3ccd6;
 
   /*
-   * Liquid glass: a body tint, a refraction of whatever is behind it, and a
-   * rim that brightens where the light lands. Two weights — the full material
-   * and a thinner one for the many small panes.
+   * Liquid glass. Not a translucent box — an optical stack, because that is
+   * what the eye is actually reading when it calls something glass:
+   *
+   *   1. a frosted body that blurs and re-saturates the backdrop,
+   *   2. a lens band at the edge, where a thick pane bends and brightens what
+   *      is behind it before the border,
+   *   3. a rim whose brightness travels around the perimeter rather than
+   *      sitting at one uniform value,
+   *   4. specular highlights from a light source off the top-left shoulder.
+   *
+   * Kept dark, so it belongs to this palette rather than Apple's white one.
    */
-  --glass-bg: linear-gradient(
-    158deg,
-    rgba(255, 255, 255, 0.13) 0%,
-    rgba(255, 255, 255, 0.055) 34%,
-    rgba(255, 255, 255, 0.028) 62%,
-    rgba(255, 255, 255, 0.075) 100%
+  --glass-tint: linear-gradient(
+      152deg,
+      rgba(255, 255, 255, 0.17) 0%,
+      rgba(255, 255, 255, 0.07) 30%,
+      rgba(255, 255, 255, 0.028) 58%,
+      rgba(255, 255, 255, 0.06) 84%,
+      rgba(255, 255, 255, 0.12) 100%
+    ),
+    linear-gradient(180deg, rgba(10, 16, 24, 0.34) 0%, rgba(10, 16, 24, 0.5) 100%);
+  --glass-specular: radial-gradient(
+      86% 62% at 6% -12%,
+      rgba(255, 255, 255, 0.3) 0%,
+      rgba(255, 255, 255, 0.08) 42%,
+      transparent 70%
+    ),
+    radial-gradient(70% 52% at 102% 112%, rgba(255, 255, 255, 0.13), transparent 66%);
+  --glass-body: blur(30px) saturate(210%) brightness(0.88) contrast(1.06);
+  --glass-body-lite: blur(18px) saturate(195%) brightness(0.9) contrast(1.04);
+  /* The lens band: what is behind the edge, lifted and re-saturated relative
+     to what is behind the middle. Kept restrained — over near-black footage a
+     strong lift stops reading as refraction and starts reading as a second
+     frame drawn inside the first. */
+  --glass-lens: blur(2px) saturate(240%) brightness(1.22);
+  --glass-lens-w: 11px;
+  /* Light travelling round the rim: bright at the top-left shoulder, gone at
+     the opposite corner, picked back up as a bounce at the bottom. */
+  --glass-rim: conic-gradient(
+    from 216deg at 50% 50%,
+    rgba(255, 255, 255, 0.78) 0deg,
+    rgba(255, 255, 255, 0.26) 42deg,
+    rgba(255, 255, 255, 0.05) 104deg,
+    rgba(255, 255, 255, 0.03) 172deg,
+    rgba(255, 255, 255, 0.22) 232deg,
+    rgba(255, 255, 255, 0.5) 296deg,
+    rgba(255, 255, 255, 0.78) 360deg
   );
-  --glass-filter: blur(26px) saturate(200%) brightness(1.06);
-  --glass-filter-lite: blur(14px) saturate(185%) brightness(1.04);
-  --glass-rim: linear-gradient(
-    148deg,
-    rgba(255, 255, 255, 0.62) 0%,
-    rgba(255, 255, 255, 0.14) 26%,
-    rgba(255, 255, 255, 0.02) 48%,
-    rgba(255, 255, 255, 0.08) 72%,
-    rgba(255, 255, 255, 0.34) 100%
-  );
-  --glass-inner: inset 0 1px 0 rgba(255, 255, 255, 0.2),
-    inset 0 -12px 26px -18px rgba(255, 255, 255, 0.16);
-  --glass-drop: 0 18px 48px -20px rgba(0, 0, 0, 0.72);
+  --glass-inner: inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 0 24px -6px rgba(255, 255, 255, 0.1);
+  --glass-drop: 0 26px 62px -24px rgba(0, 0, 0, 0.85),
+    0 4px 14px -8px rgba(0, 0, 0, 0.6);
 
   /* Type */
   --font-sans: var(--font-cairo), "Cairo", "Segoe UI", system-ui, -apple-system,
@@ -68,38 +96,49 @@
   --measure: 58ch;
 
   /* Corners are generously rounded — roughly a quarter of the short side. */
-  --radius: 12px;
-  --radius-lg: 20px;
-  --radius-glass: 24px;
+  --radius: 16px;
+  --radius-lg: 26px;
+  --radius-glass: 30px;
 
-  --header-h: 4.25rem;
+  /* Panes are given room to breathe; a glass pane with tight padding reads as
+     a border round the text rather than a surface under it. */
+  --pane-pad: clamp(1.75rem, 1.3rem + 2vw, 3rem);
+  --pane-pad-sm: clamp(1.375rem, 1.1rem + 1.2vw, 2rem);
+
+  --header-h: 4.75rem;
 }
 
 /* --------------------------------------------------------------------------
    Liquid glass
    -------------------------------------------------------------------------- */
 
+/* Layer 1 — the frosted body, plus the specular highlights painted straight
+   into the element's own background stack. */
 .glass,
 .glass--lite {
   position: relative;
   isolation: isolate;
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-filter);
-  -webkit-backdrop-filter: var(--glass-filter);
+  background: var(--glass-specular), var(--glass-tint);
+  backdrop-filter: var(--glass-body);
   border: 0;
   border-radius: var(--radius-glass);
   box-shadow: var(--glass-inner), var(--glass-drop);
 }
 
-/* Thinner glass for the many small panes — the same material, less depth of
-   field, so a dozen of them can sit over the film without the compositor
-   struggling. */
+/* Thinner glass for the many small panes — the same optics, less depth of
+   field, so a dozen of them can sit over a seeking video. */
 .glass--lite {
-  --glass-filter: var(--glass-filter-lite);
-  box-shadow: var(--glass-inner), 0 10px 26px -16px rgba(0, 0, 0, 0.6);
+  --glass-body: var(--glass-body-lite);
+  --glass-lens-w: 9px;
+  box-shadow: var(--glass-inner), 0 14px 32px -18px rgba(0, 0, 0, 0.7);
 }
 
-/* The specular sheen: a soft light source off the top-left shoulder. */
+/*
+ * Layer 2 — the lens band. A second backdrop filter, masked to a band just
+ * inside the border and faded inward, so the backdrop reappears sharper and
+ * brighter at the edge than it is through the middle of the pane. This is the
+ * cue that separates thick glass from a sheet of tinted plastic.
+ */
 .glass::before,
 .glass--lite::before {
   content: "";
@@ -108,16 +147,17 @@
   z-index: -1;
   border-radius: inherit;
   pointer-events: none;
-  background: radial-gradient(
-      120% 90% at 8% -14%,
-      rgba(255, 255, 255, 0.22),
-      transparent 58%
-    ),
-    radial-gradient(90% 70% at 96% 108%, rgba(255, 255, 255, 0.09), transparent 62%);
+  backdrop-filter: var(--glass-lens);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  padding: var(--glass-lens-w);
+  opacity: 0.6;
 }
 
-/* The rim: a one-pixel ring that brightens where the light lands and fades
-   where it does not, rather than a flat border on all four sides. */
+/* Layer 3 — the rim. A 1.5px ring carrying a conic gradient, so the light
+   travels around the perimeter instead of sitting flat on four borders. */
 .glass::after,
 .glass--lite::after {
   content: "";
@@ -125,7 +165,7 @@
   inset: 0;
   z-index: -1;
   border-radius: inherit;
-  padding: 1px;
+  padding: 1.5px;
   pointer-events: none;
   background: var(--glass-rim);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
@@ -134,10 +174,39 @@
   mask-composite: exclude;
 }
 
+/*
+ * The prefixed property gets its own rule. Written beside the standard one it
+ * is merged away by the build's minifier — which keeps exactly one of the pair
+ * — and Safari before 18 has only the prefixed form, so losing it would mean
+ * losing the material on every one of those devices.
+ */
+@supports (-webkit-backdrop-filter: blur(1px)) {
+  .glass,
+  .glass--lite {
+    -webkit-backdrop-filter: var(--glass-body);
+  }
+
+  .glass::before,
+  .glass--lite::before {
+    -webkit-backdrop-filter: var(--glass-lens);
+  }
+
+  .btn--ghost {
+    -webkit-backdrop-filter: var(--glass-body-lite);
+  }
+}
+
+/* Without backdrop-filter there is nothing to refract; fall back to a solid
+   panel rather than a washed-out ghost. */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .glass,
   .glass--lite {
-    background: rgba(16, 24, 35, 0.9);
+    background: rgba(16, 24, 35, 0.92);
+  }
+
+  .glass::before,
+  .glass--lite::before {
+    display: none;
   }
 }
 
@@ -388,7 +457,7 @@ textarea {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.875rem 1.625rem;
+  padding: 1rem 1.875rem;
   background: var(--btn-bg);
   color: var(--btn-fg);
   border: 1px solid var(--btn-bd);
@@ -489,7 +558,7 @@ textarea {
   align-items: center;
   gap: 1rem;
   border-radius: var(--radius-glass);
-  padding-inline: clamp(0.875rem, 0.5rem + 1.2vw, 1.375rem);
+  padding-inline: clamp(1.125rem, 0.7rem + 1.5vw, 1.875rem);
 }
 
 .header__inner > * {
@@ -594,7 +663,7 @@ textarea {
 }
 
 .header__cta {
-  padding: 0.5625rem 1rem;
+  padding: 0.6875rem 1.25rem;
   font-size: 0.875rem;
 }
 
@@ -648,7 +717,7 @@ textarea {
 .mobile-nav {
   display: none;
   margin-block-start: 0.625rem;
-  padding: 0.5rem 1.25rem 1.25rem;
+  padding: 0.75rem var(--pane-pad-sm) var(--pane-pad-sm);
   transform-origin: top center;
   opacity: 0;
   visibility: hidden;
@@ -756,7 +825,11 @@ textarea {
   position: absolute;
   inset: 0;
   margin: auto;
-  width: 100%;
+  /* Nearly fills a landscape viewport — the 0.94 leaves a shallow band top and
+     bottom for the mask to work on, so the frame ends on a fade rather than a
+     hard edge. `max-width` has to be released; the reset caps media at 100%. */
+  width: max(100%, calc(100svh * 16 / 9 * 0.94));
+  max-width: none;
   height: auto;
   aspect-ratio: 16 / 9;
   object-fit: cover;
@@ -777,10 +850,12 @@ textarea {
   );
 }
 
-/* On a tall screen the frame would be a thin strip; open it up — still less
-   than half the magnification `cover` was forcing. */
+/* A phone is more than twice as tall as the frame is; filling it would mean
+   the macro crop all over again. The frame is sized to the width and opened up
+   instead — still well under the magnification `cover` was forcing. */
 @media (max-aspect-ratio: 3 / 4) {
   .film__video {
+    width: 100%;
     transform: translate3d(var(--px, 0px), var(--py, 0px), 0) scale(1.8);
   }
 }
@@ -818,6 +893,35 @@ textarea {
   align-items: center;
   min-height: min(84vh, 46rem);
   padding-block: clamp(4rem, 2.5rem + 7vw, 8rem) clamp(3.5rem, 2.5rem + 5vw, 6.5rem);
+}
+
+/*
+ * The hold. The hero is given a runway and its content pinned inside it, so
+ * the first stretch of scrolling moves the film and not the page — the weight
+ * the visitor feels at the top of the site. The runway is declared in CSS
+ * rather than added by script, so there is no reflow after hydration, and only
+ * where there is a script to fade the pinned content out again.
+ */
+@media (scripting: enabled) {
+  .hero {
+    display: block;
+    min-height: 0;
+    height: 220vh;
+    padding-block: 0;
+  }
+
+  .hero__pin {
+    position: sticky;
+    inset-block-start: 0;
+    display: grid;
+    align-items: center;
+    min-height: 100vh;
+    min-height: 100svh;
+    padding-block: calc(var(--header-h) + 2rem) clamp(3.5rem, 2.5rem + 5vw, 6.5rem);
+    /* Driven from the scroll loop; the pinned hero has to be gone before the
+       section below it scrolls over the same patch of film. */
+    opacity: var(--hero-opacity, 1);
+  }
 }
 
 /* Kept on the container's own measure so the hero starts on the same edge as
@@ -945,7 +1049,7 @@ textarea {
 }
 
 .chip {
-  padding: 0.3125rem 0.75rem;
+  padding: 0.4375rem 1rem;
   border: 1px solid var(--line);
   border-radius: 999px;
   font-size: 0.8125rem;
@@ -1186,16 +1290,16 @@ textarea {
    -------------------------------------------------------------------------- */
 
 .about__body.glass {
-  padding: clamp(1.5rem, 1.2rem + 1.2vw, 2.25rem);
-  margin-block-start: 1.5rem;
+  padding: var(--pane-pad);
+  margin-block-start: 1.75rem;
 }
 
 .cap.glass--lite {
-  padding: 1.25rem clamp(1rem, 0.8rem + 0.8vw, 1.5rem);
+  padding: var(--pane-pad-sm);
 }
 
 .project__points.glass--lite {
-  padding: 0.25rem clamp(1rem, 0.8rem + 0.8vw, 1.5rem);
+  padding: 0.5rem var(--pane-pad-sm);
 }
 
 .project__point:first-child {
@@ -1213,14 +1317,13 @@ textarea {
 }
 
 .founder__copy.glass {
-  padding: clamp(1.5rem, 1.2rem + 1.5vw, 2.5rem);
+  padding: var(--pane-pad);
 }
 
 /* The ghost button is a small pane of the same glass. */
 .btn--ghost {
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-filter-lite);
-  -webkit-backdrop-filter: var(--glass-filter-lite);
+  background: var(--glass-specular), var(--glass-tint);
+  backdrop-filter: var(--glass-body-lite);
   border-color: rgba(255, 255, 255, 0.16);
   box-shadow: var(--glass-inner);
 }
@@ -1854,6 +1957,21 @@ select.field__control {
   .reveal {
     opacity: 1;
     transform: none;
+  }
+
+  /* No hold and no damping: the hero is a section like any other, and nothing
+     is left pinned that the script would otherwise have faded out. */
+  .hero {
+    height: auto;
+    min-height: min(84vh, 46rem);
+    padding-block: clamp(4rem, 2.5rem + 7vw, 8rem) clamp(3.5rem, 2.5rem + 5vw, 6.5rem);
+  }
+
+  .hero__pin {
+    position: static;
+    min-height: 0;
+    padding-block: 0;
+    opacity: 1 !important;
   }
 
   /* Scroll-driven animations ignore duration; the timeline itself is removed. */

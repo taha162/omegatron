@@ -41,14 +41,14 @@ app/
   icon.svg                favicon
   robots.ts, sitemap.ts
 components/               Header, Footer, ProjectForm, FilmBackdrop,
-                          Reveal, Logo, Icons
+                          SmoothScroll, Reveal, Logo, Icons
 lib/
   i18n.ts                 every string on the site, in both languages
   mailer.ts               email transport (server-only)
   upload.ts               attachment limits shared by client and server
   site.ts                 canonical URL resolution
 public/images/            photography — see public/images/README.md
-public/media/             the film backdrop (two sizes x two codecs)
+public/media/             the film backdrop (two H.264 sizes, one VP9)
 ```
 
 ### Editing content
@@ -92,28 +92,43 @@ and TRON in gold as the logo does.
 
 ### Liquid glass
 
-Surfaces that sit over the film are glass rather than filled panels. Three
-layers make the material, and all three matter — a translucent box with a flat
-border reads as grey plastic, not glass:
+Surfaces that sit over the film are glass rather than filled panels. It is an
+optical stack, not a translucent box, because a translucent box with a flat
+border reads as tinted plastic no matter how it is tuned:
 
-1. **A refraction.** `backdrop-filter: blur() saturate(200%) brightness()`
-   lifts and re-saturates whatever is behind the pane, so the board is still
-   legible through it.
-2. **A specular sheen.** A `::before` with two radial gradients — a strong one
-   off the top-left shoulder, a faint bounce at the bottom-right — gives the
-   pane a light source instead of a uniform tint.
-3. **A light-catching rim.** A `::after` masked down to a one-pixel ring, filled
-   with a diagonal gradient, so the edge is bright where the light lands and
-   nearly invisible where it does not.
+1. **The body.** `backdrop-filter: blur(30px) saturate(210%) brightness(0.88)
+   contrast(1.06)` on the pane itself — the board stays legible through it, and
+   the slight darkening keeps the material in this palette rather than Apple's
+   white one.
+2. **The lens band.** A `::before` carrying a *second* backdrop filter, masked
+   to an 11px band just inside the border, lifting and re-saturating what is
+   behind the edge relative to what is behind the middle. This is the cue that
+   separates thick glass from a sheet of film. It is deliberately restrained:
+   pushed harder, over near-black footage, it stops reading as refraction and
+   starts reading as a second frame drawn inside the first.
+3. **The rim.** A `::after` masked down to a 1.5px ring carrying a **conic**
+   gradient, so the light travels around the perimeter — bright at the top-left
+   shoulder, gone at the opposite corner, picked up again as a bounce along the
+   bottom — instead of sitting at one value on four borders.
+4. **The speculars.** Two radial gradients painted into the pane's own
+   `background` stack, giving it a light source off the top-left shoulder and a
+   faint bounce at the bottom-right.
 
-Two weights: **`.glass`** (26px blur) for the header, the About panel, the
-founder copy and the mobile sheet; **`.glass--lite`** (14px) for the many small
-panes — capability cards, project points, chips, the ghost button — so a dozen
-of them can composite over a seeking video.
+Two weights: **`.glass`** (30px blur, 11px lens) for the header, the About
+panel, the founder copy and the mobile sheet; **`.glass--lite`** (18px, 9px) for
+the many small panes — capability cards, project points, chips, the ghost
+button — so a dozen of them can composite over a seeking video.
 
-Every value is a custom property (`--glass-bg`, `--glass-filter`,
-`--glass-filter-lite`, `--glass-rim`, `--glass-inner`, `--glass-drop`,
-`--radius-glass`), so the material is tunable in one place.
+Every value is a custom property (`--glass-tint`, `--glass-specular`,
+`--glass-body`, `--glass-body-lite`, `--glass-lens`, `--glass-lens-w`,
+`--glass-rim`, `--glass-inner`, `--glass-drop`, `--radius-glass`), so the
+material is tunable in one place.
+
+**One build note worth keeping.** The prefixed `-webkit-backdrop-filter` is
+declared in its own `@supports` rule rather than beside the standard property.
+Written as a neighbouring pair, the build's CSS minifier keeps exactly one of
+the two — and Safari before 18 has only the prefixed form, so losing it would
+mean losing the material outright on those devices.
 
 The header is a floating bar: padded away from the viewport edge, with corners
 rounded to `--radius-glass` rather than to a full pill, so it reads as a panel
@@ -121,8 +136,11 @@ of glass rather than a capsule. Its three tracks are `auto 1fr auto`, which
 centres the nav against the bar rather than against whatever the brand and the
 actions happen to measure.
 
-**Corners.** One scale, all of it generous: `--radius` 12px for controls,
-`--radius-lg` 20px for photography, `--radius-glass` 24px for panes.
+**Corners and room.** One scale, all of it generous: `--radius` 16px for
+controls, `--radius-lg` 26px for photography, `--radius-glass` 30px for panes.
+Padding is a scale too — `--pane-pad` and `--pane-pad-sm` — because a glass pane
+with tight padding reads as a border round the text rather than a surface
+under it.
 
 **The mobile sheet** hangs off the bar rather than sitting in the flow, so a
 closed menu costs no layout and an open one covers the page instead of pushing
@@ -135,11 +153,39 @@ against an assumed worst-case ground of `rgb(38,44,56)` — the scrim over the
 brightest patch of footage — rather than a sampled pixel. Headings run 12:1 and
 body copy 7.81:1 against the same ground.
 
+## Weight
+
+Two mechanisms, and they are separate on purpose.
+
+**The hold.** The hero is given a 220vh runway with its content pinned inside
+it, so the first stretch of scrolling moves the film and not the page. That
+resistance is the weight at the top of the site. The statement dissolves over
+the last quarter of the runway, so the release reads as a hand-off to the film
+rather than the words being dragged off the top of the screen. The runway is
+declared in CSS under `@media (scripting: enabled)` rather than added by script,
+so there is no reflow after hydration, and only where there is a script to fade
+the pinned content out again.
+
+**The damper.** `components/SmoothScroll.tsx` takes the wheel off the document.
+Each notch adds to a target position and a `requestAnimationFrame` loop eases
+the real scroll position toward it, so the page takes the movement up and puts
+it down again. It drives the *native* scroll position rather than transforming
+the page, which is what keeps `position: sticky` — and therefore the hold above
+— along with anchors, IntersectionObserver, the scrollbar and find-in-page all
+working. Anything that moves the page from outside the loop is detected and the
+loop resynchronises to it instead of fighting it. Off for touch, where the
+platform's own momentum is better than anything we would put in front of it.
+
+**Both easings are measured in time, not in frames.** A fixed fraction per frame
+means the page settles in half the time on a 120Hz screen and takes three times
+as long on a machine dropping to 20fps — the feel would be whatever the hardware
+happened to be doing. The per-frame figure is converted into the equivalent
+share of however long the frame actually took.
+
 ## The hero
 
 No photograph — the film is the picture. The hero is a statement, a lead, and
-two actions, vertically centred in a viewport-height block so the board reads
-behind it.
+two actions, pinned and centred over the board.
 
 ## The film
 
@@ -172,17 +218,20 @@ exactly **one**:
 
 | File | Codec | Size | Served to |
 | --- | --- | --- | --- |
-| `circuit-1280.mp4` | H.264 high, all-intra | 3.9 MB | ≥900px viewports |
-| `circuit-854.mp4` | H.264 high, all-intra | 2.4 MB | narrow viewports |
-| `circuit-1280.webm` | VP9 | 3.7 MB | browsers without H.264 |
-| `circuit-854.webm` | VP9 | 2.5 MB | browsers without H.264 |
+| `circuit-1080.mp4` | 1920x1080 H.264, all-intra | 7.5 MB | ≥900px viewports |
+| `circuit-540.mp4` | 960x540 H.264, all-intra | 2.8 MB | narrow viewports |
+| `circuit-720.webm` | 1280x720 VP9 | 3.7 MB | browsers without H.264 |
 
 The component asks `canPlayType` and assigns `video.src` itself rather than
 listing `<source>` elements — a fallthrough list makes the browser fetch the
 MP4, fail to decode it, and fetch the WebM as well, doubling the bytes. Every
 real browser takes the MP4.
 
-All four are 12 seconds at 20 fps with no audio stream. **Every frame is a
+All three are 12 seconds at 20 fps with no audio stream. Desktop is served at
+full 1080p — a deliberate trade of weight for sharpness, since the film is the
+only picture on the page above the fold; the phone gets a quarter of the
+pixels. The WebM exists for browsers without H.264, which is now a rare enough
+case that one encode covers both viewports. **Every frame is a
 keyframe** — that is what makes the scrub feel attached to the thumb rather
 than lagging behind it. Scrubbing lands on an arbitrary time, and with an
 inter-frame group the decoder has to walk forward from the last keyframe to get
@@ -190,12 +239,15 @@ there; all-intra means one decode per seek, at any position, in any direction.
 240 frames across the range works out at roughly one frame per 17px of scroll.
 A 28 KB poster covers the moment before the first frame decodes.
 
-**Framing.** The element is given the footage's own 16:9 ratio and sized to the
-viewport width, rather than stretched to the viewport and cropped with `cover`.
-Cover turned the board into a macro shot — brutally so on a phone, where the
-viewport is more than twice as tall as the frame. Because the box now matches
-the picture exactly, a radial mask fades the picture's real edges into the page
-instead of ending on a rectangle.
+**Framing.** The element is given the footage's own 16:9 ratio rather than
+being stretched to the viewport and cropped with `cover` — cover turned the
+board into a macro shot, brutally so on a phone, where the viewport is more
+than twice as tall as the frame. On a landscape screen it is then sized to
+`100svh * 16/9 * 0.94`, so it nearly fills the viewport with only a shallow
+band left top and bottom; on a portrait one it is sized to the width instead
+and opened up, which is a fraction of the magnification cover was forcing.
+Because the box matches the picture exactly either way, a radial mask fades the
+picture's real edges into the page instead of ending on a rectangle.
 
 **Reduced motion** shows a single frame and never scrubs — the loop simply never
 starts, and the layer stays visible so the composition is intact.
@@ -203,10 +255,10 @@ starts, and the layer stays visible so the composition is intact.
 To re-cut the film, any full ffmpeg will do:
 
 ```bash
-ffmpeg -ss 2 -t 12 -i source.mp4 -vf "fps=20,scale=1280:720:flags=lanczos" \
+ffmpeg -ss 2 -t 12 -i source.mp4 -vf "fps=20,scale=1920:1080:flags=lanczos" \
   -c:v libx264 -profile:v high -pix_fmt yuv420p -g 1 -keyint_min 1 -bf 0 \
-  -sc_threshold 0 -crf 33 -preset slow -movflags +faststart -an \
-  public/media/circuit-1280.mp4
+  -sc_threshold 0 -crf 32 -preset slow -movflags +faststart -an \
+  public/media/circuit-1080.mp4
 ```
 
 ## Scroll-linked motion

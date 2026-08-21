@@ -30,6 +30,7 @@ export function FilmBackdrop({ rangeId }: { rangeId: string }) {
 
     let raf = 0;
     let active = false;
+    let last = 0;
     let eased = 0;
     let pointerX = 0;
     let pointerY = 0;
@@ -45,13 +46,40 @@ export function FilmBackdrop({ rangeId }: { rangeId: string }) {
       return Math.min(1, Math.max(0, -rect.top / runway));
     }
 
-    function frame() {
+    /*
+     * The hero dissolves as its hold runs out, so the release reads as a
+     * hand-off to the film rather than the statement being dragged off the top
+     * of the screen.
+     */
+    const hero = document.querySelector<HTMLElement>(".hero");
+    function fadeHero() {
+      if (!hero) return;
+      const rect = hero.getBoundingClientRect();
+      const runway = rect.height - window.innerHeight;
+      if (runway <= 0) return;
+      const through = Math.min(1, Math.max(0, -rect.top / runway));
+      const out = Math.min(1, Math.max(0, (through - 0.72) / 0.28));
+      hero.style.setProperty("--hero-opacity", String(1 - out));
+    }
+
+    /* Per-frame fractions make the easing depend on the frame rate; converting
+       them to a share of the elapsed time keeps the same glide on a 120Hz
+       screen and on a phone dropping frames while it decodes. */
+    function share(dt: number, perFrame: number): number {
+      return 1 - Math.pow(1 - perFrame, Math.min(dt, 100) / (1000 / 60));
+    }
+
+    function frame(now: number) {
       if (!active) return;
+      const dt = last ? now - last : 1000 / 60;
+      last = now;
 
       const target = progress();
-      // Enough smoothing to take the jitter out of a trackpad, not so much
-      // that the film lags behind the thumb.
-      eased += (target - eased) * 0.18;
+      // The page itself is already smoothed by the scroll damper, so this only
+      // has to take the last of the jitter out.
+      eased += (target - eased) * share(dt, 0.3);
+
+      fadeHero();
 
       const duration = video!.duration;
       if (ready && Number.isFinite(duration) && duration > 0) {
@@ -68,8 +96,8 @@ export function FilmBackdrop({ rangeId }: { rangeId: string }) {
       const fade = eased > 0.9 ? Math.max(0, 1 - (eased - 0.9) / 0.1) : 1;
       layer!.style.opacity = String(fade);
 
-      driftX += (pointerX - driftX) * 0.05;
-      driftY += (pointerY - driftY) * 0.05;
+      driftX += (pointerX - driftX) * share(dt, 0.05);
+      driftY += (pointerY - driftY) * share(dt, 0.05);
       layer!.style.setProperty("--px", `${driftX.toFixed(2)}px`);
       layer!.style.setProperty("--py", `${driftY.toFixed(2)}px`);
 
@@ -81,6 +109,7 @@ export function FilmBackdrop({ rangeId }: { rangeId: string }) {
       layer!.classList.add("is-live");
       if (reduced.matches) return;
       active = true;
+      last = 0;
       raf = requestAnimationFrame(frame);
     }
 
@@ -107,9 +136,12 @@ export function FilmBackdrop({ rangeId }: { rangeId: string }) {
     // and fetch the WebM as well. Asking canPlayType first means exactly one
     // request, and the smaller H.264 file everywhere it is supported.
     const wide = window.matchMedia("(min-width: 900px)").matches;
-    const base = wide ? "/media/circuit-1280" : "/media/circuit-854";
     const h264 = video.canPlayType('video/mp4; codecs="avc1.640028"');
-    video.src = h264 ? `${base}.mp4` : `${base}.webm`;
+    video.src = h264
+      ? wide
+        ? "/media/circuit-1080.mp4"
+        : "/media/circuit-540.mp4"
+      : "/media/circuit-720.webm";
     video.load();
 
     const runner = new IntersectionObserver(
