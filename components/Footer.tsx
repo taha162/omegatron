@@ -30,11 +30,35 @@ export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
             <p className="footer__tagline" lang="en" dir="ltr">
               {dict.meta.tagline}
             </p>
+
+            {/* The language pair belongs with the brand, not filed under
+                "contact" as it was. */}
+            <div className="footer__langs" role="group" aria-label={dict.footer.language}>
+              {LOCALES.map((code) => (
+                <Link
+                  key={code}
+                  href={`/${code}`}
+                  className="footer__link"
+                  lang={code}
+                  hrefLang={code}
+                  aria-current={code === locale ? "page" : undefined}
+                >
+                  {code === "ar" ? "العربية" : "English"}
+                </Link>
+              ))}
+            </div>
           </div>
 
+          {/*
+           * These label link groups; they are not headings. Marking them up as
+           * <h2> put "Sections" and "Contact" into the document outline beside
+           * the real section titles.
+           */}
           <div>
-            <h2 className="footer__title mono">{dict.footer.sections}</h2>
-            <ul className="footer__list">
+            <p className="footer__title mono" id="footer-sections">
+              {dict.footer.sections}
+            </p>
+            <ul className="footer__list" aria-labelledby="footer-sections">
               {sections.map((item) => (
                 <li key={item.href}>
                   <Link href={item.href} className="footer__link">
@@ -46,8 +70,10 @@ export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
           </div>
 
           <div>
-            <h2 className="footer__title mono">{dict.footer.contact}</h2>
-            <ul className="footer__list">
+            <p className="footer__title mono" id="footer-contact">
+              {dict.footer.contact}
+            </p>
+            <ul className="footer__list" aria-labelledby="footer-contact">
               <li>
                 <Link href={`/${locale}/start`} className="footer__link">
                   {dict.footer.startLabel}
@@ -60,19 +86,6 @@ export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
                   </a>
                 </li>
               ) : null}
-              {LOCALES.map((code) => (
-                <li key={code}>
-                  <Link
-                    href={`/${code}`}
-                    className="footer__link"
-                    lang={code}
-                    hrefLang={code}
-                    aria-current={code === locale ? "true" : undefined}
-                  >
-                    {code === "ar" ? "العربية" : "English"}
-                  </Link>
-                </li>
-              ))}
             </ul>
           </div>
         </div>

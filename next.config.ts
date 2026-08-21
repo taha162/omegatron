@@ -41,6 +41,14 @@ const nextConfig: NextConfig = {
           { key: "Cache-Control", value: "public, max-age=3600, stale-while-revalidate=86400" },
         ],
       },
+      {
+        // The film and its poster change only when the film is re-cut, and a
+        // repeat visitor should never pay for them twice.
+        source: "/media/:path*",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" },
+        ],
+      },
     ];
   },
 };
