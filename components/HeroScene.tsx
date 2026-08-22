@@ -9,8 +9,8 @@ import { createFilmRenderer, type FilmRenderer } from "./filmShader";
 import { motion, prefersReduced } from "./motion";
 import type { Dictionary, Locale } from "@/lib/i18n";
 
-/** The film, cut to 167 all-intra frames at 24fps. */
-const FRAME = 1 / 24;
+/** The film's own frame rate. Every frame is a keyframe, so a seek is exact. */
+const FPS = 24;
 
 /**
  * One encode, served to every device.
@@ -98,23 +98,206 @@ export function HeroScene({ locale, dict }: { locale: Locale; dict: Dictionary }
 
     const { gsap, ScrollTrigger } = motion();
 
+    /* Captured non-null: the compiler cannot narrow a ref through the hoisted
+       function declarations below. */
+    const vid: HTMLVideoElement = video;
+    const layer: HTMLDivElement = film;
+
     let ready = false;
-    let light = false;
+
+    /*
+     * ==================================================================
+     * The scheduler
+     * ==================================================================
+     *
+     * Scrubbing a 1080p all-intra film is decode work, and there are three
+     * ways to get it wrong. All three produce the same symptom — a picture
+     * that stalls and then jumps — and the first version of this file made
+     * all three:
+     *
+     *  1. Asking for frames faster than the film has them. A threshold of
+     *     half a frame allows ~48 requests a second for a 24fps film, and
+     *     half of those land on the frame already showing. Everything below
+     *     is quantised to a frame *index*, so a frame is never requested
+     *     twice.
+     *
+     *  2. Assigning `currentTime` while a seek is still in flight. The engine
+     *     abandons the first seek and starts again, so under a slow scroll —
+     *     where a fresh request arrives every single frame — nothing ever
+     *     completes. That is exactly why the film appeared frozen while
+     *     reading slowly and then jumped when the scroll stopped. Nothing is
+     *     assigned here while `video.seeking` is true.
+     *
+     *  3. Re-uploading the texture on every scroll event instead of on every
+     *     new frame. At 60Hz that is roughly 330 MB/s of texture traffic for
+     *     a film with 24 distinct frames a second to show. The upload is now
+     *     driven by `requestVideoFrameCallback`, which fires when the engine
+     *     actually has a new frame to paint.
+     *
+     * The scroll handler now records position and nothing else. Every decode
+     * decision belongs to the loop, which runs at the display's rate rather
+     * than at whatever rate scroll events happen to arrive.
+     */
+    let targetTime = 0;
+    let easedTime = 0;
+    let shownFrame = -1;
+    let pendingFrame = -1;
+    let dirty = false;
+    let velocity = 0;
+    let raf = 0;
+    let hintGone = false;
+
+    type FrameCallbackHost = HTMLVideoElement & {
+      requestVideoFrameCallback?: (cb: () => void) => number;
+      cancelVideoFrameCallback?: (handle: number) => void;
+    };
+    const frameHost = video as FrameCallbackHost;
+    const hasFrameCallback = typeof frameHost.requestVideoFrameCallback === "function";
+    let frameHandle = 0;
+
+    function onNewFrame() {
+      dirty = true;
+      if (pendingFrame >= 0) {
+        shownFrame = pendingFrame;
+        pendingFrame = -1;
+      }
+      if (hasFrameCallback) {
+        frameHandle = frameHost.requestVideoFrameCallback!(onNewFrame);
+      }
+    }
+
+    /* Where `requestVideoFrameCallback` is unavailable, `seeked` is the next
+       best signal that the requested frame has landed. */
+    const onSeeked = () => {
+      dirty = true;
+      if (pendingFrame >= 0) {
+        shownFrame = pendingFrame;
+        pendingFrame = -1;
+      }
+    };
+    video.addEventListener("seeked", onSeeked);
+
+    /*
+     * The shader.
+     *
+     * Taken only where it is affordable: a machine reporting little memory, or
+     * a narrow viewport, keeps the plain video element. Where it is taken the
+     * video is still the source of truth — simply drawn through the canvas
+     * rather than composited directly.
+     */
+    const canvas = canvasRef.current;
+    const nav = navigator as Navigator & { deviceMemory?: number };
+    const affordable = (nav.deviceMemory ?? 8) > 4 && window.innerWidth >= 700;
+    let renderer: FilmRenderer | null = null;
+
+    /*
+     * A device that cannot keep up is given a coarser grid rather than a
+     * different file: it still shows 1080p, it is simply asked for a new frame
+     * every second or third one. Quantising to a coarser index is what keeps a
+     * phone's decoder inside its budget.
+     */
+    let step = pickSource(video).light ? 3 : 1;
+
+    /*
+     * The watchdog.
+     *
+     * No machine is asked to prove itself before the effect is offered, and
+     * none is left stuttering under it either: the loop times its own frames,
+     * and if the hero cannot hold its rate the shader is dropped for the rest
+     * of the session and the plain video takes over. A visitor never sees a
+     * page that judders — at worst they see one without a flourish.
+     */
+    const FRAME_BUDGET = 26; // ms. 60Hz is 16.7; this allows real headroom.
+    let slowFrames = 0;
+    let sampled = 0;
+    let lastFrameAt = 0;
+    let shaderRetired = false;
+
+    function retireShader() {
+      if (shaderRetired || !renderer) return;
+      shaderRetired = true;
+      renderer.destroy();
+      renderer = null;
+      layer.classList.remove("is-shaded");
+      window.removeEventListener("resize", onResize);
+      // A device that cannot afford the shader cannot afford a frame every
+      // frame either.
+      step = Math.max(step, 3);
+    }
+
+    function loop() {
+      raf = requestAnimationFrame(loop);
+
+      const now = performance.now();
+      /*
+       * Only frames the shader is actually responsible for are judged.
+       *
+       * A frame is counted when the film is decodable and the reader is
+       * moving — during load the page is streaming a large file, decoding,
+       * laying out and running its entrances, and none of that is the
+       * shader's doing. Judging those frames retires the effect on machines
+       * that could have carried it perfectly well, which is what the first
+       * version of this watchdog did.
+       */
+      if (lastFrameAt && renderer && !shaderRetired && ready && Math.abs(velocity) > 0.01) {
+        const delta = now - lastFrameAt;
+        if (sampled < 600) {
+          sampled += 1;
+          if (delta > FRAME_BUDGET) slowFrames += 1;
+          // A third of a sustained scroll missing its budget is not a blip.
+          if (sampled > 120 && slowFrames > sampled / 3) retireShader();
+        }
+      }
+      lastFrameAt = now;
+
+      if (ready && Number.isFinite(vid.duration) && vid.duration > 0) {
+        // Chase the scroll rather than snapping to it, so a flick asks the
+        // decoder for a run of frames instead of one impossible jump.
+        easedTime += (targetTime - easedTime) * 0.24;
+
+        const total = Math.max(1, Math.round(vid.duration * FPS));
+        const raw = Math.round((easedTime * FPS) / step) * step;
+        const want = Math.min(total - 1, Math.max(0, raw));
+
+        // One request in flight at a time, and never for the frame already up.
+        if (want !== shownFrame && want !== pendingFrame && !vid.seeking) {
+          pendingFrame = want;
+          // Land mid-frame: on an exact boundary an engine may round either
+          // way and hand back the neighbour.
+          vid.currentTime = (want + 0.5) / FPS;
+        }
+      }
+
+      if (renderer) {
+        renderer.render(velocity, dirty);
+        dirty = false;
+      }
+
+      velocity *= 0.9;
+      if (Math.abs(velocity) < 0.001) velocity = 0;
+    }
+
+    const onResize = () => renderer?.resize();
 
     const onLoaded = () => {
       ready = true;
       video.pause();
       film.classList.add("is-live");
+      dirty = true;
+
+      if (hasFrameCallback) {
+        frameHandle = frameHost.requestVideoFrameCallback!(onNewFrame);
+      }
 
       if (canvas && affordable) {
         renderer = createFilmRenderer(video, canvas);
         if (renderer) {
           film.classList.add("is-shaded");
           window.addEventListener("resize", onResize);
-          seekedThisFrame = true;
-          raf = requestAnimationFrame(paintFilm);
         }
       }
+
+      raf = requestAnimationFrame(loop);
     };
     video.addEventListener("loadeddata", onLoaded);
 
@@ -123,21 +306,19 @@ export function HeroScene({ locale, dict }: { locale: Locale; dict: Dictionary }
      *
      * The poster is already painted as the layer's background, so the scene
      * has its picture from the first frame; starting a multi-megabyte media
-     * fetch alongside the document only pushes out the moment the hero is
-     * actually readable. The pin runs for three viewports, so the footage has
-     * time to arrive before anyone can scrub far into it — and until it does,
-     * `ready` stays false and the poster simply holds.
+     * fetch alongside the document only pushes out the moment the hero becomes
+     * readable. Until the footage is decodable, `ready` stays false and the
+     * poster simply holds.
      */
     const chosen = pickSource(video);
-    light = chosen.light;
 
     let idle = 0;
     let idleIsTimeout = false;
 
     function fetchFilm() {
-      if (video!.src) return;
-      video!.src = chosen.src;
-      video!.load();
+      if (vid.src) return;
+      vid.src = chosen.src;
+      vid.load();
     }
 
     function scheduleFetch() {
@@ -153,42 +334,8 @@ export function HeroScene({ locale, dict }: { locale: Locale; dict: Dictionary }
     if (document.readyState === "complete") scheduleFetch();
     else window.addEventListener("load", scheduleFetch, { once: true });
 
-    let hintGone = false;
-    let lastSeek = -1;
-
-    /*
-     * The shader.
-     *
-     * Taken only where it is affordable: a machine that has told us it has
-     * little memory, or a narrow viewport, keeps the plain video element. When
-     * the renderer is taken the video is still the source of truth — it is
-     * simply drawn through the canvas instead of composited directly, so
-     * everything about the scrub is unchanged.
-     */
-    const canvas = canvasRef.current;
-    const nav = navigator as Navigator & { deviceMemory?: number };
-    const affordable = (nav.deviceMemory ?? 8) > 4 && window.innerWidth >= 700;
-    let renderer: FilmRenderer | null = null;
-
-    /* Signed, normalised, and eased — the raw figure from ScrollTrigger is far
-       too spiky to drive a picture with. */
-    let velocity = 0;
-    let seekedThisFrame = false;
-    let raf = 0;
-
-    function paintFilm() {
-      if (!renderer) return;
-      renderer.render(velocity, seekedThisFrame);
-      seekedThisFrame = false;
-      velocity *= 0.9;
-      if (Math.abs(velocity) < 0.001) velocity = 0;
-      raf = requestAnimationFrame(paintFilm);
-    }
-
-    const onResize = () => renderer?.resize();
-
-    /** Beat opacity for a given progress figure. Shared by the first paint
-        and by every scroll update, so the two can never disagree. */
+    /** Beat opacity for a given progress figure. Shared by the first paint and
+        by every scroll update, so the two can never disagree. */
     function paintBeats(p: number) {
       beats.forEach((beat, i) => {
         const [a, b, c, d] = BEATS[i];
@@ -211,31 +358,15 @@ export function HeroScene({ locale, dict }: { locale: Locale; dict: Dictionary }
         const p = self.progress;
         root.style.setProperty("--film-progress", p.toFixed(4));
 
-        /*
-         * Frame selection. A seek costs one decode — every frame is a
-         * keyframe, so it is a cheap one, but not free at 120Hz. Below half a
-         * frame of movement there is nothing new to show, so nothing is asked
-         * for. Scrolling hard raises that threshold: at speed the eye cannot
-         * resolve single frames anyway, and holding the decoder to every one
-         * of them is what drops the frame rate on a phone. On a device already
-         * marked light, the floor is five frames, as a deliberate coarsening.
-         */
+        // Position only. No decode work happens on a scroll event.
         if (ready && Number.isFinite(video.duration) && video.duration > 0) {
-          const speed = Math.abs(self.getVelocity());
-          const coarse = light ? 5 : 1 + Math.min(3, speed / 2200);
-          const time = p * video.duration;
-          if (lastSeek < 0 || Math.abs(time - lastSeek) > FRAME * coarse * 0.5) {
-            video.currentTime = time;
-            lastSeek = time;
-            // Only a new frame is worth a texture upload.
-            seekedThisFrame = true;
-          }
-
-          // Signed and normalised. 2800px/s is about as fast as a deliberate
-          // flick goes; past that the picture would simply tear.
-          const signed = Math.max(-1, Math.min(1, self.getVelocity() / 2800));
-          velocity += (signed - velocity) * 0.25;
+          targetTime = p * video.duration;
         }
+
+        // Signed and normalised. 2800px/s is about as fast as a deliberate
+        // flick goes; past that the picture would simply tear.
+        const signed = Math.max(-1, Math.min(1, self.getVelocity() / 2800));
+        velocity += (signed - velocity) * 0.25;
 
         // Beats cross-fade with a little parallax, so the type has depth
         // against the board rather than sitting flat on it.
@@ -250,6 +381,10 @@ export function HeroScene({ locale, dict }: { locale: Locale; dict: Dictionary }
 
     return () => {
       cancelAnimationFrame(raf);
+      if (frameHandle && typeof frameHost.cancelVideoFrameCallback === "function") {
+        frameHost.cancelVideoFrameCallback(frameHandle);
+      }
+      video.removeEventListener("seeked", onSeeked);
       window.removeEventListener("resize", onResize);
       renderer?.destroy();
       trigger.kill();
