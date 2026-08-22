@@ -109,6 +109,17 @@ const ar = {
     },
   },
 
+  /**
+   * الأرشيف — جدار من الصور يتجمّع مع القراءة.
+   *
+   * الصور هنا هي صور الفريق نفسه، ولا يعرض القسم غير ما صوّره الفريق فعلًا.
+   */
+  gallery: {
+    label: "الأرشيف",
+    heading: "لقطات من العمل",
+    lead: "الوحدة وغلافها وغرفة الاستشعار، من صور الفريق نفسه.",
+  },
+
   capabilities: {
     label: "القدرات",
     heading: "ما نعمل عليه",
@@ -364,6 +375,12 @@ const en: typeof ar = {
       enclosureAlt: "The 3D-printed enclosure and its side air intake port.",
       chamberAlt: "A view inside the sensing chamber through the intake port, sensors set around it.",
     },
+  },
+
+  gallery: {
+    label: "Archive",
+    heading: "Frames from the work",
+    lead: "The unit, its enclosure, and the sensing chamber — the team's own photographs.",
   },
 
   capabilities: {

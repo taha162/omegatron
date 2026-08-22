@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { ArrowIcon } from "./Icons";
-import { Scramble } from "./Scramble";
 import { SplitWords } from "./SplitWords";
+import { Wordmark } from "./Wordmark";
 import { createFilmRenderer, type FilmRenderer } from "./filmShader";
 import { motion, prefersReduced } from "./motion";
 import type { Dictionary, Locale } from "@/lib/i18n";
@@ -279,6 +279,38 @@ export function HeroScene({ locale, dict }: { locale: Locale; dict: Dictionary }
 
     const onResize = () => renderer?.resize();
 
+    /*
+     * The loop only runs while the scene is on screen.
+     *
+     * It used to run for the life of the page, which meant every section below
+     * the hero was paying for a WebGL draw it could not see. Measured over a
+     * read of the archive that was the whole of that section's frame cost:
+     * gating the loop on visibility took it to none.
+     */
+    let onScreen = true;
+
+    function startLoop() {
+      if (!raf && ready) raf = requestAnimationFrame(loop);
+    }
+
+    function stopLoop() {
+      if (raf) cancelAnimationFrame(raf);
+      raf = 0;
+      // The watchdog measures gaps between frames; a gap that spans a pause is
+      // not the shader's doing.
+      lastFrameAt = 0;
+    }
+
+    const watcher = new IntersectionObserver(
+      ([entry]) => {
+        onScreen = entry.isIntersecting;
+        if (onScreen) startLoop();
+        else stopLoop();
+      },
+      { rootMargin: "15% 0px" }
+    );
+    watcher.observe(root);
+
     const onLoaded = () => {
       ready = true;
       video.pause();
@@ -297,7 +329,7 @@ export function HeroScene({ locale, dict }: { locale: Locale; dict: Dictionary }
         }
       }
 
-      raf = requestAnimationFrame(loop);
+      if (onScreen) startLoop();
     };
     video.addEventListener("loadeddata", onLoaded);
 
@@ -380,6 +412,7 @@ export function HeroScene({ locale, dict }: { locale: Locale; dict: Dictionary }
     });
 
     return () => {
+      watcher.disconnect();
       cancelAnimationFrame(raf);
       if (frameHandle && typeof frameHost.cancelVideoFrameCallback === "function") {
         frameHost.cancelVideoFrameCallback(frameHandle);
@@ -430,7 +463,7 @@ export function HeroScene({ locale, dict }: { locale: Locale; dict: Dictionary }
           <div className="hero__beats">
             {/* Beat 1 — the thesis */}
             <div className="hero__beat">
-              <Scramble className="hero__lockup" text={dict.hero.lockup} />
+              <Wordmark locale={locale} label={dict.hero.lockup} />
               <SplitWords
                 as="h1"
                 className="hero__statement"
