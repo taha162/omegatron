@@ -85,7 +85,7 @@ export function Header({ locale, dict }: { locale: Locale; dict: Dictionary }) {
         <div className="header__inner">
           <Link href={`/${locale}`} className="brand" aria-label={dict.nav.home} onClick={close}>
             <Logo className="brand__mark" />
-            <Wordmark className="wordmark" />
+            <Wordmark className="brand__word" />
           </Link>
 
           <nav className="nav" aria-label={dict.nav.primary}>

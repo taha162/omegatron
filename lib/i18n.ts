@@ -267,6 +267,15 @@ const ar = {
     motto: ["نهندس", "نبتكر", "ننتصر"],
   },
 
+  /** شاشة الإقلاع: ما يُقرأ بينما يجهز المشهد. */
+  boot: {
+    /** يوصف ما يجري لقارئ الشاشة مرة واحدة، لا مع كل خطوة. */
+    label: "جارٍ تجهيز المشهد",
+    steps: ["الخطوط", "اللوحة", "الفيلم"],
+    ready: "جاهز",
+    skip: "تخطٍّ",
+  },
+
   notFound: {
     title: "الصفحة غير موجودة",
     body: "هذا الرابط لا يقود إلى صفحة قائمة.",
@@ -524,6 +533,15 @@ const en: typeof ar = {
     location: "Iraq",
     /** The line set under the mark itself — three words, not a sentence. */
     motto: ["Engineer", "Innovate", "Win"],
+  },
+
+  /** The boot screen: what is read while the scene is made ready. */
+  boot: {
+    /** Announced once to a screen reader, not once per step. */
+    label: "Preparing the scene",
+    steps: ["Type", "Plate", "Film"],
+    ready: "Ready",
+    skip: "Skip",
   },
 
   notFound: {

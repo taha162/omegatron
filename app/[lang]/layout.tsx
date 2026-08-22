@@ -5,6 +5,7 @@ import "../globals.css";
 
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { Boot } from "@/components/Boot";
 import { SmoothScroll } from "@/components/SmoothScroll";
 import { ScrollProgress } from "@/components/ScrollProgress";
 import { Cursor } from "@/components/Cursor";
@@ -125,6 +126,11 @@ export default async function LocaleLayout({
           <span className="ambient__glow ambient__glow--gold" />
           <span className="ambient__glow ambient__glow--steel" />
         </div>
+
+        {/* The curtain. It raises itself only on the home route, and only when
+            there is motion to have; everything under it is already rendered and
+            live, so nothing here delays the page becoming usable. */}
+        <Boot locale={lang} dict={dict} />
 
         <SmoothScroll />
         <ScrollProgress />

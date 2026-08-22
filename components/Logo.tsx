@@ -74,12 +74,19 @@ export function Logo({
 /**
  * The wordmark, split silver/gold exactly as the official logo sets it.
  * Always Latin — a brand name, not a translated string.
+ *
+ * Its classes are named for the block it belongs to rather than for itself.
+ * They used to be `.wordmark__a` / `.wordmark__b` under a `.wordmark` parent,
+ * which is also what the drawn hero lockup in `components/Wordmark.tsx` calls
+ * its root — so this span was quietly inheriting that block's `display`,
+ * `inline-size` and, visibly, a bottom margin meant for a mark ten times its
+ * size. Two components, one class name, one of them wrong.
  */
 export function Wordmark({ className }: { className?: string }) {
   return (
     <span className={className} lang="en" dir="ltr">
-      <span className="wordmark__a">OMEGA</span>
-      <span className="wordmark__b">TRON</span>
+      <span className="brand__word-a">OMEGA</span>
+      <span className="brand__word-b">TRON</span>
     </span>
   );
 }
