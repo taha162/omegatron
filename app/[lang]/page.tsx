@@ -7,7 +7,6 @@ import { Reveal } from "@/components/Reveal";
 import { ArrowIcon, ArmIcon, ChipIcon, GaugeIcon, LoopIcon, NetworkIcon, SolidIcon } from "@/components/Icons";
 import { HeroScene } from "@/components/HeroScene";
 import { Award } from "@/components/Award";
-import { Gallery } from "@/components/Gallery";
 import { ProjectRail } from "@/components/ProjectRail";
 import { Methodology } from "@/components/Methodology";
 import { FillText } from "@/components/FillText";
@@ -85,10 +84,6 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
 
       {/* The achievement, immediately after the hero. */}
       <Award dict={dict} />
-
-      {/* The archive: the team's own frames, assembling into a wall. It runs
-          before the written sections so the work is seen before it is read. */}
-      <Gallery dict={dict} />
 
       {/* --------------------------------------------------------------- About */}
       <section className="section section--tint" id="about" aria-labelledby="about-title">
