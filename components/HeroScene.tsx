@@ -366,16 +366,30 @@ export function HeroScene({ locale, dict }: { locale: Locale; dict: Dictionary }
     if (document.readyState === "complete") scheduleFetch();
     else window.addEventListener("load", scheduleFetch, { once: true });
 
-    /** Beat opacity for a given progress figure. Shared by the first paint and
-        by every scroll update, so the two can never disagree. */
+    /*
+     * Beat opacity for a given progress figure. Shared by the first paint and
+     * by every scroll update, so the two can never disagree.
+     *
+     * `opacity` and `transform` are what a compositor is for and cost nothing
+     * to set every frame. `pointer-events` and `aria-hidden` are not: both
+     * invalidate style, and neither has anything new to say until a beat
+     * actually crosses the threshold. They are written on the crossing only.
+     */
+    const live: boolean[] = beats.map(() => false);
+
     function paintBeats(p: number) {
       beats.forEach((beat, i) => {
         const [a, b, c, d] = BEATS[i];
         const shown = ramp(p, a, b) * (1 - ramp(p, c, d));
         beat.style.opacity = String(shown);
         beat.style.transform = `translateY(${((1 - shown) * 18).toFixed(2)}px)`;
-        beat.style.pointerEvents = shown > 0.55 ? "auto" : "none";
-        beat.setAttribute("aria-hidden", shown > 0.55 ? "false" : "true");
+
+        const isLive = shown > 0.55;
+        if (isLive !== live[i]) {
+          live[i] = isLive;
+          beat.style.pointerEvents = isLive ? "auto" : "none";
+          beat.setAttribute("aria-hidden", isLive ? "false" : "true");
+        }
       });
     }
 

@@ -87,7 +87,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
 
       {/* --------------------------------------------------------------- About */}
       <section className="section section--tint" id="about" aria-labelledby="about-title">
-        <div className="container sec skewable">
+        <div className="container sec">
           <Reveal className="sec__rail">
             <p className="sec-label mono">{dict.about.label}</p>
           </Reveal>
@@ -115,7 +115,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
 
       {/* -------------------------------------------------------- Capabilities */}
       <section className="section" id="capabilities" aria-labelledby="capabilities-title">
-        <div className="container sec skewable">
+        <div className="container sec">
           <Reveal className="sec__rail">
             <p className="sec-label mono">{dict.capabilities.label}</p>
           </Reveal>
@@ -149,7 +149,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
         id="process"
         aria-labelledby="process-title"
       >
-        <div className="container sec skewable">
+        <div className="container sec">
           <Reveal className="sec__rail">
             <p className="sec-label mono">{dict.process.label}</p>
           </Reveal>
@@ -168,7 +168,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
       {/* ------------------------------------------------------------- Founder
           A short introduction here; the story itself has its own route. */}
       <section className="section" id="founder" aria-labelledby="founder-title">
-        <div className="container sec skewable">
+        <div className="container sec">
           <Reveal className="sec__rail">
             <p className="sec-label mono">{dict.founder.label}</p>
           </Reveal>
@@ -209,7 +209,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
 
       {/* ------------------------------------------------------------- Contact */}
       <section className="section section--solid" id="contact" aria-labelledby="contact-title">
-        <div className="container contact skewable">
+        <div className="container contact">
           <div>
             <p className="sec-label mono">{dict.contact.label}</p>
             <h2 className="contact__heading" id="contact-title">

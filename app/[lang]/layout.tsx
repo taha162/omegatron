@@ -117,6 +117,15 @@ export default async function LocaleLayout({
   return (
     <html lang={lang} dir={dir} className={cairo.variable}>
       <body>
+        {/* The ground the whole page sits on: the same near-black, with a
+            graticule over it and two slow lights moving behind. It is fixed
+            and negatively stacked, so it costs one composited layer for the
+            life of the page and every section shows it through. */}
+        <div className="ambient" aria-hidden="true">
+          <span className="ambient__glow ambient__glow--gold" />
+          <span className="ambient__glow ambient__glow--steel" />
+        </div>
+
         <SmoothScroll />
         <ScrollProgress />
         <Cursor />
