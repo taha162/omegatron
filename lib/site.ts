@@ -23,3 +23,13 @@ export const ORG_NAME_EN = "OmegaTron";
 export const ORG_NAME_AR = "أوميكاترون";
 export const FOUNDER_NAME_EN = "Taha Jasim Mohammed";
 export const FOUNDER_NAME_AR = "طه جاسم محمد";
+
+/**
+ * The founder's public profiles, as supplied by the team.
+ *
+ * Tracking parameters are stripped: a share link carries the campaign that
+ * produced it, which has nothing to do with this site and follows anyone who
+ * clicks through from here.
+ */
+export const FOUNDER_LINKEDIN = "https://www.linkedin.com/in/tjd162/";
+export const FOUNDER_INSTAGRAM = "https://instagram.com/tjd_162";

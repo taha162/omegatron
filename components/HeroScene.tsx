@@ -10,42 +10,35 @@ import type { Dictionary, Locale } from "@/lib/i18n";
 const FRAME = 1 / 24;
 
 /**
- * The renditions. The source is 1080p, so there is no tier above it: a 1440p
- * or 4K entry would be an upscale of pixels that were never shot, which costs
- * bytes and returns nothing.
- */
-const TIERS = {
-  full: "/media/chip-1080.mp4",
-  mid: "/media/chip-720.mp4",
-  low: "/media/chip-540.mp4",
-  fallback: "/media/chip-540.webm",
-} as const;
-
-type Conn = { saveData?: boolean; effectiveType?: string; deviceMemory?: number };
-
-/**
- * Which encode this device should be asked to scrub.
+ * One encode, served to every device.
  *
- * Scrubbing decodes a frame per seek, so the cost is the decoder's, not just
- * the network's — a phone handed the 1080p file drops frames even once it has
- * downloaded it. Width picks the tier; a metered or slow link drops one more.
+ * The team asked for maximum quality everywhere, so there is no ladder: this is
+ * the 1080p source re-cut at every frame with every frame a keyframe. The
+ * source is 1080p, so there is nothing above it — a larger tier would be an
+ * upscale of pixels that were never shot.
+ *
+ * It is a heavy file, and that is the accepted trade. Everything around it is
+ * built so the weight is never in front of the reader: the poster is painted
+ * as the layer's own background, the fetch waits for the page's own load, and
+ * until the footage is decodable the scene simply holds on that first frame.
  */
+const FILM = "/media/chip-1080.mp4";
+const FILM_FALLBACK = "/media/chip-720.webm";
+
+/** The one case that cannot take the MP4 at all. */
 function pickSource(video: HTMLVideoElement): { src: string; light: boolean } {
   const canH264 = video.canPlayType('video/mp4; codecs="avc1.640028"') !== "";
-  if (!canH264) return { src: TIERS.fallback, light: true };
+  if (!canH264) return { src: FILM_FALLBACK, light: true };
 
-  const nav = navigator as Navigator & { connection?: Conn; deviceMemory?: number };
-  const conn = nav.connection;
-  const thin =
-    conn?.saveData === true ||
-    (conn?.effectiveType !== undefined && conn.effectiveType !== "4g");
-  // Reported in GiB by Chromium; absent elsewhere, which we read as "fine".
+  /*
+   * `light` no longer selects a smaller file — there is only one — but it
+   * still coarsens how often the decoder is asked for a frame. A phone can
+   * display 1080p perfectly well; what it cannot do is decode a new frame on
+   * every animation frame while the page is also scrolling.
+   */
+  const nav = navigator as Navigator & { deviceMemory?: number };
   const smallMemory = (nav.deviceMemory ?? 8) <= 4;
-
-  const w = window.innerWidth;
-  if (thin || w < 700 || smallMemory) return { src: TIERS.low, light: true };
-  if (w < 1200) return { src: TIERS.mid, light: false };
-  return { src: TIERS.full, light: false };
+  return { src: FILM, light: smallMemory || window.innerWidth < 700 };
 }
 
 /** Ramp a progress figure across a window, clamped at both ends. */
@@ -257,9 +250,7 @@ export function HeroScene({ locale, dict }: { locale: Locale; dict: Dictionary }
           <div className="hero__beats">
             {/* Beat 1 — the thesis */}
             <div className="hero__beat">
-              <p className="hero__wordmark" lang="en" dir="ltr">
-                {dict.hero.wordmark}
-              </p>
+              <p className="hero__lockup">{dict.hero.lockup}</p>
               <h1 className="hero__statement">{dict.hero.statement}</h1>
               <p className="hero__lead">{dict.hero.lead}</p>
               <div className="hero__actions">
@@ -295,9 +286,11 @@ export function HeroScene({ locale, dict }: { locale: Locale; dict: Dictionary }
           </div>
         </div>
 
-        <div className="hero__hint" ref={hintRef}>
-          <span className="hero__hint-rule" aria-hidden="true" />
-          <span className="mono">{dict.hero.scrollHint}</span>
+        {/* No caption: on a page whose whole opening is a scroll, being told
+            to scroll is noise. The rule breathes and then leaves. */}
+        <div className="hero__hint" ref={hintRef} aria-hidden="true">
+          <span className="hero__hint-rule" />
+          <span className="hero__hint-dot" />
         </div>
       </div>
     </section>

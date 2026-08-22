@@ -132,7 +132,10 @@ export function Header({ locale, dict }: { locale: Locale; dict: Dictionary }) {
               aria-label={open ? dict.nav.close : dict.nav.menu}
               onClick={() => setOpen((v) => !v)}
             >
+              {/* Four pads in a 2x2 array — the corner of the package the
+                  whole site opens on, not another hamburger. */}
               <span className="nav-toggle__bars" aria-hidden="true">
+                <span />
                 <span />
                 <span />
                 <span />

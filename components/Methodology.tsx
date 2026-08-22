@@ -26,11 +26,20 @@ export function Methodology({ dict }: { dict: Dictionary }) {
 
     const { ScrollTrigger } = motion();
 
+    /*
+     * Deliberately slow.
+     *
+     * The rule used to be full before the reader had finished the first step,
+     * which made it decoration. Starting later and ending well past the list's
+     * own foot stretches the fill across roughly twice the scroll, so it is
+     * still travelling while the steps are being read — which is the only way
+     * anyone notices it is tracking them.
+     */
     const trigger = ScrollTrigger.create({
       trigger: list,
-      start: "top 76%",
-      end: "bottom 62%",
-      scrub: 0.5,
+      start: "top 88%",
+      end: "bottom 25%",
+      scrub: 1.1,
       onUpdate(self) {
         list.style.setProperty("--flow-progress", self.progress.toFixed(4));
       },

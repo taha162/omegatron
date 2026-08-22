@@ -10,6 +10,7 @@ import { Award } from "@/components/Award";
 import { ProjectRail } from "@/components/ProjectRail";
 import { Methodology } from "@/components/Methodology";
 import { ProjectForm } from "@/components/ProjectForm";
+import { Social } from "@/components/Social";
 import { DEFAULT_LOCALE, getDictionary, isLocale } from "@/lib/i18n";
 import { FOUNDER_NAME_AR, FOUNDER_NAME_EN, ORG_NAME_AR, ORG_NAME_EN, SITE_URL } from "@/lib/site";
 
@@ -181,12 +182,14 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
                 </h2>
                 <p className="founder-role mono">{dict.founder.role}</p>
                 <p className="about__body">{dict.founder.lead}</p>
-                <p style={{ marginBlockStart: "2rem" }}>
+                <div className="founder-actions">
                   <Link href={`/${lang}/founder`} className="btn btn--ghost">
                     {dict.founder.readMore}
                     <ArrowIcon className="btn__arrow" />
                   </Link>
-                </p>
+
+                  <Social label={dict.founder.social} />
+                </div>
               </Reveal>
             </div>
           </div>
