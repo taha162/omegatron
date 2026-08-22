@@ -4,12 +4,17 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
 import { Reveal } from "@/components/Reveal";
-import { ArrowIcon } from "@/components/Icons";
-import { Logo, Wordmark } from "@/components/Logo";
+import { ArrowIcon, ArmIcon, ChipIcon, GaugeIcon, LoopIcon, NetworkIcon, SolidIcon } from "@/components/Icons";
+import { HeroScene } from "@/components/HeroScene";
+import { Award } from "@/components/Award";
+import { ProjectRail } from "@/components/ProjectRail";
+import { Methodology } from "@/components/Methodology";
 import { ProjectForm } from "@/components/ProjectForm";
-import { FilmBackdrop } from "@/components/FilmBackdrop";
 import { DEFAULT_LOCALE, getDictionary, isLocale } from "@/lib/i18n";
 import { FOUNDER_NAME_AR, FOUNDER_NAME_EN, ORG_NAME_AR, ORG_NAME_EN, SITE_URL } from "@/lib/site";
+
+/** One mark per capability, in the dictionary's own order. */
+const CAPABILITY_ICONS = [ChipIcon, ArmIcon, NetworkIcon, GaugeIcon, LoopIcon, SolidIcon];
 
 export async function generateMetadata({
   params,
@@ -47,6 +52,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
           "@type": "Person",
           name: lang === "ar" ? FOUNDER_NAME_AR : FOUNDER_NAME_EN,
           jobTitle: dict.founder.role,
+          url: `${SITE_URL}/${lang}/founder`,
         },
         knowsAbout: dict.capabilities.items.map((item) => item.title),
         award: project.award,
@@ -70,37 +76,14 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      {/* ---------------------------------------------------------------- Hero
-          The film runs here and nowhere else: the statement stands on the
-          board, and the scale along the bottom edge marks how far the board
-          has advanced. */}
-      <section className="hero" id="hero" aria-label={dict.meta.siteName}>
-        <FilmBackdrop rangeId="hero" />
+      {/* The scene: pinned, scrubbed, and handing off to the award below. */}
+      <HeroScene locale={lang} dict={dict} />
 
-        <div className="container hero__inner">
-          <p className="hero__wordmark" lang="en" dir="ltr">
-            {dict.hero.wordmark}
-          </p>
-          <h1 className="hero__statement">{dict.hero.statement}</h1>
-          <p className="hero__lead">{dict.hero.lead}</p>
-          <div className="hero__actions">
-            <Link href={`/${lang}/start`} className="btn">
-              {dict.hero.secondaryCta}
-              <ArrowIcon className="btn__arrow" />
-            </Link>
-            <a href="#projects" className="btn btn--ghost">
-              {dict.hero.primaryCta}
-            </a>
-          </div>
-        </div>
-
-        <div className="hero__scale" aria-hidden="true">
-          <span className="hero__scale-mark" />
-        </div>
-      </section>
+      {/* The achievement, immediately after the hero. */}
+      <Award dict={dict} />
 
       {/* --------------------------------------------------------------- About */}
-      <section className="section" id="about" aria-labelledby="about-title">
+      <section className="section section--tint" id="about" aria-labelledby="about-title">
         <div className="container sec">
           <Reveal className="sec__rail">
             <p className="sec-label mono">{dict.about.label}</p>
@@ -115,105 +98,8 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
         </div>
       </section>
 
-      {/* ------------------------------------------------------------ Projects
-          One project, read as a sheet: the plates first, then what it does,
-          then the parameters that describe it. */}
-      <section className="section section--tint" id="projects" aria-labelledby="projects-title">
-        <div className="container sec">
-          <Reveal className="sec__rail">
-            <p className="sec-label mono">{dict.projects.label}</p>
-          </Reveal>
-
-          <div className="sec__body">
-            <Reveal className="sec-head">
-              <h2 className="sec-title" id="projects-title">
-                {dict.projects.heading}
-              </h2>
-              <p className="projects__note">{dict.projects.oneOf}</p>
-            </Reveal>
-
-            <article aria-labelledby={`project-${project.id}`}>
-              <Reveal>
-                <figure className="project__hero">
-                  <div className="media media--16x10">
-                    <Image
-                      src="/images/project-enclosure.jpg"
-                      alt={dict.projects.images.chamberAlt}
-                      fill
-                      loading="lazy"
-                      sizes="(max-width: 860px) 92vw, 62vw"
-                    />
-                  </div>
-                </figure>
-
-                <div className="project__gallery">
-                  <figure>
-                    <div className="media media--3x2">
-                      <Image
-                        src="/images/project-chamber.jpg"
-                        alt={dict.projects.images.enclosureAlt}
-                        fill
-                        loading="lazy"
-                        sizes="(max-width: 860px) 45vw, 31vw"
-                      />
-                    </div>
-                  </figure>
-                  <figure>
-                    <div className="media media--3x2">
-                      <Image
-                        src="/images/project-array.jpg"
-                        alt={dict.projects.images.unitAlt}
-                        fill
-                        loading="lazy"
-                        sizes="(max-width: 860px) 45vw, 31vw"
-                      />
-                    </div>
-                  </figure>
-                </div>
-              </Reveal>
-
-              <div className="project__body">
-                <Reveal>
-                  <h3 className="project__name" id={`project-${project.id}`}>
-                    {project.name}
-                  </h3>
-                  <p className="project__summary">{project.summary}</p>
-                  <ul className="project__points">
-                    {project.points.map((point) => (
-                      <li className="project__point" key={point}>
-                        <span>{point}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </Reveal>
-
-                {/* The parameter block — the same facts, set the way this team
-                    would write them down. */}
-                <Reveal as="dl" className="spec" delay={60}>
-                  <div className="spec__row">
-                    <dt className="spec__key mono">{dict.projects.spec.status}</dt>
-                    <dd className="spec__val">{project.status}</dd>
-                  </div>
-                  <div className="spec__row">
-                    <dt className="spec__key mono">{dict.projects.spec.award}</dt>
-                    <dd className="spec__val spec__val--award">{project.award}</dd>
-                  </div>
-                  <div className="spec__row">
-                    <dt className="spec__key mono">{dict.projects.spec.domains}</dt>
-                    <dd>
-                      <ul className="spec__list">
-                        {project.domains.map((domain) => (
-                          <li key={domain}>{domain}</li>
-                        ))}
-                      </ul>
-                    </dd>
-                  </div>
-                </Reveal>
-              </div>
-            </article>
-          </div>
-        </div>
-      </section>
+      {/* The project, as a filmstrip pulled sideways by vertical scroll. */}
+      <ProjectRail dict={dict} />
 
       {/* -------------------------------------------------------- Capabilities */}
       <section className="section" id="capabilities" aria-labelledby="capabilities-title">
@@ -229,20 +115,28 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
               </h2>
             </Reveal>
 
-            <Reveal as="ul" className="caps" delay={60}>
-              {dict.capabilities.items.map((item) => (
-                <li className="cap" key={item.title}>
-                  <h3 className="cap__title">{item.title}</h3>
-                  <p className="cap__body">{item.body}</p>
-                </li>
-              ))}
+            <Reveal as="ul" className="bento" delay={60}>
+              {dict.capabilities.items.map((item, i) => {
+                const Icon = CAPABILITY_ICONS[i] ?? ChipIcon;
+                return (
+                  <li className="bento__cell" key={item.title}>
+                    <Icon className="bento__icon" />
+                    <h3 className="bento__title">{item.title}</h3>
+                    <p className="bento__body">{item.body}</p>
+                  </li>
+                );
+              })}
             </Reveal>
           </div>
         </div>
       </section>
 
-      {/* ------------------------------------------------------------- Process */}
-      <section className="section section--tight" id="process" aria-labelledby="process-title">
+      {/* --------------------------------------------------------- Methodology */}
+      <section
+        className="section section--tint"
+        id="process"
+        aria-labelledby="process-title"
+      >
         <div className="container sec">
           <Reveal className="sec__rail">
             <p className="sec-label mono">{dict.process.label}</p>
@@ -254,57 +148,48 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
                 {dict.process.heading}
               </h2>
             </Reveal>
-
-            <Reveal as="ol" className="flow" delay={60}>
-              {dict.process.steps.map((step, i) => (
-                <li className="flow__step" key={step}>
-                  <span className="flow__index mono" lang="en" dir="ltr">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <span className="flow__label">{step}</span>
-                </li>
-              ))}
-            </Reveal>
+            <Methodology dict={dict} />
           </div>
         </div>
       </section>
 
-      {/* -------------------------------------------------------------- Founder
-          The person is the headline: a plate, the name at display scale, the
-          sentence that says what he does, and a title block signing it. */}
-      <section className="section section--tint" id="founder" aria-labelledby="founder-title">
-        <div className="container founder">
-          <Reveal className="founder__media">
-            <div className="media founder__portrait">
-              <Image
-                src="/images/founder.jpg"
-                alt={dict.founder.imageAlt}
-                fill
-                loading="lazy"
-                sizes="(max-width: 860px) 92vw, 38vw"
-              />
-            </div>
+      {/* ------------------------------------------------------------- Founder
+          A short introduction here; the story itself has its own route. */}
+      <section className="section" id="founder" aria-labelledby="founder-title">
+        <div className="container sec">
+          <Reveal className="sec__rail">
+            <p className="sec-label mono">{dict.founder.label}</p>
           </Reveal>
 
-          <Reveal className="founder__copy" delay={60}>
-            <p className="founder__label sec-label mono">{dict.founder.label}</p>
-            <h2 className="founder__name" id="founder-title">
-              {dict.founder.name}
-            </h2>
-            <p className="founder__role mono">{dict.founder.role}</p>
-            <p className="founder__lead">{dict.founder.lead}</p>
-            <p className="founder__body">{dict.founder.body}</p>
+          <div className="sec__body">
+            <div className="founder-grid">
+              <Reveal>
+                <div className="founder-portrait">
+                  <Image
+                    src="/images/founder.jpg"
+                    alt={dict.founder.imageAlt}
+                    fill
+                    loading="lazy"
+                    sizes="(max-width: 1024px) 92vw, 30vw"
+                  />
+                </div>
+              </Reveal>
 
-            <div className="founder__sign">
-              <Logo className="founder__sign-mark" />
-              <span className="founder__sign-text">
-                <Wordmark className="wordmark" />
-              </span>
-              <Link href={`/${lang}/start`} className="btn btn--ghost founder__cta">
-                {dict.nav.start}
-              </Link>
+              <Reveal delay={60}>
+                <h2 className="sec-title" id="founder-title">
+                  {dict.founder.name}
+                </h2>
+                <p className="founder-role mono">{dict.founder.role}</p>
+                <p className="about__body">{dict.founder.lead}</p>
+                <p style={{ marginBlockStart: "2rem" }}>
+                  <Link href={`/${lang}/founder`} className="btn btn--ghost">
+                    {dict.founder.readMore}
+                    <ArrowIcon className="btn__arrow" />
+                  </Link>
+                </p>
+              </Reveal>
             </div>
-          </Reveal>
+          </div>
         </div>
       </section>
 

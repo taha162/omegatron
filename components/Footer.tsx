@@ -97,6 +97,14 @@ export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
           <p>{dict.footer.location}</p>
         </div>
       </div>
+
+      {/* The wordmark runs the width of the footer and is cut off by its
+          bottom edge. Always Latin — a brand name, not a translated string —
+          so it is never mirrored, and it is hidden from assistive technology
+          because the brand is already named in the link above. */}
+      <p className="footer__wordmark" lang="en" dir="ltr" aria-hidden="true">
+        OMEGATRON
+      </p>
     </footer>
   );
 }

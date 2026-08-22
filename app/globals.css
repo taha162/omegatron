@@ -1,83 +1,87 @@
 /* ==========================================================================
-   OmegaTron — the engineering sheet
+   OmegaTron — cinematic engineering film
    --------------------------------------------------------------------------
-   The vernacular of this team is the datasheet and the engineering drawing:
-   a titled sheet, hairline rules, a measurement register, and one accent that
-   means something. Saturated colour appears only in the photographs and the
-   film, so the hardware is the only thing on the page that glows.
+   Dark only. Two accents and nothing else: the brand gold from the logo's
+   needle, and the cold steel blue of the traces in the film. Everything
+   structural is a 1px rule. Everything that moves is driven by scroll.
    ========================================================================== */
 
 :root {
   color-scheme: dark;
 
   /* Ground */
-  --paper: #06090e;
-  --surface: #0a0f16;
-  --surface-2: #0f151e;
-  --panel: #0d131b;
+  --paper: #05070c;
+  --surface: #0a0e17;
+  --surface-2: #101623;
+  --panel: #0c111b;
 
-  /* Ink — every value checked at or above 4.99:1 on --paper */
-  --ink: #e6ebf1;
-  --ink-2: #9fadbc;
-  --ink-3: #75828f;
-  --ink-inverse: #06090e;
+  /* Ink — checked at or above 6.4:1 on --paper */
+  --ink: #e8edf5;
+  --ink-2: #b0b8c8;
+  --ink-3: #8a92a5;
+  --ink-inverse: #05070c;
 
-  /* Rules. The sheet is drawn in hairlines, so there are three weights of
-     them and nothing heavier. */
-  --line: rgba(230, 235, 241, 0.09);
-  --line-strong: rgba(230, 235, 241, 0.18);
-  --line-bright: rgba(230, 235, 241, 0.34);
+  /* Surgical rules */
+  --line: rgba(232, 237, 245, 0.08);
+  --line-strong: rgba(232, 237, 245, 0.16);
+  --line-bright: rgba(232, 237, 245, 0.32);
 
   /*
-   * The needle. It is the gold line through the centre of the logo mark, and
-   * it is the only colour in the interface. It is spent on four things and
-   * nothing else: the rail segment that titles a section, the award, the
-   * current state of a control, and the index mark on the hero scale.
+   * Two accents.
+   *
+   * Gold is the needle through the centre of the logo mark — the brand's own,
+   * and the warm data points in the film happen to sit on it exactly. It marks
+   * achievement and the single action the page wants.
+   *
+   * Steel blue is the trace colour of the board. It marks data, state and
+   * instrumentation. It never means "click here".
    */
   --gold: #d9ae45;
   --gold-bright: #f0c860;
-  --gold-dim: rgba(217, 174, 69, 0.34);
-  --gold-tint: rgba(217, 174, 69, 0.1);
+  --gold-dim: rgba(217, 174, 69, 0.32);
+  --gold-glow: rgba(217, 174, 69, 0.28);
 
-  --steel: #c3ccd6;
+  --steel: #4a90d9;
+  --steel-bright: #6fabe6;
+  --steel-dim: rgba(74, 144, 217, 0.3);
+  --steel-glow: rgba(74, 144, 217, 0.3);
 
-  /* Type */
+  --silver: #8a92a5;
+
+  /* Type — Cairo covers both scripts, so the register changes by weight and
+     size rather than by family. Latin data uses the system monospace, which is
+     SF Mono on Apple hardware and costs no request. */
   --font-sans: var(--font-cairo), "Cairo", "Segoe UI", system-ui, -apple-system,
     "Helvetica Neue", Arial, sans-serif;
-  --font-mono: ui-monospace, "SFMono-Regular", "SF Mono", Menlo, Consolas,
-    "Liberation Mono", monospace;
+  --font-mono: ui-monospace, "SFMono-Regular", "SF Mono", "JetBrains Mono", Menlo,
+    Consolas, "Liberation Mono", monospace;
 
-  /*
-   * A wide scale with few stops. Engineering confidence is a big jump between
-   * a display size and a body size, not six sizes a few percent apart.
-   */
   --step--2: clamp(0.6875rem, 0.67rem + 0.09vw, 0.75rem);
   --step--1: clamp(0.8125rem, 0.79rem + 0.11vw, 0.875rem);
   --step-0: clamp(1rem, 0.97rem + 0.15vw, 1.0625rem);
   --step-1: clamp(1.125rem, 1.06rem + 0.32vw, 1.375rem);
   --step-2: clamp(1.4375rem, 1.28rem + 0.78vw, 2rem);
   --step-3: clamp(1.875rem, 1.5rem + 1.85vw, 3.25rem);
-  --step-4: clamp(2.5rem, 1.75rem + 3.6vw, 5rem);
+  --step-4: clamp(2.5rem, 1.6rem + 4.2vw, 5.5rem);
 
-  /* Rhythm */
-  --gutter: clamp(1.25rem, 0.9rem + 1.75vw, 2.5rem);
-  --section-y: clamp(4.5rem, 3.25rem + 5.5vw, 7.5rem);
-  --max-width: 76rem;
+  /* Generous whitespace, as the brief asks. */
+  --gutter: clamp(1.25rem, 0.9rem + 1.75vw, 3rem);
+  --section-y: clamp(5.5rem, 4rem + 7vw, 10rem);
+  --max-width: 78rem;
   --measure: 56ch;
 
-  /* The rail: the title block down the leading edge of every section. */
   --rail-w: clamp(7rem, 4rem + 7vw, 11rem);
   --rail-gap: clamp(1.5rem, 0.75rem + 3vw, 3.5rem);
 
-  /* Machined, not rounded. */
   --radius: 2px;
   --radius-lg: 3px;
   --radius-media: 3px;
 
-  --pane-pad: clamp(1.5rem, 1.15rem + 1.6vw, 2.5rem);
-  --pane-pad-sm: clamp(1.125rem, 0.95rem + 0.8vw, 1.5rem);
+  --header-h: 4.5rem;
 
-  --header-h: 4rem;
+  /* Every entrance uses the first curve; every hover uses the second. */
+  --ease-enter: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-hover: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* --------------------------------------------------------------------------
@@ -92,8 +96,22 @@
 
 html {
   -webkit-text-size-adjust: 100%;
-  scroll-behavior: smooth;
   scroll-padding-block-start: calc(var(--header-h) + 2rem);
+}
+
+/* Lenis drives the scroll position itself; native smooth behaviour would
+   fight it. Restored the moment the engine is off. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
 }
 
 body {
@@ -183,15 +201,10 @@ textarea {
 [lang="en"] h1,
 [lang="en"] h2,
 [lang="en"] h3 {
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
   line-height: 1.06;
 }
 
-/*
- * The data register. Latin only — part numbers, indices, the scale. Arabic
- * has no monospaced convention that reads as technical rather than broken, so
- * it takes the sans at a heavier weight instead.
- */
 .mono {
   font-family: var(--font-mono);
   font-size: var(--step--2);
@@ -228,13 +241,7 @@ textarea {
   background: var(--surface);
 }
 
-.section--tight {
-  padding-block-start: 0;
-}
-
-/* Sections below the film need their own ground to cover the fixed layer. */
-.section--solid,
-.footer {
+.section--solid {
   position: relative;
   z-index: 1;
   background: var(--paper);
@@ -265,16 +272,7 @@ textarea {
   border: 0;
 }
 
-/* --------------------------------------------------------------------------
-   The rail — the title block of the sheet
-
-   Every section is a narrow rail carrying its label beside a wide content
-   column. A hairline runs the height of the rail on its leading edge, and a
-   short gold segment sits at the top of that line: the needle from the logo
-   mark. It is the same skeleton on every section, which is what makes the
-   page read as one document rather than six blocks.
-   -------------------------------------------------------------------------- */
-
+/* The rail — a title block down the leading edge of each section. */
 .sec {
   display: grid;
   grid-template-columns: var(--rail-w) minmax(0, 1fr);
@@ -289,7 +287,6 @@ textarea {
   min-height: 3rem;
 }
 
-/* The hairline down the sheet edge. */
 .sec__rail::before {
   content: "";
   position: absolute;
@@ -299,7 +296,6 @@ textarea {
   background: var(--line-strong);
 }
 
-/* The needle. */
 .sec__rail::after {
   content: "";
   position: absolute;
@@ -340,7 +336,7 @@ textarea {
 }
 
 /* --------------------------------------------------------------------------
-   Media — aspect ratio reserved up front, so nothing shifts as images load
+   Media
    -------------------------------------------------------------------------- */
 
 .media {
@@ -359,28 +355,16 @@ textarea {
   object-fit: cover;
 }
 
-.media--4x5 {
-  aspect-ratio: 4 / 5;
-}
-.media--4x3 {
-  aspect-ratio: 4 / 3;
-}
-.media--3x2 {
-  aspect-ratio: 3 / 2;
-}
-.media--16x10 {
-  aspect-ratio: 16 / 10;
-}
+.media--4x5 { aspect-ratio: 4 / 5; }
+.media--3x2 { aspect-ratio: 3 / 2; }
+.media--16x10 { aspect-ratio: 16 / 10; }
 
 /* --------------------------------------------------------------------------
-   Buttons — two, and they do not look alike
-
-   The primary is the needle: gold, solid, the only filled control on the page.
-   The secondary is a hairline outline. Anyone glancing at the hero can tell in
-   one look which action the site wants.
+   Buttons
    -------------------------------------------------------------------------- */
 
 .btn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -395,12 +379,16 @@ textarea {
   line-height: 1.2;
   cursor: pointer;
   text-align: center;
-  transition: background-color 0.16s ease, border-color 0.16s ease, color 0.16s ease;
+  overflow: hidden;
+  transition: background-color 0.3s var(--ease-hover),
+    border-color 0.3s var(--ease-hover), color 0.3s var(--ease-hover),
+    box-shadow 0.3s var(--ease-hover);
 }
 
 .btn:hover {
   background: var(--gold-bright);
   border-color: var(--gold-bright);
+  box-shadow: 0 0 24px -4px var(--gold-glow);
 }
 
 .btn--ghost {
@@ -413,11 +401,12 @@ textarea {
   background: transparent;
   color: var(--gold);
   border-color: var(--gold);
+  box-shadow: 0 0 24px -6px var(--gold-glow);
 }
 
 .btn__arrow {
   flex: none;
-  transition: transform 0.16s ease;
+  transition: transform 0.3s var(--ease-hover);
 }
 
 [dir="rtl"] .btn__arrow {
@@ -440,6 +429,28 @@ textarea {
 .btn[disabled]:hover {
   background: var(--gold);
   border-color: var(--gold);
+  box-shadow: none;
+}
+
+/* The ripple a click leaves behind, scaled from the pointer. */
+.btn__ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(5, 7, 12, 0.28);
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(0);
+  animation: ripple 0.6s var(--ease-enter) forwards;
+}
+
+.btn--ghost .btn__ripple {
+  background: rgba(232, 237, 245, 0.16);
+}
+
+@keyframes ripple {
+  to {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0;
+  }
 }
 
 :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
@@ -452,7 +463,7 @@ textarea {
   position: absolute;
   inset-block-start: -100%;
   inset-inline-start: var(--gutter);
-  z-index: 100;
+  z-index: 200;
   padding: 0.75rem 1.25rem;
   background: var(--gold);
   color: var(--ink-inverse);
@@ -465,17 +476,62 @@ textarea {
 }
 
 /* --------------------------------------------------------------------------
-   Header — a thin dark bar on a hairline. Not a floating pane.
+   Custom cursor — an 8px dot that inverts what it crosses, opening to 40px
+   over anything clickable. Pointer-only; a touch device never renders it.
+   -------------------------------------------------------------------------- */
+
+.cursor {
+  position: fixed;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  z-index: 300;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  border-radius: 50%;
+  background: #ffffff;
+  mix-blend-mode: difference;
+  pointer-events: none;
+  opacity: 0;
+  transition: width 0.3s var(--ease-hover), height 0.3s var(--ease-hover),
+    margin 0.3s var(--ease-hover), opacity 0.3s var(--ease-hover);
+  will-change: transform;
+}
+
+.cursor.is-visible {
+  opacity: 1;
+}
+
+.cursor.is-wide {
+  width: 40px;
+  height: 40px;
+  margin: -20px 0 0 -20px;
+}
+
+/* The real pointer stays put — the dot is an addition, not a replacement, so
+   nothing is lost if a script fails or a user needs the system cursor. */
+@media (hover: none), (pointer: coarse) {
+  .cursor {
+    display: none;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Header — "HUD orbital"
+
+   Nothing at rest: no ground, no rule, no shadow. Past 15vh it phases in like
+   an instrument coming up — the pane resolves, a gradient sweeps the bottom
+   edge from gold to steel, and the mark wipes in on a scanline.
    -------------------------------------------------------------------------- */
 
 .header {
-  position: sticky;
+  position: fixed;
   inset-block-start: 0;
-  z-index: 50;
-  background: rgba(6, 9, 14, 0.92);
-  border-block-end: 1px solid var(--line);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  inset-inline: 0;
+  z-index: 100;
+  background: transparent;
+  transition: background-color 0.5s var(--ease-hover),
+    backdrop-filter 0.5s var(--ease-hover);
 }
 
 .header__inner {
@@ -486,6 +542,74 @@ textarea {
   gap: 1rem;
 }
 
+/* The pane. Kept on a pseudo-element so the blur can be faded in without the
+   bar itself ever changing size. */
+.header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: rgba(5, 7, 12, 0.62);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transition: opacity 0.5s var(--ease-hover);
+}
+
+/* 3% film grain over the pane, so the HUD has a surface rather than being a
+   clean sheet of glass. */
+.header::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 120px 120px;
+  transition: opacity 0.5s var(--ease-hover);
+}
+
+.header.is-hud::before {
+  opacity: 1;
+}
+
+.header.is-hud::after {
+  opacity: 0.03;
+}
+
+/* The sweep: a 1px rule that draws itself across the bottom edge, gold into
+   steel, once the HUD comes up. */
+.header__sweep {
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline: 0;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(
+    to var(--sweep-to, right),
+    var(--gold) 0%,
+    var(--steel) 100%
+  );
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.9s var(--ease-enter);
+}
+
+[dir="rtl"] .header__sweep {
+  --sweep-to: left;
+  transform-origin: right center;
+}
+
+.header.is-hud .header__sweep {
+  transform: scaleX(1);
+}
+
+.header__inner > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* The mark wipes in on a scanline rather than fading. */
 .brand {
   grid-column: 1;
   display: inline-flex;
@@ -493,14 +617,21 @@ textarea {
   gap: 0.625rem;
   flex: none;
   justify-self: start;
+  clip-path: inset(0 0 0 0);
+  transition: clip-path 0.7s var(--ease-enter), opacity 0.4s var(--ease-hover);
+}
+
+.header:not(.is-hud) .brand {
+  clip-path: inset(0 0 100% 0);
+  opacity: 0;
 }
 
 .brand__mark {
   flex: none;
   width: 1.875rem;
   height: 1.875rem;
-  color: var(--steel);
-  transition: color 0.18s ease;
+  color: var(--silver);
+  transition: color 0.3s var(--ease-hover);
 }
 
 .brand:hover .brand__mark {
@@ -520,13 +651,8 @@ textarea {
   font-size: 0.9375rem;
 }
 
-.wordmark__a {
-  color: var(--ink);
-}
-
-.wordmark__b {
-  color: var(--gold);
-}
+.wordmark__a { color: var(--ink); }
+.wordmark__b { color: var(--gold); }
 
 .nav {
   grid-column: 2;
@@ -536,20 +662,25 @@ textarea {
   gap: clamp(0.75rem, 0.2rem + 1.4vw, 1.75rem);
 }
 
-/*
- * A nav item is a test point: the label, and a gold tick that rises under it
- * on approach. Nothing moves, nothing fades — the mark is either made or it
- * is not.
- */
 .nav__link {
   position: relative;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--ink-2);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--silver);
   padding-block: 0.5rem;
-  transition: color 0.16s ease;
+  transition: color 0.3s var(--ease-hover);
 }
 
+/* Arabic is not an uppercasing script, and tracking breaks its joins. */
+[lang="ar"] .nav__link {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.9375rem;
+}
+
+/* The underline opens from the centre and carries its own glow. */
 .nav__link::after {
   content: "";
   position: absolute;
@@ -558,11 +689,12 @@ textarea {
   width: 0;
   height: 1px;
   background: var(--gold);
-  transition: width 0.18s ease, inset-inline-start 0.18s ease;
+  box-shadow: 0 0 8px var(--gold-glow);
+  transition: width 0.3s var(--ease-hover), inset-inline-start 0.3s var(--ease-hover);
 }
 
 .nav__link:hover {
-  color: var(--ink);
+  color: #ffffff;
 }
 
 .nav__link:hover::after {
@@ -579,8 +711,6 @@ textarea {
   justify-self: end;
 }
 
-/* The language pair reads as a two-position switch: the inactive side is
-   quiet, the active side carries the needle under it. */
 .lang-toggle {
   display: inline-flex;
   align-items: center;
@@ -594,17 +724,12 @@ textarea {
   display: inline-block;
   padding: 0.3125rem 0.4375rem;
   color: var(--ink-3);
-  transition: color 0.16s ease;
+  transition: color 0.3s var(--ease-hover);
   line-height: 1.4;
 }
 
-.lang-toggle__opt:hover {
-  color: var(--ink);
-}
-
-.lang-toggle__opt[aria-current] {
-  color: var(--ink);
-}
+.lang-toggle__opt:hover { color: var(--ink); }
+.lang-toggle__opt[aria-current] { color: var(--ink); }
 
 .lang-toggle__opt[aria-current]::after {
   content: "";
@@ -613,17 +738,11 @@ textarea {
   inset-inline: 0.4375rem;
   height: 1px;
   background: var(--gold);
+  box-shadow: 0 0 8px var(--gold-glow);
 }
 
-.lang-toggle__sep {
-  color: var(--line-bright);
-}
+.lang-toggle__sep { color: var(--line-bright); }
 
-/*
- * The persistent CTA is an outline, not a second gold button: above the fold
- * the hero already spends the accent once, and two filled golds would leave a
- * visitor with no idea which one the page meant.
- */
 .header__cta {
   padding: 0.5625rem 1.0625rem;
   font-size: 0.8125rem;
@@ -638,6 +757,7 @@ textarea {
   color: var(--ink-inverse);
 }
 
+/* The hamburger rotates into an X on a spring. */
 .nav-toggle {
   display: none;
   align-items: center;
@@ -654,12 +774,18 @@ textarea {
   display: grid;
   gap: 4px;
   width: 18px;
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.nav-toggle[aria-expanded="true"] .nav-toggle__bars {
+  transform: rotate(180deg);
 }
 
 .nav-toggle__bars span {
   height: 1.5px;
   background: currentColor;
-  transition: transform 0.2s ease, opacity 0.2s ease;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 0.2s var(--ease-hover);
 }
 
 .nav-toggle[aria-expanded="true"] .nav-toggle__bars span:nth-child(1) {
@@ -674,67 +800,58 @@ textarea {
   transform: translateY(-5.5px) rotate(-45deg);
 }
 
-/* The sheet hangs off the bar rather than sitting in the flow, so a closed
-   menu takes up no space and an open one covers the page instead of pushing
-   it down. */
-.mobile-nav-wrap {
-  position: absolute;
-  inset-inline: 0;
-  inset-block-start: 100%;
-  padding-inline: 0;
-  z-index: 2;
-}
-
-/* Sits below the sheet and above the page. It is never in the tab order — the
-   Escape key is the keyboard's way out, and the sheet's own links are next. */
-.nav-scrim {
-  display: none;
-  position: fixed;
-  inset: var(--header-h) 0 0;
-  z-index: 1;
-  padding: 0;
-  border: 0;
-  background: rgba(6, 9, 14, 0.72);
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.2s ease, visibility 0s linear 0.2s;
-}
-
-.nav-scrim.is-open {
-  opacity: 1;
-  visibility: visible;
-  transition: opacity 0.2s ease, visibility 0s;
-}
-
+/* Full-screen overlay menu, links staggered 50ms apart. */
 .mobile-nav {
   display: none;
-  padding: 0.5rem var(--gutter) 1.5rem;
-  background: var(--surface);
-  border-block-end: 1px solid var(--line-strong);
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  padding: calc(var(--header-h) + 2rem) var(--gutter) 2rem;
+  background: rgba(5, 7, 12, 0.96);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   opacity: 0;
   visibility: hidden;
-  transform: translateY(-0.5rem);
-  transition: opacity 0.2s ease, transform 0.24s cubic-bezier(0.22, 1, 0.36, 1),
-    visibility 0s linear 0.24s;
+  transition: opacity 0.4s var(--ease-hover), visibility 0s linear 0.4s;
 }
 
 .mobile-nav.is-open {
   opacity: 1;
   visibility: visible;
-  transform: none;
-  transition: opacity 0.2s ease, transform 0.26s cubic-bezier(0.22, 1, 0.36, 1),
-    visibility 0s;
+  transition: opacity 0.4s var(--ease-hover), visibility 0s;
 }
 
 .mobile-nav__list {
   display: grid;
 }
 
+.mobile-nav__list > li,
+.mobile-nav__cta {
+  opacity: 0;
+  transform: translateY(1rem);
+  transition: opacity 0.5s var(--ease-enter), transform 0.6s var(--ease-enter);
+}
+
+.mobile-nav.is-open .mobile-nav__list > li,
+.mobile-nav.is-open .mobile-nav__cta {
+  opacity: 1;
+  transform: none;
+}
+
+.mobile-nav.is-open .mobile-nav__list > li:nth-child(1) { transition-delay: 0.05s; }
+.mobile-nav.is-open .mobile-nav__list > li:nth-child(2) { transition-delay: 0.1s; }
+.mobile-nav.is-open .mobile-nav__list > li:nth-child(3) { transition-delay: 0.15s; }
+.mobile-nav.is-open .mobile-nav__list > li:nth-child(4) { transition-delay: 0.2s; }
+.mobile-nav.is-open .mobile-nav__list > li:nth-child(5) { transition-delay: 0.25s; }
+.mobile-nav.is-open .mobile-nav__list > li:nth-child(6) { transition-delay: 0.3s; }
+.mobile-nav.is-open .mobile-nav__list > li:nth-child(7) { transition-delay: 0.35s; }
+.mobile-nav.is-open .mobile-nav__cta { transition-delay: 0.4s; }
+
 .mobile-nav__link {
   display: block;
-  padding-block: 0.9375rem;
-  font-size: 1.0625rem;
-  font-weight: 600;
+  padding-block: 1rem;
+  font-size: var(--step-2);
+  font-weight: 700;
   border-block-end: 1px solid var(--line);
 }
 
@@ -743,87 +860,108 @@ textarea {
 }
 
 .mobile-nav__cta {
-  margin-block-start: 1.25rem;
+  margin-block-start: 2rem;
   width: 100%;
 }
 
 /* --------------------------------------------------------------------------
-   The film — an instrument display, not wallpaper
+   Hero — the scroll-driven scene
 
-   It runs full-bleed inside the hero and nowhere else. The poster is painted
-   underneath it from the first frame the browser draws, so the picture is
-   there at 48 KB whether or not the footage is ever fetched; see
-   `components/FilmBackdrop.tsx` for when it is.
+   A 100svh stage pinned inside a track several viewports long. Scroll drives
+   the film's `currentTime`; nothing autoplays and nothing can be clicked to
+   play. The beats over the top are cross-faded by the same progress figure.
    -------------------------------------------------------------------------- */
 
-.film {
+.hero {
+  position: relative;
+  /* Track height is set from the component so the number lives in one place. */
+  height: var(--hero-track, 300svh);
+}
+
+.hero__stage {
+  position: sticky;
+  inset-block-start: 0;
+  height: 100svh;
+  overflow: hidden;
+  display: grid;
+  align-items: center;
+}
+
+.hero__film {
   position: absolute;
   inset: 0;
   z-index: 0;
-  overflow: hidden;
-  pointer-events: none;
-  background: var(--paper) url("/media/circuit-poster.jpg") center / cover no-repeat;
+  background: var(--paper) url("/media/chip-poster.jpg") center / cover no-repeat;
 }
 
-.film__video {
+.hero__video {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   max-width: none;
+  /* Never upscaled: the source is 1080p and the element is only ever asked to
+     cover, never to magnify beyond its own pixels on a larger stage. */
   object-fit: cover;
   opacity: 0;
-  transition: opacity 0.6s ease;
+  transition: opacity 0.8s var(--ease-hover);
 }
 
-/* Only once the footage has decoded a frame does it take over from the
-   poster, so the swap can never show an empty box. */
-.film.is-live .film__video {
+.hero__film.is-live .hero__video {
   opacity: 1;
 }
 
-/*
- * The scrim is what makes the statement readable. It is heaviest along the
- * leading edge, where the type sits, and lifts across the frame so the board
- * is still legible as a picture.
- */
-.film__scrim {
+.hero__scrim {
   position: absolute;
   inset: 0;
+  z-index: 1;
   background:
-    linear-gradient(to bottom, rgba(6, 9, 14, 0.72) 0%, rgba(6, 9, 14, 0.34) 42%, rgba(6, 9, 14, 0.9) 100%),
-    linear-gradient(to var(--scrim-to, right), rgba(6, 9, 14, 0.82) 0%, rgba(6, 9, 14, 0.34) 58%, transparent 100%);
+    linear-gradient(to bottom, rgba(5, 7, 12, 0.72) 0%, rgba(5, 7, 12, 0.25) 45%, rgba(5, 7, 12, 0.92) 100%),
+    linear-gradient(to var(--scrim-to, right), rgba(5, 7, 12, 0.86) 0%, rgba(5, 7, 12, 0.3) 62%, transparent 100%);
 }
 
-[dir="rtl"] .film__scrim {
+[dir="rtl"] .hero__scrim {
   --scrim-to: left;
-}
-
-/* --------------------------------------------------------------------------
-   Hero — the statement over the board, on a measured edge
-   -------------------------------------------------------------------------- */
-
-.hero {
-  position: relative;
-  isolation: isolate;
-  display: grid;
-  align-items: center;
-  min-height: min(88svh, 48rem);
-  padding-block: clamp(3.5rem, 2.5rem + 5vw, 6rem) clamp(4rem, 3rem + 5vw, 6.5rem);
-  border-block-end: 1px solid var(--line-strong);
-  overflow: hidden;
 }
 
 .hero__inner {
   position: relative;
-  z-index: 1;
+  z-index: 2;
+  width: 100%;
+}
+
+/* Each beat occupies the same cell; the script cross-fades between them, so
+   only one is ever readable and none of them shifts the layout. */
+.hero__beats {
+  display: grid;
+}
+
+.hero__beat {
+  grid-area: 1 / 1;
+  max-width: 46rem;
+}
+
+/*
+ * The opening state, in CSS rather than in the script.
+ *
+ * ScrollTrigger's onUpdate does not fire until the scroll position actually
+ * changes, so a page sitting at the top would otherwise show every beat at
+ * once, stacked in the same cell. Only the first is lit before the script has
+ * anything to say; without scripting at all, this block is skipped and the
+ * beats stack legibly as ordinary blocks.
+ */
+@media (scripting: enabled) {
+  .hero__beat + .hero__beat {
+    opacity: 0;
+    pointer-events: none;
+  }
 }
 
 .hero__wordmark {
   display: block;
   font-size: var(--step--2);
   font-weight: 700;
-  letter-spacing: 0.28em;
+  letter-spacing: 0.3em;
   text-transform: uppercase;
   color: var(--ink-3);
   margin-block-end: 1.25rem;
@@ -833,24 +971,35 @@ textarea {
   font-size: var(--step-4);
   font-weight: 800;
   line-height: 1;
-  letter-spacing: -0.035em;
-  max-width: 14ch;
+  letter-spacing: -0.03em;
+  max-width: 15ch;
   text-wrap: balance;
   margin-block-end: 1.5rem;
+}
+
+/* The scanline wipe: the heading is revealed by a clip-path opening downward
+   rather than by a fade. Scoped to the <h1>, since the later beats carry the
+   same class on a <p> and cross-fade instead — clipping those would shut them
+   permanently. Only where a script can open it again. */
+@media (scripting: enabled) {
+  h1.hero__statement {
+    clip-path: inset(0 0 100% 0);
+  }
 }
 
 [lang="ar"] .hero__statement {
   line-height: 1.3;
   letter-spacing: 0;
-  max-width: 16ch;
+  max-width: 17ch;
   font-weight: 700;
 }
 
 .hero__lead {
   color: var(--ink-2);
-  max-width: 38ch;
+  max-width: 40ch;
   margin-block-end: 2rem;
   font-weight: 300;
+  font-size: var(--step-1);
 }
 
 [lang="ar"] .hero__lead {
@@ -863,55 +1012,119 @@ textarea {
   gap: 0.75rem;
 }
 
-/*
- * The graticule. The hero's bottom edge is a scale, and a gold index mark
- * travels it as scroll drives the film — so the mechanism shows itself
- * instead of being asserted. `--film-progress` is written by the film loop;
- * with no script, no footage, or reduced motion it stays at 0 and the mark is
- * simply parked at the origin.
- */
-.hero__scale {
+/* A readout of the scene's own position, in the data register. */
+.hero__readout {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--steel);
+  margin-block-end: 1.25rem;
+}
+
+.hero__readout-bar {
+  width: clamp(4rem, 12vw, 9rem);
+  height: 1px;
+  background: var(--line-strong);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero__readout-bar::after {
+  content: "";
   position: absolute;
-  inset-block-end: 0;
-  inset-inline: 0;
-  z-index: 1;
-  height: 1.25rem;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: 100%;
+  background: var(--steel);
+  box-shadow: 0 0 8px var(--steel-glow);
+  transform: scaleX(var(--film-progress, 0));
+  transform-origin: left center;
+}
+
+[dir="rtl"] .hero__readout-bar::after {
+  transform-origin: right center;
+}
+
+/* Scroll indicator: breathes until the first scroll, then leaves. */
+.hero__hint {
+  position: absolute;
+  inset-block-end: clamp(1.5rem, 4vh, 3rem);
+  inset-inline-start: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  display: grid;
+  justify-items: center;
+  gap: 0.625rem;
+  color: var(--ink-3);
+  transition: opacity 0.6s var(--ease-hover), transform 0.6s var(--ease-hover);
+}
+
+.hero__hint.is-gone {
+  opacity: 0;
+  transform: translateX(-50%) translateY(0.75rem);
   pointer-events: none;
 }
 
-.hero__scale::before {
-  content: "";
-  position: absolute;
-  inset-block-end: 0;
-  inset-inline: 0;
-  height: 0.5rem;
-  background-image: repeating-linear-gradient(
-    to var(--tick-to, right),
-    var(--line-bright) 0 1px,
-    transparent 1px 2.5%
-  );
-  -webkit-mask-image: linear-gradient(to bottom, transparent, #000);
-  mask-image: linear-gradient(to bottom, transparent, #000);
+.hero__hint-rule {
+  width: 1px;
+  height: 2.5rem;
+  background: linear-gradient(to bottom, transparent, var(--steel));
+  animation: breathe 2.6s ease-in-out infinite;
 }
 
-[dir="rtl"] .hero__scale::before {
-  --tick-to: left;
-}
-
-.hero__scale-mark {
-  position: absolute;
-  inset-block-end: 0;
-  /* An inset percentage resolves against the scale's own width, which is what
-     the mark is measuring. A translate percentage would resolve against the
-     mark, and `100vw` would count a scrollbar the scale does not have. */
-  inset-inline-start: calc(var(--film-progress, 0) * (100% - 2px));
-  width: 2px;
-  height: 1.25rem;
-  background: var(--gold);
+@keyframes breathe {
+  0%, 100% { opacity: 0.25; transform: scaleY(0.6); transform-origin: top center; }
+  50% { opacity: 1; transform: scaleY(1); transform-origin: top center; }
 }
 
 /* --------------------------------------------------------------------------
-   About — the philosophy line set as the largest thing in the section
+   Route transition — a diagonal shutter that wipes the incoming page in
+   -------------------------------------------------------------------------- */
+
+.wipe {
+  position: fixed;
+  inset: 0;
+  z-index: 250;
+  pointer-events: none;
+  background: var(--paper);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+  animation: wipe-out 0.85s var(--ease-enter) forwards;
+}
+
+.wipe::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: 1px;
+  background: linear-gradient(to bottom, var(--gold), var(--steel));
+  opacity: 0.6;
+}
+
+@keyframes wipe-out {
+  from {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+  }
+  to {
+    clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%);
+  }
+}
+
+[dir="rtl"] .wipe {
+  animation-name: wipe-out-rtl;
+}
+
+@keyframes wipe-out-rtl {
+  from {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+  }
+  to {
+    clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   About
    -------------------------------------------------------------------------- */
 
 .about__statement {
@@ -945,354 +1158,723 @@ textarea {
 }
 
 /* --------------------------------------------------------------------------
-   Projects — one case study, read as a sheet: plate, then narrative, then
-   the parameters that describe it
+   Achievement — NURAI 2026
+
+   Not a badge in a box. The section opens dark, the board's traces draw
+   themselves, a deconstructed plate stack assembles in 3D, and the mark
+   resolves on top of it out of a chromatic split.
    -------------------------------------------------------------------------- */
 
-.projects__note {
-  color: var(--ink-3);
+.award {
+  position: relative;
+  background: var(--paper);
+  overflow: hidden;
+  padding-block: clamp(6rem, 4rem + 9vw, 12rem);
+}
+
+.award__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(2.5rem, 1.5rem + 5vw, 6rem);
+  align-items: center;
+}
+
+/* Layer 1 — the traces. Stroke-dashoffset is driven from the component as the
+   section enters, so the board wires itself up rather than fading in. */
+.award__traces {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.award__traces path,
+.award__traces line {
+  stroke-dasharray: var(--len, 1200);
+  stroke-dashoffset: calc(var(--len, 1200) * (1 - var(--draw, 0)));
+}
+
+.award__traces circle {
+  opacity: var(--draw, 0);
+  transition: opacity 0.6s var(--ease-hover);
+}
+
+/* Layer 2 — ambient data points drifting over the board. */
+.award__dust {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.award__mote {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 6px var(--gold-glow);
+  animation: drift linear infinite;
+  opacity: 0.55;
+}
+
+@keyframes drift {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(0, -140px, 0); }
+}
+
+/* Layer 3 — the monument itself. */
+.award__stage {
+  position: relative;
+  z-index: 1;
+  perspective: 1200px;
+  display: grid;
+  place-items: center;
+  min-height: clamp(18rem, 34vw, 27rem);
+}
+
+/* The plates and the badge share one cell: the badge stands on the stack, and
+   flowing it into a row of its own would drop it below the monument. */
+.award__assembly,
+.award__badge-anchor {
+  grid-area: 1 / 1;
+  place-self: center;
+}
+
+.award__badge-anchor {
+  z-index: 2;
+}
+
+.award__assembly {
+  position: relative;
+  transform-style: preserve-3d;
+  /* Shallow enough that the plates still read as plates; at 58 degrees the
+     stack foreshortened into a single dark trapezoid. */
+  transform: rotateX(46deg) rotateZ(var(--tilt-z, 0deg));
+  display: grid;
+  place-items: center;
+}
+
+/* The plates: three boards stacked in depth, each arriving from further out
+   and settling as the section is entered. `--assemble` runs 0..1. */
+.award__plate {
+  grid-area: 1 / 1;
+  width: clamp(11rem, 22vw, 17rem);
+  height: clamp(11rem, 22vw, 17rem);
+  border: 1px solid var(--line-bright);
+  background:
+    repeating-linear-gradient(90deg, rgba(74, 144, 217, 0.16) 0 1px, transparent 1px 14%),
+    repeating-linear-gradient(0deg, rgba(74, 144, 217, 0.1) 0 1px, transparent 1px 22%),
+    linear-gradient(135deg, rgba(74, 144, 217, 0.14), rgba(5, 7, 12, 0.72) 60%);
+  transform: translateZ(calc(var(--z, 0px) * var(--assemble, 0)))
+    scale(calc(0.86 + 0.14 * var(--assemble, 0)));
+  opacity: var(--assemble, 0);
+  transition: none;
+}
+
+.award__plate:nth-child(1) { --z: 0px; border-color: var(--steel-dim); }
+.award__plate:nth-child(2) { --z: 34px; }
+.award__plate:nth-child(3) { --z: 68px; border-color: var(--gold-dim); }
+
+/* A brushed-metal sheen across the top plate. */
+.award__plate:nth-child(3)::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+      118deg,
+      rgba(232, 237, 245, 0.05) 0 1px,
+      transparent 1px 3px
+    ),
+    radial-gradient(120% 80% at 20% 0%, rgba(232, 237, 245, 0.12), transparent 60%);
+}
+
+/* The badge sits above the stack, facing the reader rather than lying on the
+   board with it. */
+.award__badge {
+  position: relative;
+  z-index: 2;
+  transform: translateY(calc(-1 * clamp(1.5rem, 4vw, 3rem)))
+    rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+  transform-style: preserve-3d;
+  display: grid;
+  place-items: center;
+  padding: clamp(1rem, 2vw, 1.5rem) clamp(1.5rem, 3vw, 2.25rem);
+  border: 1px solid var(--gold-dim);
+  border-radius: var(--radius);
+  background: linear-gradient(150deg, rgba(232, 237, 245, 0.1), rgba(5, 7, 12, 0.5));
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  box-shadow: 0 0 40px -12px var(--gold-glow), inset 0 1px 0 rgba(232, 237, 245, 0.16);
+  transition: transform 0.4s var(--ease-hover), box-shadow 0.4s var(--ease-hover);
+  cursor: default;
+}
+
+.award__badge:hover {
+  box-shadow: 0 0 60px -10px var(--gold-glow), inset 0 1px 0 rgba(232, 237, 245, 0.24);
+}
+
+.award__place {
+  position: relative;
+  font-size: clamp(1.5rem, 3.4vw, 2.5rem);
+  font-weight: 800;
+  line-height: 1;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+[lang="ar"] .award__place {
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+/*
+ * The chromatic split. Two copies of the text sit behind the real one in the
+ * two accent hues and separate for a moment as the badge resolves, then land.
+ * `--glitch` runs 1..0, so the split closes rather than opening.
+ */
+.award__place span {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.award__place span:nth-of-type(1) {
+  color: var(--steel);
+  transform: translateX(calc(var(--glitch, 0) * -6px));
+  mix-blend-mode: screen;
+}
+
+.award__place span:nth-of-type(2) {
+  color: var(--gold);
+  transform: translateX(calc(var(--glitch, 0) * 6px));
+  mix-blend-mode: screen;
+}
+
+.award__year {
+  font-family: var(--font-mono);
+  font-size: var(--step--2);
+  letter-spacing: 0.22em;
+  color: var(--steel);
+  margin-block-start: 0.5rem;
+}
+
+/* The copy beside it, typed rather than faded. */
+.award__title {
+  font-size: var(--step-3);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin-block: 1rem 1.25rem;
+  text-wrap: balance;
+}
+
+[lang="ar"] .award__title {
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0;
+}
+
+.award__body {
+  color: var(--ink-2);
+  max-width: 44ch;
+  font-weight: 300;
+  font-size: var(--step-1);
+  line-height: 1.65;
+  min-height: 3.4em;
+}
+
+[lang="ar"] .award__body {
+  font-weight: 400;
+  line-height: 1.9;
+}
+
+/* The terminal caret, shown only while the line is still being typed. */
+.award__caret {
+  display: inline-block;
+  width: 0.6ch;
+  margin-inline-start: 0.15ch;
+  background: var(--gold);
+  animation: caret 1s steps(1) infinite;
+  vertical-align: -0.1em;
+  height: 1.05em;
+}
+
+.award__caret.is-done {
+  display: none;
+}
+
+@keyframes caret {
+  0%, 50% { opacity: 1; }
+  50.01%, 100% { opacity: 0; }
+}
+
+/* --------------------------------------------------------------------------
+   Projects — a horizontal filmstrip, pinned and driven by vertical scroll
+   -------------------------------------------------------------------------- */
+
+.rail {
+  position: relative;
+  background: var(--surface);
+}
+
+.rail__viewport {
+  position: sticky;
+  inset-block-start: 0;
+  height: 100svh;
+  overflow: hidden;
+  display: grid;
+  align-content: center;
+}
+
+.rail__track {
+  display: flex;
+  /* Each panel keeps its own height. Stretching them to the tallest — the
+     lead panel, which carries the whole summary — leaves a void under every
+     photograph, worst of all on a phone. */
+  align-items: center;
+  gap: clamp(1rem, 2vw, 2rem);
+  padding-inline: var(--gutter);
+  will-change: transform;
+}
+
+.rail__panel {
+  position: relative;
+  flex: none;
+  width: clamp(17rem, 46vw, 34rem);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--panel);
+  transition: border-color 0.4s var(--ease-hover), box-shadow 0.4s var(--ease-hover);
+}
+
+.rail__panel:hover {
+  border-color: var(--gold-dim);
+  box-shadow: 0 0 40px -14px var(--gold-glow);
+}
+
+.rail__figure {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+}
+
+.rail__figure img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s var(--ease-hover);
+}
+
+.rail__panel:hover .rail__figure img {
+  transform: scale(1.02);
+}
+
+/* The spec sheet rides up from the bottom edge on approach. */
+.rail__spec {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  padding: 1.25rem clamp(1rem, 2vw, 1.5rem);
+  background: linear-gradient(to top, rgba(5, 7, 12, 0.96), rgba(5, 7, 12, 0.7) 70%, transparent);
+  transform: translateY(101%);
+  transition: transform 0.5s var(--ease-hover);
+}
+
+.rail__panel:hover .rail__spec,
+.rail__panel:focus-within .rail__spec {
+  transform: translateY(0);
+}
+
+.rail__spec-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-block: 0.4375rem;
+  border-block-end: 1px solid var(--line);
   font-size: var(--step--1);
-  max-width: 46ch;
-  margin-block-start: 1rem;
 }
 
-.project__gallery {
+.rail__spec-row:last-child { border-block-end: 0; }
+.rail__spec-key { color: var(--ink-3); }
+.rail__spec-val { color: var(--ink); font-weight: 600; }
+
+.rail__caption {
+  padding: 1.125rem clamp(1rem, 2vw, 1.5rem) 1.375rem;
+  border-block-start: 1px solid var(--line);
+}
+
+.rail__index {
+  color: var(--steel);
+  display: block;
+  margin-block-end: 0.375rem;
+}
+
+.rail__caption-text {
+  font-size: var(--step--1);
+  color: var(--ink-2);
+  line-height: 1.6;
+}
+
+/* The lead panel carries the project's name and summary rather than a plate. */
+.rail__panel--lead {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(0.5rem, 0.4rem + 0.5vw, 0.875rem);
-  margin-block-start: clamp(0.5rem, 0.4rem + 0.5vw, 0.875rem);
+  align-content: center;
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  background: var(--paper);
 }
 
-.project__body {
-  display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
-  gap: clamp(2rem, 1rem + 3vw, 3.5rem);
-  margin-block-start: clamp(2rem, 1.5rem + 2vw, 3rem);
-  align-items: start;
-}
-
-.project__name {
+.rail__name {
   font-size: var(--step-2);
   font-weight: 800;
   line-height: 1.15;
-  margin-block-end: 1rem;
+  margin-block: 0.875rem 1rem;
 }
 
-[lang="ar"] .project__name {
-  font-weight: 700;
-  line-height: 1.45;
-}
+[lang="ar"] .rail__name { font-weight: 700; line-height: 1.45; }
 
-.project__summary {
+.rail__summary {
   color: var(--ink-2);
-  max-width: var(--measure);
-  font-size: var(--step-1);
   font-weight: 300;
   line-height: 1.65;
 }
 
-[lang="ar"] .project__summary {
-  font-weight: 400;
-  line-height: 1.9;
+[lang="ar"] .rail__summary { font-weight: 400; line-height: 1.9; }
+
+.rail__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-block-start: 1.5rem;
 }
 
-/* What the unit does, one claim per rule. */
-.project__points {
-  display: grid;
-  margin-block-start: clamp(1.5rem, 1.25rem + 1vw, 2rem);
-  border-block-start: 1px solid var(--line);
+.rail__tag {
+  padding: 0.3125rem 0.75rem;
+  border: 1px solid var(--steel-dim);
+  border-radius: var(--radius);
+  font-size: 0.75rem;
+  color: var(--steel);
+  font-family: var(--font-mono);
+  letter-spacing: 0.08em;
 }
 
-.project__point {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 0.875rem;
-  align-items: baseline;
-  padding-block: 0.875rem;
-  border-block-end: 1px solid var(--line);
-  font-size: var(--step--1);
-  color: var(--ink-2);
+[lang="ar"] .rail__tag {
+  font-family: var(--font-sans);
+  letter-spacing: 0;
+  font-size: 0.8125rem;
 }
 
-.project__point::before {
+/* A progress rule under the strip, so the reader can see how far the pin runs. */
+.rail__progress {
+  position: absolute;
+  inset-block-end: clamp(2rem, 6vh, 4rem);
+  inset-inline: var(--gutter);
+  height: 1px;
+  background: var(--line-strong);
+}
+
+.rail__progress::after {
   content: "";
-  width: 5px;
-  height: 5px;
-  background: var(--gold);
-  transform: rotate(45deg);
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to var(--sweep-to, right), var(--gold), var(--steel));
+  transform: scaleX(var(--rail-progress, 0));
+  transform-origin: left center;
 }
 
-/*
- * The parameter block. A datasheet is how this team describes a thing it has
- * built, so the facts already in the page — its state, its award, the
- * disciplines it crosses — are set as parameters rather than as prose or as
- * chips floating in space.
- */
-.spec {
-  border-block-start: 1px solid var(--line-bright);
+[dir="rtl"] .rail__progress::after {
+  --sweep-to: left;
+  transform-origin: right center;
 }
 
-.spec__row {
+/* --------------------------------------------------------------------------
+   Capabilities — a bento grid. Six cells, each with a gradient edge and a
+   drawn icon; the two leading cells run wide so the grid has a rhythm rather
+   than being six identical boxes.
+   -------------------------------------------------------------------------- */
+
+.bento {
   display: grid;
-  grid-template-columns: minmax(0, 7rem) minmax(0, 1fr);
-  gap: 0.5rem 1rem;
-  padding-block: 0.875rem;
-  border-block-end: 1px solid var(--line);
-  align-items: baseline;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: clamp(0.625rem, 0.5rem + 0.6vw, 1rem);
 }
 
-.spec__key {
-  color: var(--ink-3);
+.bento__cell {
+  position: relative;
+  grid-column: span 2;
+  padding: clamp(1.25rem, 2.2vw, 1.875rem);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  overflow: hidden;
+  transition: background-color 0.4s var(--ease-hover);
 }
 
-.spec__val {
-  font-size: var(--step--1);
-  color: var(--ink);
-  font-weight: 600;
+.bento__cell:nth-child(1),
+.bento__cell:nth-child(2) {
+  grid-column: span 3;
 }
 
-.spec__val--award {
+/* The gradient edge: a 1px ring drawn with a masked gradient, so the border
+   itself carries the two accents instead of being a flat colour. */
+.bento__cell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(140deg, var(--line-bright), transparent 45%, var(--line) 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  transition: background 0.4s var(--ease-hover);
+}
+
+.bento__cell:hover::before {
+  background: linear-gradient(140deg, var(--steel), transparent 50%, var(--gold-dim) 100%);
+}
+
+.bento__cell:hover {
+  background: var(--surface-2);
+}
+
+.bento__icon {
+  width: 1.75rem;
+  height: 1.75rem;
+  color: var(--steel);
+  margin-block-end: 1rem;
+  transition: color 0.4s var(--ease-hover);
+}
+
+.bento__cell:hover .bento__icon {
   color: var(--gold);
 }
 
-.spec__list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.375rem 0.75rem;
-  font-size: var(--step--1);
-  color: var(--ink-2);
-  font-weight: 500;
-}
-
-/* Separated by a rule rather than boxed — the disciplines are a list, not six
-   buttons. */
-.spec__list li + li {
-  padding-inline-start: 0.75rem;
-  border-inline-start: 1px solid var(--line-strong);
-}
-
-/* --------------------------------------------------------------------------
-   Capabilities — a register, not a card grid
-
-   Six things this team works on. A card for each would be six boxes saying
-   nothing; a ruled register says the same in a third of the space and looks
-   like the document it belongs to.
-   -------------------------------------------------------------------------- */
-
-.caps {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  column-gap: clamp(2rem, 1rem + 3vw, 4rem);
-  border-block-start: 1px solid var(--line);
-}
-
-.cap {
-  position: relative;
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 0.25rem 1rem;
-  align-items: baseline;
-  padding-block: 1.125rem;
-  border-block-end: 1px solid var(--line);
-}
-
-/* The tick is the register's own mark: it is drawn on approach, in the gutter,
-   and it costs one pseudo-element. */
-.cap::before {
-  content: "";
-  width: 0;
-  height: 1px;
-  background: var(--gold);
-  transition: width 0.2s ease;
-  align-self: center;
-  margin-block-start: 0.125rem;
-}
-
-.cap:hover::before {
-  width: 0.75rem;
-}
-
-.cap__title {
+.bento__title {
   font-size: var(--step-0);
   font-weight: 700;
-  grid-column: 2;
+  margin-block-end: 0.25rem;
 }
 
-.cap__body {
+.bento__body {
   color: var(--ink-3);
   font-size: var(--step--1);
   line-height: 1.6;
-  grid-column: 2;
 }
 
-[lang="ar"] .cap__body {
-  line-height: 1.8;
-}
+[lang="ar"] .bento__body { line-height: 1.8; }
 
 /* --------------------------------------------------------------------------
-   Process — five marks on a rule. A real sequence, so it is numbered.
+   Methodology — a vertical timeline. A glowing rule runs down the centre, and
+   each step's number sits behind its own content at 10% opacity.
    -------------------------------------------------------------------------- */
 
 .flow {
+  position: relative;
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 0 clamp(0.75rem, 0.5rem + 1vw, 1.75rem);
+  gap: clamp(1.5rem, 1.25rem + 1.4vw, 2.5rem);
+  padding-inline-start: clamp(2.5rem, 6vw, 5rem);
+}
+
+/* The line. It fills as the section is read; `--flow-progress` comes from the
+   component. */
+.flow::before {
+  content: "";
+  position: absolute;
+  inset-block: 0.5rem 0;
+  inset-inline-start: clamp(0.75rem, 2vw, 1.75rem);
+  width: 1px;
+  background: var(--line-strong);
+}
+
+.flow::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 0.5rem;
+  inset-inline-start: clamp(0.75rem, 2vw, 1.75rem);
+  width: 1px;
+  height: calc((100% - 0.5rem) * var(--flow-progress, 0));
+  background: var(--gold);
+  box-shadow: 0 0 12px var(--gold-glow);
 }
 
 .flow__step {
   position: relative;
-  padding-block-start: 1.25rem;
-  border-block-start: 1px solid var(--line-strong);
 }
 
+/* The node on the line. */
 .flow__step::before {
   content: "";
   position: absolute;
-  inset-block-start: -3px;
-  inset-inline-start: 0;
-  width: 5px;
-  height: 5px;
-  background: var(--gold);
+  inset-block-start: clamp(1.4rem, 2.8vw, 2.3rem);
+  inset-inline-start: calc(clamp(0.75rem, 2vw, 1.75rem) - clamp(2.5rem, 6vw, 5rem) - 3px);
+  width: 7px;
+  height: 7px;
+  background: var(--paper);
+  border: 1px solid var(--gold);
   transform: rotate(45deg);
 }
 
+/*
+ * The number sits behind its own label rather than beside it. The label is
+ * inset far enough that the leading digit stays uncovered, so the two read as
+ * one layered mark instead of colliding — which is what happens when both
+ * start on the same edge.
+ */
 .flow__index {
-  display: block;
-  color: var(--ink-3);
-  margin-block-end: 0.375rem;
+  position: absolute;
+  inset-block-start: -0.28em;
+  inset-inline-start: 0;
+  font-family: var(--font-mono);
+  font-size: clamp(3.25rem, 8vw, 5.5rem);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--ink);
+  opacity: 0.1;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .flow__label {
-  font-size: var(--step-1);
+  position: relative;
+  z-index: 1;
+  display: block;
+  padding-inline-start: clamp(2.25rem, 5vw, 4rem);
+  padding-block: clamp(0.75rem, 2vw, 1.5rem);
+  font-size: var(--step-2);
   font-weight: 700;
 }
 
 /* --------------------------------------------------------------------------
-   Founder — the person is the headline
-
-   Not a bio card beside a portrait: a plate, a name at display scale, the
-   sentence that says what he does set large, and a title block that signs the
-   section the way a drawing is signed.
+   Founder — its own route, 40/60, editorial
    -------------------------------------------------------------------------- */
 
-.founder {
+.founder-page {
+  padding-block: calc(var(--header-h) + clamp(3rem, 6vw, 6rem)) var(--section-y);
+}
+
+.founder-grid {
   display: grid;
-  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr);
-  gap: clamp(2rem, 1.25rem + 4vw, 4.5rem);
-  align-items: end;
+  grid-template-columns: minmax(0, 40fr) minmax(0, 60fr);
+  gap: clamp(2rem, 1.5rem + 4vw, 5rem);
+  align-items: start;
 }
 
-.founder__media {
+.founder-portrait {
   position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: var(--radius-media);
+  background: var(--surface-2);
 }
 
-/* The needle again, down the leading edge of the plate. */
-.founder__media::before {
+/* The plate is taller than its frame so the slower travel reveals more of the
+   picture instead of exposing an edge. The overflow (10% each way) has to stay
+   larger than the parallax travel set in `FounderStory`. */
+.founder-portrait img {
+  position: absolute;
+  inset: -11% 0;
+  width: 100%;
+  height: 122%;
+  object-fit: cover;
+  object-position: 50% 28%;
+  filter: grayscale(1) contrast(1.08);
+  will-change: transform;
+}
+
+/* Fine grain, so the plate reads as printed rather than pasted on. */
+.founder-portrait::after {
   content: "";
   position: absolute;
-  inset-block: 0;
-  inset-inline-start: -1px;
-  width: 2px;
-  background: var(--gold);
+  inset: 0;
   z-index: 2;
+  pointer-events: none;
+  opacity: 0.16;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 140px 140px;
 }
 
-.founder__portrait {
-  aspect-ratio: 4 / 5;
-}
-
-.founder__portrait img {
-  object-position: 50% 28%;
-  filter: grayscale(1) contrast(1.06);
-  transition: filter 0.5s ease;
-}
-
-.founder:hover .founder__portrait img {
-  filter: grayscale(0) contrast(1);
-}
-
-.founder__label {
-  display: block;
-  color: var(--ink-3);
-  margin-block-end: 1rem;
-}
-
-.founder__name {
-  font-size: var(--step-3);
+.founder-name {
+  font-size: clamp(3rem, 6vw, 6rem);
   font-weight: 800;
-  line-height: 1.02;
-  letter-spacing: -0.03em;
-  margin-block-end: 0.75rem;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  margin-block: 0.75rem 0.75rem;
 }
 
-[lang="ar"] .founder__name {
+[lang="ar"] .founder-name {
   font-weight: 700;
-  line-height: 1.35;
+  line-height: 1.3;
   letter-spacing: 0;
 }
 
-.founder__role {
-  color: var(--ink-3);
-  margin-block-end: clamp(1.5rem, 1.25rem + 1vw, 2rem);
+.founder-role {
+  color: var(--steel);
+  margin-block-end: clamp(2rem, 4vw, 3rem);
 }
 
-/* The one sentence that says what he actually does, set at the size that
-   claim deserves. */
-.founder__lead {
+/* Each line is masked and lifts into place. */
+.mask-line {
+  overflow: hidden;
+}
+
+.mask-line > * {
+  display: block;
+  transform: translateY(110%);
+  transition: transform 0.9s var(--ease-enter);
+}
+
+.mask-line.is-in > * {
+  transform: none;
+}
+
+.founder-body {
+  font-size: 1.125rem;
+  line-height: 1.7;
+  color: var(--ink-2);
+  max-width: 52ch;
+}
+
+[lang="ar"] .founder-body { line-height: 1.95; }
+
+.founder-body p + p { margin-block-start: 1.25rem; }
+
+.founder-quote {
+  margin-block: clamp(2.5rem, 5vw, 4rem);
+  padding-inline-start: 1.5rem;
+  border-inline-start: 2px solid var(--gold);
   font-size: var(--step-2);
   font-weight: 300;
-  line-height: 1.3;
-  letter-spacing: -0.015em;
+  line-height: 1.35;
   color: var(--ink);
-  max-width: 22ch;
-  margin-block-end: 1.25rem;
-  text-wrap: balance;
+  max-width: 24ch;
+  min-height: 2.7em;
 }
 
-[lang="ar"] .founder__lead {
+[lang="ar"] .founder-quote {
   font-weight: 400;
   line-height: 1.6;
-  letter-spacing: 0;
-  max-width: 26ch;
+  max-width: 28ch;
 }
 
-.founder__body {
-  color: var(--ink-2);
-  max-width: 46ch;
-  font-weight: 300;
-  line-height: 1.7;
+.founder-quote__caret {
+  display: inline-block;
+  width: 0.55ch;
+  height: 0.95em;
+  margin-inline-start: 0.15ch;
+  background: var(--gold);
+  vertical-align: -0.08em;
+  animation: caret 1s steps(1) infinite;
 }
 
-[lang="ar"] .founder__body {
-  font-weight: 400;
-  line-height: 1.9;
-}
-
-/* The signature: the mark, the wordmark, and the role — a drawing's title
-   block, closing the section the founder opened. */
-.founder__sign {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-block-start: clamp(1.75rem, 1.5rem + 1.25vw, 2.5rem);
-  padding-block-start: 1.25rem;
-  border-block-start: 1px solid var(--line-strong);
-}
-
-.founder__sign-mark {
-  width: 1.75rem;
-  height: 1.75rem;
-  flex: none;
-  color: var(--ink-3);
-}
-
-.founder__sign-text {
-  color: var(--ink-3);
-}
-
-.founder__cta {
-  margin-inline-start: auto;
-}
+.founder-quote__caret.is-done { display: none; }
 
 /* --------------------------------------------------------------------------
    Contact
@@ -1309,7 +1891,7 @@ textarea {
   font-size: var(--step-3);
   font-weight: 800;
   line-height: 1.05;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
   margin-block-end: 1.25rem;
   max-width: 13ch;
   text-wrap: balance;
@@ -1332,20 +1914,22 @@ textarea {
   color: var(--gold);
   font-weight: 600;
   border-block-end: 1px solid var(--gold-dim);
-  transition: border-color 0.16s ease;
+  transition: border-color 0.3s var(--ease-hover);
 }
 
-.contact__full-link:hover {
-  border-block-end-color: var(--gold);
-}
+.contact__full-link:hover { border-block-end-color: var(--gold); }
 
 /* --------------------------------------------------------------------------
-   Footer
+   Footer — the wordmark at full width, clipped by the bottom edge
    -------------------------------------------------------------------------- */
 
 .footer {
+  position: relative;
+  z-index: 1;
+  background: #030509;
   border-block-start: 1px solid var(--line);
-  padding-block: clamp(2.5rem, 2rem + 2vw, 3.5rem) 1.75rem;
+  padding-block: clamp(2.5rem, 2rem + 2vw, 3.5rem) 0;
+  overflow: hidden;
 }
 
 .footer__grid {
@@ -1362,24 +1946,34 @@ textarea {
   font-family: var(--font-mono);
 }
 
+.footer__langs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  margin-block-start: 1.25rem;
+}
+
+.footer__langs .footer__link[aria-current] {
+  color: var(--ink);
+  font-weight: 600;
+}
+
 .footer__title {
   color: var(--ink-3);
   margin-block-end: 0.875rem;
 }
 
-.footer__list {
-  display: grid;
-  gap: 0.5rem;
-}
+.footer__list { display: grid; gap: 0.5rem; }
 
 .footer__link {
   font-size: var(--step--1);
   color: var(--ink-2);
-  transition: color 0.16s ease;
+  transition: color 0.3s var(--ease-hover), text-shadow 0.3s var(--ease-hover);
 }
 
 .footer__link:hover {
   color: var(--gold);
+  text-shadow: 0 0 12px var(--gold-glow);
 }
 
 .footer__bottom {
@@ -1393,6 +1987,30 @@ textarea {
   border-block-start: 1px solid var(--line);
   color: var(--ink-3);
   font-size: var(--step--1);
+  font-family: var(--font-mono);
+}
+
+[lang="ar"] .footer__bottom:lang(ar) {
+  font-family: var(--font-sans);
+}
+
+/* The wordmark spans the footer and is cut off by its bottom edge. Always
+   Latin — a brand name, not a translated string — so it is never mirrored. */
+.footer__wordmark {
+  display: block;
+  margin-block-start: clamp(1.5rem, 4vw, 3rem);
+  margin-block-end: -0.22em;
+  font-size: clamp(3.5rem, 15.5vw, 15rem);
+  font-weight: 800;
+  line-height: 0.8;
+  letter-spacing: -0.03em;
+  text-align: center;
+  color: transparent;
+  background: linear-gradient(to bottom, rgba(232, 237, 245, 0.14), rgba(232, 237, 245, 0.02));
+  -webkit-background-clip: text;
+  background-clip: text;
+  user-select: none;
+  white-space: nowrap;
 }
 
 /* --------------------------------------------------------------------------
@@ -1400,7 +2018,7 @@ textarea {
    -------------------------------------------------------------------------- */
 
 .start-hero {
-  padding-block: clamp(2.5rem, 2rem + 3vw, 4rem) clamp(2rem, 1.5rem + 2vw, 3rem);
+  padding-block: calc(var(--header-h) + clamp(2rem, 4vw, 3.5rem)) clamp(2rem, 1.5rem + 2vw, 3rem);
   border-block-end: 1px solid var(--line);
 }
 
@@ -1408,7 +2026,7 @@ textarea {
   font-size: var(--step-3);
   font-weight: 800;
   line-height: 1.05;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
   margin-block: 0.75rem 1rem;
   max-width: 16ch;
 }
@@ -1441,10 +2059,7 @@ textarea {
   margin-block-end: 1rem;
 }
 
-.start-aside__list {
-  display: grid;
-  gap: 0.875rem;
-}
+.start-aside__list { display: grid; gap: 0.875rem; }
 
 .start-aside__item {
   font-size: var(--step--1);
@@ -1452,31 +2067,17 @@ textarea {
   line-height: 1.65;
 }
 
-[lang="ar"] .start-aside__item {
-  line-height: 1.85;
-}
+[lang="ar"] .start-aside__item { line-height: 1.85; }
 
 /* --------------------------------------------------------------------------
    Form
    -------------------------------------------------------------------------- */
 
-.form {
-  max-width: 42rem;
-}
+.form { max-width: 42rem; }
+.form--compact { max-width: none; }
 
-.form--compact {
-  max-width: none;
-}
-
-.form__fieldset {
-  border: 0;
-  padding: 0;
-  margin: 0;
-}
-
-.form__fieldset + .form__fieldset {
-  margin-block-start: 2.5rem;
-}
+.form__fieldset { border: 0; padding: 0; margin: 0; }
+.form__fieldset + .form__fieldset { margin-block-start: 2.5rem; }
 
 .form__legend {
   padding: 0;
@@ -1490,18 +2091,10 @@ textarea {
   gap: 1.125rem 1.25rem;
 }
 
-.form__row + .form__row {
-  margin-block-start: 1.125rem;
-}
+.form__row + .form__row { margin-block-start: 1.125rem; }
 
-.field {
-  display: grid;
-  gap: 0.4375rem;
-}
-
-.field--full {
-  grid-column: 1 / -1;
-}
+.field { display: grid; gap: 0.4375rem; }
+.field--full { grid-column: 1 / -1; }
 
 .field__label {
   font-size: 0.875rem;
@@ -1512,16 +2105,8 @@ textarea {
   gap: 0.375rem;
 }
 
-.field__opt {
-  font-size: 0.75rem;
-  font-weight: 400;
-  color: var(--ink-3);
-}
-
-.field__req {
-  color: var(--gold);
-  font-weight: 700;
-}
+.field__opt { font-size: 0.75rem; font-weight: 400; color: var(--ink-3); }
+.field__req { color: var(--gold); font-weight: 700; }
 
 .field__control {
   width: 100%;
@@ -1531,56 +2116,35 @@ textarea {
   border-radius: var(--radius);
   font-size: var(--step-0);
   line-height: 1.6;
-  transition: border-color 0.16s ease, box-shadow 0.16s ease;
+  transition: border-color 0.3s var(--ease-hover), box-shadow 0.3s var(--ease-hover);
   -webkit-appearance: none;
   appearance: none;
 }
 
-.field__control::placeholder {
-  color: var(--ink-3);
-  opacity: 0.75;
-}
-
-.field__control:hover {
-  border-color: var(--ink-3);
-}
+.field__control::placeholder { color: var(--ink-3); opacity: 0.75; }
+.field__control:hover { border-color: var(--ink-3); }
 
 .field__control:focus {
   outline: none;
   border-color: var(--gold);
-  box-shadow: 0 0 0 3px var(--gold-tint);
+  box-shadow: 0 0 0 3px rgba(217, 174, 69, 0.14);
 }
 
-.field__control[aria-invalid="true"] {
-  border-color: #f2837c;
-}
+.field__control[aria-invalid="true"] { border-color: #f2837c; }
 
-textarea.field__control {
-  min-height: 7.5rem;
-  resize: vertical;
-}
+textarea.field__control { min-height: 7.5rem; resize: vertical; }
 
 select.field__control {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%2375828f' stroke-width='1.5' stroke-linecap='square'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%238a92a5' stroke-width='1.5' stroke-linecap='square'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 0.9375rem center;
   padding-inline-end: 2.375rem;
 }
 
-[dir="rtl"] select.field__control {
-  background-position: left 0.9375rem center;
-}
+[dir="rtl"] select.field__control { background-position: left 0.9375rem center; }
 
-.field__error {
-  font-size: 0.8125rem;
-  color: #f2837c;
-  font-weight: 500;
-}
-
-.field__hint {
-  font-size: 0.8125rem;
-  color: var(--ink-3);
-}
+.field__error { font-size: 0.8125rem; color: #f2837c; font-weight: 500; }
+.field__hint { font-size: 0.8125rem; color: var(--ink-3); }
 
 .files__input {
   position: absolute;
@@ -1590,12 +2154,7 @@ select.field__control {
   pointer-events: none;
 }
 
-.files__row {
-  display: flex;
-  align-items: center;
-  gap: 0.875rem;
-  flex-wrap: wrap;
-}
+.files__row { display: flex; align-items: center; gap: 0.875rem; flex-wrap: wrap; }
 
 .files__btn {
   display: inline-flex;
@@ -1607,24 +2166,12 @@ select.field__control {
   font-weight: 600;
   color: var(--ink-2);
   cursor: pointer;
-  transition: border-color 0.18s ease, color 0.18s ease;
+  transition: border-color 0.3s var(--ease-hover), color 0.3s var(--ease-hover);
 }
 
-.files__btn:hover {
-  border-color: var(--gold);
-  color: var(--gold);
-}
-
-.files__empty {
-  font-size: 0.875rem;
-  color: var(--ink-3);
-}
-
-.files__list {
-  display: grid;
-  gap: 0.5rem;
-  margin-block-start: 0.75rem;
-}
+.files__btn:hover { border-color: var(--gold); color: var(--gold); }
+.files__empty { font-size: 0.875rem; color: var(--ink-3); }
+.files__list { display: grid; gap: 0.5rem; margin-block-start: 0.75rem; }
 
 .files__item {
   display: flex;
@@ -1636,20 +2183,8 @@ select.field__control {
   font-size: 0.875rem;
 }
 
-.files__name {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.files__size {
-  color: var(--ink-3);
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  flex: none;
-}
+.files__name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.files__size { color: var(--ink-3); font-family: var(--font-mono); font-size: 0.75rem; flex: none; }
 
 .files__remove {
   flex: none;
@@ -1661,16 +2196,9 @@ select.field__control {
   border-radius: var(--radius);
 }
 
-.files__remove:hover {
-  color: #f2837c;
-}
+.files__remove:hover { color: #f2837c; }
 
-.form__footer {
-  margin-block-start: 2rem;
-  display: grid;
-  gap: 0.875rem;
-  justify-items: start;
-}
+.form__footer { margin-block-start: 2rem; display: grid; gap: 0.875rem; justify-items: start; }
 
 .form__required-note,
 .form__privacy {
@@ -1690,15 +2218,9 @@ select.field__control {
   margin-block-end: 1.5rem;
 }
 
-.form__alert-title {
-  font-weight: 700;
-  margin-block-end: 0.25rem;
-}
+.form__alert-title { font-weight: 700; margin-block-end: 0.25rem; }
 
-.form-success {
-  max-width: 42rem;
-  border-radius: var(--radius);
-}
+.form-success { max-width: 42rem; border-radius: var(--radius); }
 
 .form-success__mark {
   width: 2.5rem;
@@ -1708,30 +2230,19 @@ select.field__control {
   border: 1px solid var(--gold);
   color: var(--gold);
   margin-block-end: 1.25rem;
+  box-shadow: 0 0 24px -8px var(--gold-glow);
 }
 
-.form-success__title {
-  font-size: var(--step-2);
-  font-weight: 800;
-  margin-block-end: 0.5rem;
-}
-
-[lang="ar"] .form-success__title {
-  font-weight: 700;
-}
-
-.form-success__body {
-  color: var(--ink-2);
-  max-width: 46ch;
-  margin-block-end: 1.5rem;
-}
+.form-success__title { font-size: var(--step-2); font-weight: 800; margin-block-end: 0.5rem; }
+[lang="ar"] .form-success__title { font-weight: 700; }
+.form-success__body { color: var(--ink-2); max-width: 46ch; margin-block-end: 1.5rem; }
 
 /* --------------------------------------------------------------------------
    404
    -------------------------------------------------------------------------- */
 
 .nf {
-  min-height: 60vh;
+  min-height: 70svh;
   display: grid;
   align-content: center;
   gap: 1rem;
@@ -1745,37 +2256,21 @@ select.field__control {
   color: var(--gold);
 }
 
-.nf__title {
-  font-size: var(--step-3);
-  font-weight: 800;
-}
-
-[lang="ar"] .nf__title {
-  font-weight: 700;
-}
+.nf__title { font-size: var(--step-3); font-weight: 800; }
+[lang="ar"] .nf__title { font-weight: 700; }
 
 /* --------------------------------------------------------------------------
-   Motion
-
-   Four things move on this site: the film across the hero's exit, one short
-   entrance per block, the photographs settling as they enter frame, and the
-   reading hairline. Everything else is a state change on a hairline.
+   Entrances
    -------------------------------------------------------------------------- */
 
 .reveal {
-  transition: opacity 0.4s cubic-bezier(0.22, 0.61, 0.36, 1),
-    transform 0.4s cubic-bezier(0.22, 0.61, 0.36, 1);
+  transition: opacity 0.7s var(--ease-enter), transform 0.7s var(--ease-enter);
 }
 
-/*
- * The starting state is applied only where scripting can undo it. Browsers
- * with JavaScript off — and any browser that does not understand this query —
- * skip the block and render the content visible.
- */
 @media (scripting: enabled) {
   .reveal {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(14px);
   }
 }
 
@@ -1788,49 +2283,17 @@ select.field__control {
   position: fixed;
   inset-block-start: 0;
   inset-inline: 0;
-  z-index: 60;
+  z-index: 110;
   height: 1px;
-  background: var(--gold);
-  transform: scaleX(0);
+  background: linear-gradient(to var(--sweep-to, right), var(--gold), var(--steel));
+  transform: scaleX(var(--page-progress, 0));
   transform-origin: left center;
   pointer-events: none;
 }
 
 [dir="rtl"] .scroll-progress {
+  --sweep-to: left;
   transform-origin: right center;
-}
-
-@keyframes progress-x {
-  from {
-    transform: scaleX(0);
-  }
-  to {
-    transform: scaleX(1);
-  }
-}
-
-@keyframes ease-scale {
-  from {
-    transform: scale(1.04);
-  }
-  to {
-    transform: scale(1);
-  }
-}
-
-@supports (animation-timeline: scroll()) {
-  .scroll-progress {
-    animation: progress-x linear both;
-    animation-timeline: scroll(root block);
-  }
-}
-
-@supports (animation-timeline: view()) {
-  .media img {
-    animation: ease-scale linear both;
-    animation-timeline: view();
-    animation-range: entry 5% cover 45%;
-  }
 }
 
 /* --------------------------------------------------------------------------
@@ -1838,46 +2301,35 @@ select.field__control {
    -------------------------------------------------------------------------- */
 
 @media (max-width: 1024px) {
-  .project__body,
-  .contact {
+  .contact,
+  .award__grid {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .footer__grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .founder-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2.5rem;
+  }
+
+  .footer__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+  .bento__cell,
+  .bento__cell:nth-child(1),
+  .bento__cell:nth-child(2) {
+    grid-column: span 3;
   }
 }
 
 @media (max-width: 860px) {
   .nav,
-  .header__cta {
-    display: none;
-  }
+  .header__cta { display: none; }
 
-  /* The middle track carries nothing here, so it is dropped rather than left
-     to contribute its gaps. */
-  .header__inner {
-    grid-template-columns: minmax(0, 1fr) auto;
-  }
+  .header__inner { grid-template-columns: minmax(0, 1fr) auto; }
+  .header__actions { grid-column: 2; }
+  .nav-toggle { display: inline-flex; }
+  .mobile-nav { display: block; }
 
-  .header__actions {
-    grid-column: 2;
-  }
-
-  .nav-toggle {
-    display: inline-flex;
-  }
-
-  .mobile-nav {
-    display: block;
-  }
-
-  .nav-scrim {
-    display: block;
-  }
-
-  /* The rail turns over: the needle runs across the top of the label rather
-     than down its edge, so the title block still reads as one on a phone. */
+  /* The rail turns over: the needle runs across the top of the label. */
   .sec {
     grid-template-columns: minmax(0, 1fr);
     gap: 1.25rem;
@@ -1903,83 +2355,36 @@ select.field__control {
     height: 2px;
   }
 
-  .start-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .start-aside {
-    position: static;
-    order: -1;
-  }
-
-  .founder {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 2rem;
-  }
-
-  /* Five labels stop fitting on one line well before the nav does. */
-  .flow {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1.75rem clamp(0.75rem, 0.5rem + 1vw, 1.75rem);
-  }
+  .start-grid { grid-template-columns: minmax(0, 1fr); }
+  .start-aside { position: static; order: -1; }
 }
 
 @media (max-width: 620px) {
-  .caps,
-  .form__row {
+  .form__row { grid-template-columns: minmax(0, 1fr); }
+
+  .bento {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .flow {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .bento__cell,
+  .bento__cell:nth-child(1),
+  .bento__cell:nth-child(2) {
+    grid-column: span 1;
   }
 
-  .hero__actions .btn {
-    width: 100%;
-  }
+  .hero__actions .btn { width: 100%; }
 
-  .spec__row {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 0.25rem;
-  }
+  .footer__grid { grid-template-columns: minmax(0, 1fr); gap: 1.75rem; }
 
-  .footer__grid {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 1.75rem;
-  }
-
-  .founder__sign {
-    flex-wrap: wrap;
-    gap: 1rem;
-  }
-
-  .founder__cta {
-    margin-inline-start: 0;
-    width: 100%;
-  }
+  .rail__panel { width: 78vw; }
 }
 
 @media (max-width: 380px) {
-  :root {
-    --gutter: 1rem;
-  }
-
-  .header__actions {
-    gap: 0.375rem;
-  }
-
-  .brand {
-    gap: 0.5rem;
-  }
-
-  .brand__mark {
-    width: 1.625rem;
-    height: 1.625rem;
-  }
-
-  .lang-toggle__opt {
-    padding-inline: 0.25rem;
-  }
+  :root { --gutter: 1rem; }
+  .header__actions { gap: 0.375rem; }
+  .brand { gap: 0.5rem; }
+  .brand__mark { width: 1.625rem; height: 1.625rem; }
+  .lang-toggle__opt { padding-inline: 0.25rem; }
 }
 
 /* --------------------------------------------------------------------------
@@ -1987,10 +2392,6 @@ select.field__control {
    -------------------------------------------------------------------------- */
 
 @media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-
   *,
   *::before,
   *::after {
@@ -1999,32 +2400,64 @@ select.field__control {
     transition-duration: 0.001ms !important;
   }
 
-  .reveal {
-    opacity: 1;
-    transform: none;
+  .reveal { opacity: 1; transform: none; }
+
+  /* Nothing is pinned and nothing is scrubbed: the hero becomes a single
+     screen showing the poster, and the strip scrolls the way a list does. */
+  .hero { height: auto; }
+
+  .hero__stage {
+    position: static;
+    height: auto;
+    min-height: 82svh;
   }
 
-  /* Scroll-driven animations ignore duration; the timeline itself is removed. */
-  .media img,
-  .scroll-progress {
-    animation-timeline: none !important;
-    animation: none !important;
-    transform: none;
+  h1.hero__statement,
+  .hero__statement { clip-path: none !important; }
+
+  .hero__beat {
+    grid-area: auto;
+    opacity: 1 !important;
+    transform: none !important;
   }
 
-  .scroll-progress {
-    display: none;
+  /* Only the first beat carries the heading and the actions, so stacking the
+     rest would repeat the same block; they are dropped instead. */
+  .hero__beat + .hero__beat { display: none; }
+
+  .hero__hint { display: none; }
+
+  .rail__viewport {
+    position: static;
+    height: auto;
+    overflow: visible;
   }
 
-  /* No footage is fetched under reduced motion, so the scale has nothing to
-     report. */
-  .hero__scale-mark {
-    display: none;
+  .rail__track {
+    flex-wrap: wrap;
+    transform: none !important;
   }
 
-  .founder__portrait img {
-    transition: none;
-  }
+  .rail__panel { width: min(100%, 34rem); }
+  .rail__progress { display: none; }
+  .rail__spec { position: static; transform: none; background: none; }
+
+  .award__plate { opacity: 1; transform: none; }
+  .award__assembly { transform: none; }
+  .award__badge { transform: none; }
+  .award__traces path,
+  .award__traces line { stroke-dashoffset: 0; }
+  .award__traces circle { opacity: 1; }
+  .award__dust { display: none; }
+  .award__caret,
+  .founder-quote__caret { display: none; }
+
+  .mask-line > * { transform: none; }
+  .founder-portrait img { transform: none !important; }
+  .cursor { display: none; }
+  .wipe { display: none; }
+  .scroll-progress { display: none; }
+  .hero__hint-rule { animation: none; }
 }
 
 @media print {
@@ -2032,35 +2465,31 @@ select.field__control {
   .footer,
   .skip-link,
   .scroll-progress,
-  .hero__scale,
-  .film,
+  .cursor,
+  .wipe,
+  .hero__film,
+  .hero__scrim,
+  .hero__hint,
+  .award__dust,
+  .award__traces,
   .hero__actions {
     display: none !important;
   }
 
   /* A block only loses its entrance once it has been scrolled past, so a page
-     printed without being read through would otherwise come out blank below
-     the fold. */
-  .reveal {
+     printed without being read through would otherwise come out blank. */
+  .reveal,
+  .mask-line > * {
     opacity: 1 !important;
     transform: none !important;
   }
 
-  body {
-    color: #000;
-    background: #fff;
-  }
-}
+  .hero { height: auto; }
+  .hero__stage { position: static; height: auto; }
+  .hero__beat { grid-area: auto; opacity: 1 !important; }
+  .hero__statement { clip-path: none !important; }
+  .rail__viewport { position: static; height: auto; overflow: visible; }
+  .rail__track { flex-wrap: wrap; transform: none !important; }
 
-/* The language pair in the footer, sitting with the brand. */
-.footer__langs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem 1rem;
-  margin-block-start: 1.25rem;
-}
-
-.footer__langs .footer__link[aria-current] {
-  color: var(--ink);
-  font-weight: 600;
+  body { color: #000; background: #fff; }
 }

@@ -31,24 +31,31 @@ npm run typecheck              # tsc --noEmit
 app/
   [lang]/                 ar | en — both prerendered at build time
     layout.tsx            root layout: <html lang dir>, fonts, header, footer
-    page.tsx              home: hero, about, projects, capabilities,
-                          process, founder, contact — the film runs in
-                          the hero and nowhere else
+    page.tsx              home: hero, award, about, projects,
+                          capabilities, method, founder, contact
+    founder/page.tsx      the founder's own route
     start/page.tsx        Start a Project — the long-form request
     not-found.tsx
   api/contact/route.ts    server-side form handler and email delivery
   globals.css             the entire design system, one file
   icon.svg                favicon
   robots.ts, sitemap.ts
-components/               Header, Footer, ProjectForm, FilmBackdrop,
-                          Reveal, Logo, Icons
+components/               Header, Footer, ProjectForm, Logo, Icons
+  HeroScene.tsx           the pinned, scroll-driven film
+  Award.tsx               NURAI 2026 — the monument
+  ProjectRail.tsx         the pinned horizontal filmstrip
+  Methodology.tsx         the method timeline
+  FounderStory.tsx        the founder route's editorial layout
+  SmoothScroll.tsx        Lenis, wired to the GSAP ticker
+  Cursor / Magnetic / RippleLink / PageWipe / MaskLines / Reveal
+  motion.ts               one GSAP + ScrollTrigger registration
 lib/
   i18n.ts                 every string on the site, in both languages
   mailer.ts               email transport (server-only)
   upload.ts               attachment limits shared by client and server
   site.ts                 canonical URL resolution
 public/images/            photography — see public/images/README.md
-public/media/             the hero film (one H.264, one VP9, one poster)
+public/media/             the hero film (three H.264 tiers, one VP9, one poster)
 ```
 
 ### Editing content
@@ -78,156 +85,176 @@ where its translation is missing.
 
 ## Theme and material
 
-**The site is dark, and only dark.** There is no toggle and no
-`localStorage` read: the palette is one `:root` block at the top of
-`app/globals.css` with `color-scheme: dark`. Nothing else in the stylesheet
-references a raw colour, so re-pitching the whole site means editing that one
-block.
+**The site is dark, and only dark.** There is no toggle and no `localStorage`
+read: the palette is one `:root` block at the top of `app/globals.css` with
+`color-scheme: dark`. Nothing else in the stylesheet references a raw colour,
+so re-pitching the whole site means editing that one block.
 
-The colours come from the official logo — deep navy ground, brushed steel, one
-gold accent. The mark itself is vector art in `components/Logo.tsx` — the open
-omega ring, the gear quadrant, the circuit traces, the gold needle — so it costs
-no network request and stays crisp at any size. `Wordmark` sets OMEGA in steel
-and TRON in gold as the logo does.
+### Two accents, and what each one means
+
+| Token | Value | What it marks |
+| --- | --- | --- |
+| `--gold` | `#d9ae45` | The needle through the centre of the logo mark. Achievement, the current state of a control, and the one action the page is asking for. |
+| `--steel` | `#4a90d9` | The trace colour of the board in the film. Data, instrumentation, position. It never means "click here". |
+
+The warm accent is the brand's own gold rather than a brighter amber, so the
+site matches the mark on the team's hardware, documents and badge — and the
+warm data points in the footage happen to sit on almost exactly that hue
+already. Everything else is greyscale, so the photographs and the film are the
+only saturated things on the page.
+
+`--ink` / `--ink-2` / `--ink-3` are 17:1, 10:1 and 6.4:1 against `--paper`, and
+`--steel` is 6:1, so every text token clears WCAG AA on its own without having
+to reason about what is behind it.
 
 ### The sheet
 
-Surfaces are drawn, not stacked. The vernacular this team actually works in is
-the datasheet and the engineering drawing, so that is the material: a near-black
-ground, hairlines in three weights, and one accent.
+Structure is drawn, not stacked. Every section is a narrow title block beside a
+wide content column (`.sec` / `.sec__rail` / `.sec__body`): a hairline runs the
+height of the rail on its leading edge with a short gold segment at its head —
+the needle from the mark. On a phone the rail turns over, and the needle runs
+across the top of the label instead of down its edge.
 
-**The rail.** Every section is a narrow title block beside a wide content
-column (`.sec` / `.sec__rail` / `.sec__body`). A hairline runs the height of the
-rail on its leading edge, and a short gold segment sits at the top of it — the
-needle from the logo mark. It is the same skeleton on every section, which is
-what makes the page read as one document rather than six blocks. On a phone the
-rail turns over: the needle runs across the top of the label instead of down its
-edge.
-
-**One accent, spent four times.** Gold is the only colour in the interface, and
-it appears on the rail segment, the award, the current state of a control, and
-the index mark on the hero scale. Everything else is greyscale, so the
-photographs and the film are the only saturated things on the page — the
-hardware is the only thing that glows.
-
-**Ink.** `--ink` / `--ink-2` / `--ink-3` are 16.5:1, 8.5:1 and 5.0:1 against
-`--paper`, so every text token clears WCAG AA for normal text on its own,
-without having to reason about what is behind it.
-
-**Radius is 2px.** Machined, not rounded, and not the zero-radius broadsheet
-look either.
-
-An earlier revision used a light frosted "liquid glass" material over the film.
-It was removed: three stacked `backdrop-filter` layers over a seeking video are
-expensive on a phone, dark type on a translucent pane has a contrast ratio that
-depends on whatever video frame happens to be behind it, and white frosted
-panes read as a generic product UI rather than as this team.
-
+Radius is 2px throughout. Machined, not rounded.
 
 ## Motion
 
-Four things move, and each of them is doing a job.
+Everything that moves is driven by scroll, through **GSAP ScrollTrigger** and
+**Lenis**. Those are the only two runtime dependencies the site has; there is no
+Tailwind, no animation library beyond GSAP, and no component kit.
 
-**The film across the hero's exit.** Scroll drives `video.currentTime`, and the
-same 0..1 figure is written to `--film-progress`, which places a gold index mark
-on the scale along the hero's bottom edge. The mechanism shows itself rather
-than being asserted.
+### The engine
 
-**One entrance per block.** A single IntersectionObserver adds `.is-in`; the
-transition is 0.4s over 8px. It never delays content — the starting state is
-only applied under `@media (scripting: enabled)`, so a browser with JavaScript
-off renders everything visible.
+`components/SmoothScroll.tsx` takes the wheel and the touch off the document
+and eases the real scroll position toward a target, so movement carries weight
+instead of snapping — lerp `0.09` on a pointer, `0.15` under a finger, which
+needs to keep up with the thumb. Because it drives the *native* scroll position
+rather than transforming the page, `position: sticky` — and therefore every
+pinned section — anchors, the scrollbar and find-in-page all keep working.
 
-**Photographs settle** out of a slight over-scale as they enter frame, and a
-**reading hairline** crosses the top of the viewport. Both are CSS
-scroll-driven animations, so they never touch the main thread.
+**Lenis and ScrollTrigger share one clock.** Left on separate loops, GSAP reads
+a scroll position Lenis has not written yet and every pinned section lags a
+frame behind the page. Lenis is stepped from GSAP's ticker and ScrollTrigger is
+updated from Lenis's own event; `gsap.ticker.lagSmoothing(0)` stops GSAP
+pausing the ticker mid-gesture after a long frame.
 
-Everything else is a state change on a hairline: a tick drawn under a nav item,
-a rule extending in the capabilities register, the founder's portrait coming out
-of monochrome.
+### What is pinned
 
-`prefers-reduced-motion` removes the timelines outright rather than shortening
-them, and no footage is fetched at all.
+Three sections hold the viewport while their content advances:
 
-### What was removed, and why
+| Section | Pin length | What advances |
+| --- | --- | --- |
+| Hero | `300svh` | The film scrubs; three beats of copy cross-fade over it |
+| Projects | viewport + strip overflow | The filmstrip is pulled sideways |
+| Award, Method | not pinned | Scrubbed in place as they are entered |
 
-Two mechanisms were taken out in the process, because both cost the visitor more
-than they returned:
+Pinning is done with `position: sticky`, not GSAP's own pin: it needs no
+pin-spacer in the DOM, survives a resize without re-measuring the document, and
+degrades to an ordinary block the moment it is switched off. The projects
+section sets its own height to the viewport plus exactly the strip's overflow,
+so the pin lasts as long as the horizontal run and not a pixel longer.
 
-- **The scroll damper** took the wheel *and* touch off the document and eased
-  the scroll position toward a target, replacing the platform's own momentum. It
-  put roughly 1.8 seconds between a wheel notch and the page settling, and on a
-  phone it `preventDefault`ed `touchmove` and reimplemented fling physics.
-- **The holds** appended a run of empty scroll to every section with the content
-  pinned inside it. Measured on the built site, they made the home page **11
-  viewport-heights tall** on a 1440x900 screen for six short sections, about 2.9
-  of which were empty; whole screens had nothing on them but the film, and
-  sections released into the sticky header and into each other.
+**No screen is ever empty.** A pinned section that hands over between states can
+leave a stretch of scroll with one thing gone and the next not yet arrived,
+which is a viewport of film and nothing to read. The hero's beat windows
+therefore overlap rather than meeting end to end. This is checked rather than
+assumed: walking the built page in 32 steps at 390px, 768px and 1440px, the
+emptiest screen still carries 45 characters of visible copy.
 
-The page is now 6.9 viewport-heights on the same screen, and scrolling is the
-platform's.
+### The rest
+
+- A custom cursor: an 8px dot in `mix-blend-mode: difference`, opening to 40px
+  over anything clickable. It is an *addition* to the system pointer, not a
+  replacement, so nothing is lost if it never renders. Fine pointers only.
+- Magnetic pull on the badge and the founder's call to action; a ripple where a
+  press lands.
+- A diagonal shutter between routes, skipped on first load.
+- One entrance per block, and mask-up line reveals on the founder page.
+
+`prefers-reduced-motion` removes all of it: no engine, no pins, no scrub, no
+cursor, no wipe, and the film is never fetched. The page becomes an ordinary
+document of 8.3 screens instead of 11.1.
 
 ## The hero
 
 No photograph — the film is the picture. A statement, a lead, two actions that
-do not look alike, and a measured bottom edge.
+do not look alike, and three beats that cross-fade as the scene advances.
 
 ## The film
 
-`components/FilmBackdrop.tsx` runs the circuit-board film as the hero's
-**instrument display** — full-bleed inside the hero and nowhere else. It is not
-a player: no controls, no sound, no autoplay, `aria-hidden`, untabbable.
+`components/HeroScene.tsx` runs the circuit-board film as a scroll-driven
+sequence. It is not a player: no controls, no sound, no autoplay, no
+click-to-play, `aria-hidden`, untabbable. Scroll position drives
+`video.currentTime` through a `scrub: true` ScrollTrigger, so it advances as
+the visitor scrolls down and rewinds as they scroll up.
 
-**The picture is always there.** `.film` paints `circuit-poster.jpg` (48 KB) as
-its own CSS background, so the hero has its image in the first frame the browser
-draws, with no video element involved. The footage is an enhancement laid over
-that poster and only fades in once it has decoded a frame.
+**The picture is always there.** `.hero__film` paints `chip-poster.jpg` (50 KB)
+as its own CSS background, so the scene has its image in the first frame the
+browser draws, with no video element involved. The footage fades in over it once
+it has decoded a frame, and is fetched only **after the page's own `load`**, on
+an idle callback — a multi-megabyte media fetch running alongside the document
+only pushes out the moment the hero becomes readable.
 
-**When the footage is fetched.** The encode is all-intra — every frame a
-keyframe, which is what makes the scrub feel attached to the scroll, and also
-why it costs 9.3 MB. It is therefore only fetched when it is worth that:
+### The ladder
 
-| Condition | Footage |
-| --- | --- |
-| `prefers-reduced-motion: reduce` | never |
-| `Save-Data`, or `effectiveType` below 4g | never |
-| viewport narrower than 900px | never |
-| otherwise | after `load`, on an idle callback |
-
-The narrow-viewport rule is the split this project always intended; there was
-simply never a small encode to serve, and sending the full one to a phone is not
-a substitute for having one. A visitor on mobile data gets the same frame at
-48 KB. **Measured on the built site, that takes the home page on a 390px
-viewport from 4.55 MB to 0.32 MB.** Re-cutting a ~540p encode and lowering that
-threshold is the one obvious win still on the table.
-
-**The two files.** A browser downloads exactly one:
+The source is 1080p, so **there is no tier above it**: a 1440p or 4K entry would
+be an upscale of pixels that were never shot. A browser downloads exactly one
+file — the component asks `canPlayType` and assigns `video.src` itself, because
+a fallthrough list of `<source>` elements makes the browser fetch the MP4, fail
+to decode it, and fetch the WebM as well.
 
 | File | Codec | Size | Served to |
 | --- | --- | --- | --- |
-| `circuit-1080.mp4` | 1920x1080 H.264, all-intra | 9.3 MB | everything that can decode H.264 |
-| `circuit-720.webm` | 1280x720 VP9 | 4.6 MB | browsers that cannot |
+| `chip-1080.mp4` | 1920x1080 H.264 all-intra | 4.7 MB | ≥1200px viewports |
+| `chip-720.mp4` | 1280x720 H.264 all-intra | 2.7 MB | 700–1200px |
+| `chip-540.mp4` | 960x540 H.264 all-intra | 1.6 MB | <700px, a metered or slow link, or ≤4 GB of device memory |
+| `chip-540.webm` | 854x480 VP9 all-intra | 3.5 MB | browsers without H.264 |
 
-The component asks `canPlayType` and assigns `video.src` itself rather than
-listing `<source>` elements — a fallthrough list makes the browser fetch the
-MP4, fail to decode it, and fetch the WebM as well, doubling the bytes.
+Scrubbing decodes a frame per seek, so the cost is the decoder's and not only
+the network's — a phone handed the 1080p file drops frames even once it has
+finished downloading it. That is why the tier is chosen by viewport and device
+memory, not by bandwidth alone.
 
-15 seconds at 20 fps, no audio stream. **Every frame is a keyframe** — scrubbing
-lands on an arbitrary time, and with an inter-frame group the decoder would have
-to walk forward from the last keyframe to get there; all-intra means one decode
-per seek, at any position, in any direction. The seek target is eased toward the
-scroll position and applied only when the change is worth at least a frame, so a
-still page does not keep the decoder busy, and an IntersectionObserver runs the
-loop only while the hero is on screen.
+**Every frame is a keyframe.** Scrubbing lands on an arbitrary time, and with an
+inter-frame group the decoder has to walk forward from the last keyframe to get
+there; all-intra means one decode per seek, at any position, in any direction.
+That is also why the files are as large as they are for 7 seconds of footage.
 
-To re-cut the film, any full ffmpeg will do:
+**167 frames.** The source is 501 frames at 24fps; every third one is kept. Over
+a 300svh track that is roughly one frame per 10px of scroll on a desktop
+screen — finer than the eye resolves while scrolling, and a third of the bytes.
+
+**Frame selection.** Below half a frame of movement nothing is asked for. Faster
+scrolling raises that threshold, because at speed the eye cannot resolve single
+frames and holding the decoder to every one of them is what drops the frame
+rate; on a device already marked light the floor is five frames, as a deliberate
+coarsening. HEVC was measured at 4.1 MB against H.264's 4.7 MB for the same
+quality — 13%, which did not justify a second encode pipeline and a
+Safari-only branch. A WebP image sequence was measured at 12.4 MB and rejected.
+
+To re-cut the film from a new source:
 
 ```bash
-ffmpeg -ss 2 -t 15 -i source.mp4 -vf "fps=20,scale=1920:1080:flags=lanczos" \
+ffmpeg -i source.mp4 \
+  -vf "select='not(mod(n\,3))',scale=1920:1080:flags=lanczos,setpts=N/24/TB" -r 24 \
   -c:v libx264 -profile:v high -pix_fmt yuv420p -g 1 -keyint_min 1 -bf 0 \
   -sc_threshold 0 -crf 32 -preset slow -movflags +faststart -an \
-  public/media/circuit-1080.mp4
+  public/media/chip-1080.mp4
 ```
+
+## The award
+
+`components/Award.tsx` sits immediately after the hero. The section opens dark;
+as it is entered the board's traces draw themselves (each path reports its own
+`getTotalLength()`, so the dash animation is exact rather than a guess), three
+plates assemble in depth under a `perspective: 1200px`, and the badge resolves
+out of a chromatic split — two offset copies in the two accent hues closing onto
+the real text. The line beside it types rather than fades.
+
+One ScrollTrigger writes three custom properties (`--draw`, `--assemble`,
+`--glitch`); the stylesheet owns every appearance decision and the component
+owns only the timing. The typed line carries the full sentence as its
+`aria-label`, so assistive technology never reads a half-finished sentence.
 
 
 ## Typography
@@ -317,16 +344,18 @@ generated `*.vercel.app` hostname.
 ## Performance and accessibility
 
 - **Static by default.** Both languages of both pages are prerendered.
-- **Motion is nearly free.** The progress hairline and the image settle are CSS
-  scroll-driven animations, so they never touch the main thread. The film is the
-  one exception: a single `requestAnimationFrame` loop, gated by an
-  IntersectionObserver, and no scroll listener anywhere on the page.
-- **Minimal client JavaScript.** Only three components are interactive: the
-  mobile menu, the form, and the film — plus the entrance observer. Everything
-  else, including the language toggle, is server-rendered HTML.
-- **The film is opt-in.** See "The film" above for the conditions. On a 390px
-  viewport the home page transfers **0.32 MB**; with reduced motion, or on a
-  metered connection, the footage is never requested at all.
+- **Two runtime dependencies.** GSAP (with ScrollTrigger) and Lenis, and
+  nothing else — no Tailwind, no component kit, no second animation library.
+  About 212 KB of JavaScript in total.
+- **One clock.** Every scrubbed section reads the same ScrollTrigger timeline,
+  which is stepped by Lenis. There is not a single `scroll` listener driving
+  animation anywhere on the site.
+- **The film waits for the page.** `preload="none"`, with the source assigned on
+  an idle callback after `load`, so it never competes with first paint. The
+  poster is already showing by then.
+- **Nothing is fetched that will not be used.** Under reduced motion the footage
+  is never requested and the home page transfers **0.41 MB**; `/founder` and
+  `/start` transfer about 0.33 MB and never touch the film at all.
 - **No layout shift.** Every image sits in a wrapper with a declared aspect
   ratio and renders with `fill`; fonts carry fallback metrics.
 - **Images** are served as AVIF/WebP at responsive sizes by the Next optimiser.
@@ -339,7 +368,11 @@ generated `*.vercel.app` hostname.
   the page behind it, and dims it.
 - **SEO:** per-language metadata, canonical and `hreflang` alternates, a
   per-language Open Graph card, `robots.txt`, `sitemap.xml`, and JSON-LD for the
-  organisation, its founder, and the award.
+  organisation, the award, and a `ProfilePage` for the founder's route.
+- **Verified on the built site:** no horizontal overflow from 320px to 2560px
+  across all six routes, one `<h1>` per page, every image with alt text, every
+  landmark named, no focusable element inside `aria-hidden`, and no console
+  errors at any viewport in either language.
 
 ## Images
 

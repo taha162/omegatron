@@ -8,10 +8,10 @@ automatically.
 
 | File | Shown in | Frame | Content |
 | --- | --- | --- | --- |
-| `project-enclosure.jpg` | Projects — lead image | 16:10 | Inside the sensing chamber, seen through the intake port |
-| `project-chamber.jpg` | Projects — supporting, left | 3:2 | The printed enclosure and its side intake port |
-| `project-array.jpg` | Projects — supporting, right | 3:2 | The unit on the bench |
-| `founder.jpg` | Founder portrait | 4:5, focus 50%/34% | Taha at the whiteboard |
+| `project-enclosure.jpg` | Projects — first plate on the strip | 4:3 | Inside the sensing chamber, seen through the intake port |
+| `project-chamber.jpg` | Projects — second plate | 4:3 | The printed enclosure and its side intake port |
+| `project-array.jpg` | Projects — third plate | 4:3 | The unit on the bench |
+| `founder.jpg` | Founder route and home teaser | 4:5, focus 50%/28% | Taha at the whiteboard |
 | `team-nurai.jpg` | not rendered on the site | — | The official logo artwork, kept as a source file |
 | `og-ar.png` | Arabic social share card | 1200x630 | Drawn as flat colour and type — 29 KB |
 | `og-en.png` | English social share card | 1200x630 | Drawn as flat colour and type — 36 KB |
@@ -27,11 +27,12 @@ change them, edit the copy and re-render at 1200x630.
 
 ## Video
 
-`public/media/` holds the film that runs in the hero — one 1080p H.264 encode,
-one 720p VP9 fallback for browsers without H.264, and a 48 KB poster. The poster
-is the picture by default; the footage is only fetched on a wide viewport, on an
-unmetered connection, and never under reduced motion. See "The film" in the root
-README.
+`public/media/` holds the film that runs in the hero: three H.264 tiers cut
+all-intra for scrubbing (1080p / 720p / 540p), one VP9 fallback for browsers
+without H.264, and a 50 KB poster. The poster is the picture until the footage
+arrives; the footage is fetched only after the page has loaded, and never under
+reduced motion. See "The film" in the root README for the ladder and why every
+frame is a keyframe.
 
 The hero carries no photograph; the film is the picture there.
 
