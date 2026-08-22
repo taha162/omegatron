@@ -57,6 +57,16 @@ const ar = {
     lead: "فريق ميكاترونكس في العراق. نصمّم ونصنّع ونبرمج داخل الفريق.",
     primaryCta: "شاهد المشاريع",
     secondaryCta: "ابدأ مشروعًا",
+    scrollHint: "مرّر للاستكشاف",
+  },
+
+  award: {
+    label: "الإنجاز",
+    title: "NURAI 2026 — المركز الثالث في العراق",
+    body:
+      "المركز الثالث على مستوى العراق في NURAI 2026. بُني وجرت معايرته والتحقّق منه داخل الفريق.",
+    place: "المركز الثالث",
+    year: "NURAI 2026",
   },
 
   about: {
@@ -123,6 +133,7 @@ const ar = {
     lead: "يقود طه التوجّه الهندسي في أوميكاترون.",
     body: "يضع معمارية الأنظمة ويتابع تنفيذها مع الفريق، من الغلاف الميكانيكي إلى البرمجيات المدمجة. عمله أن يحوّل الفكرة إلى نموذج يعمل، ثم يختبره حتى يصمد.",
     imageAlt: "طه جاسم محمد، مؤسس أوميكاترون.",
+    readMore: "قصة المؤسس",
   },
 
   contact: {
@@ -300,6 +311,16 @@ const en: typeof ar = {
     lead: "A mechatronics team in Iraq. We design, fabricate, and program in-house.",
     primaryCta: "See our work",
     secondaryCta: "Start a project",
+    scrollHint: "Scroll to explore",
+  },
+
+  award: {
+    label: "Recognition",
+    title: "NURAI 2026 — 3rd Place in Iraq",
+    body:
+      "Ranked 3rd nationally at NURAI 2026. Built, calibrated, and validated in-house.",
+    place: "3rd Place",
+    year: "NURAI 2026",
   },
 
   about: {
@@ -366,6 +387,7 @@ const en: typeof ar = {
     lead: "Taha leads the engineering direction at OmegaTron.",
     body: "He sets the system architecture and works through it with the team, from the mechanical enclosure to the embedded software. His job is to turn an idea into a prototype that runs — and then test it until it holds.",
     imageAlt: "Taha Jasim Mohammed, founder of OmegaTron.",
+    readMore: "The founder's story",
   },
 
   contact: {

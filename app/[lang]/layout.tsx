@@ -5,6 +5,10 @@ import "../globals.css";
 
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { SmoothScroll } from "@/components/SmoothScroll";
+import { ScrollProgress } from "@/components/ScrollProgress";
+import { Cursor } from "@/components/Cursor";
+import { PageWipe } from "@/components/PageWipe";
 import { DEFAULT_LOCALE, LOCALES, dirOf, getDictionary, isLocale } from "@/lib/i18n";
 import { SITE_URL } from "@/lib/site";
 
@@ -27,7 +31,7 @@ export function generateStaticParams() {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#06090e",
+  themeColor: "#05070c",
   colorScheme: "dark",
 };
 
@@ -113,7 +117,10 @@ export default async function LocaleLayout({
   return (
     <html lang={lang} dir={dir} className={cairo.variable}>
       <body>
-        <div className="scroll-progress" aria-hidden="true" />
+        <SmoothScroll />
+        <ScrollProgress />
+        <Cursor />
+        <PageWipe />
         <a href="#main" className="skip-link">
           {dict.nav.skipToContent}
         </a>

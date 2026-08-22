@@ -14,18 +14,39 @@ function localizedPath(pathname: string, locale: Locale): string {
   return `/${segments.join("/")}`;
 }
 
+/** How far down the page the HUD comes up. */
+const HUD_AT = 0.15;
+
 export function Header({ locale, dict }: { locale: Locale; dict: Dictionary }) {
   const pathname = usePathname() || `/${locale}`;
   const [open, setOpen] = useState(false);
+  const [hud, setHud] = useState(false);
   const menuId = useId();
   const toggleRef = useRef<HTMLButtonElement>(null);
 
   const close = useCallback(() => setOpen(false), []);
 
   /*
-   * While the sheet is open it owns the screen: Escape shuts it and hands
+   * The bar carries nothing until the visitor is past 15vh, then phases in.
+   * Read from a plain scroll listener rather than a ScrollTrigger: it is one
+   * boolean, it must keep working on pages that never create a timeline, and
+   * Lenis dispatches native scroll events either way.
+   */
+  useEffect(() => {
+    const mark = () => setHud(window.scrollY > window.innerHeight * HUD_AT);
+    mark();
+    window.addEventListener("scroll", mark, { passive: true });
+    window.addEventListener("resize", mark);
+    return () => {
+      window.removeEventListener("scroll", mark);
+      window.removeEventListener("resize", mark);
+    };
+  }, []);
+
+  /*
+   * While the overlay is open it owns the screen: Escape shuts it and hands
    * focus back to the control that opened it, and the page behind it stops
-   * scrolling so a finger on the sheet cannot drag the document underneath.
+   * scrolling.
    */
   useEffect(() => {
     if (!open) return;
@@ -46,17 +67,20 @@ export function Header({ locale, dict }: { locale: Locale; dict: Dictionary }) {
     };
   }, [open]);
 
+  // The founder now has a page of its own; everything else is a section.
   const links = [
     { href: `/${locale}`, label: dict.nav.home },
     { href: `/${locale}#about`, label: dict.nav.about },
     { href: `/${locale}#projects`, label: dict.nav.projects },
     { href: `/${locale}#capabilities`, label: dict.nav.capabilities },
-    { href: `/${locale}#founder`, label: dict.nav.founder },
+    { href: `/${locale}/founder`, label: dict.nav.founder },
     { href: `/${locale}#contact`, label: dict.nav.contact },
   ];
 
   return (
-    <header className="header">
+    <header className={`header${hud ? " is-hud" : ""}`}>
+      <span className="header__sweep" aria-hidden="true" />
+
       <div className="container">
         <div className="header__inner">
           <Link href={`/${locale}`} className="brand" aria-label={dict.nav.home} onClick={close}>
@@ -118,23 +142,11 @@ export function Header({ locale, dict }: { locale: Locale; dict: Dictionary }) {
         </div>
       </div>
 
-      {/* The page dims under the open sheet, so the sheet is plainly the thing
-          in front and its actions cannot be confused with the ones behind it.
-          Tapping the dimmed page shuts the menu, as a tap outside a sheet
-          should. */}
-      <button
-        type="button"
-        className={`nav-scrim${open ? " is-open" : ""}`}
-        aria-hidden="true"
-        tabIndex={-1}
-        onClick={close}
-      />
-
-      {/* Kept in the document so it can ease both open and shut; while it is
-          closed CSS sets `visibility: hidden`, which also takes the links out
-          of the tab order. */}
-      <div className="mobile-nav-wrap">
-        <div className={`mobile-nav${open ? " is-open" : ""}`} id={menuId}>
+      {/* Full-screen overlay. Kept in the document so it eases both ways;
+          while it is shut CSS sets `visibility: hidden`, which also takes the
+          links out of the tab order. */}
+      <div className={`mobile-nav${open ? " is-open" : ""}`} id={menuId}>
+        <div className="container">
           <ul className="mobile-nav__list">
             {links.map((link) => (
               <li key={link.href}>
