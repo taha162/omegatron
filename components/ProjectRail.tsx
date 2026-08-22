@@ -35,6 +35,7 @@ export function ProjectRail({ dict }: { dict: Dictionary }) {
 
     const { gsap, ScrollTrigger } = motion();
     const sign = directionSign();
+    const figures = Array.from(root.querySelectorAll<HTMLElement>(".rail__figure"));
     let distance = 0;
 
     function measure() {
@@ -58,6 +59,19 @@ export function ProjectRail({ dict }: { dict: Dictionary }) {
         const p = self.progress;
         root.style.setProperty("--rail-progress", p.toFixed(4));
         gsap.set(track, { x: -distance * p * sign });
+
+        /*
+         * Depth. Each plate's picture slides against its own frame by an
+         * amount that depends on where the panel currently sits across the
+         * viewport, so the strip reads as several distances rather than one
+         * flat sheet moving sideways.
+         */
+        const mid = window.innerWidth / 2;
+        for (const figure of figures) {
+          const box = figure.getBoundingClientRect();
+          const off = (box.left + box.width / 2 - mid) / window.innerWidth;
+          figure.style.setProperty("--plate-shift", (-off * sign).toFixed(4));
+        }
       },
     });
 

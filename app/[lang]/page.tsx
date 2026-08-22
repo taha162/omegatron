@@ -9,6 +9,8 @@ import { HeroScene } from "@/components/HeroScene";
 import { Award } from "@/components/Award";
 import { ProjectRail } from "@/components/ProjectRail";
 import { Methodology } from "@/components/Methodology";
+import { FillText } from "@/components/FillText";
+import { Marquee } from "@/components/Marquee";
 import { ProjectForm } from "@/components/ProjectForm";
 import { Social } from "@/components/Social";
 import { DEFAULT_LOCALE, getDictionary, isLocale } from "@/lib/i18n";
@@ -85,15 +87,18 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
 
       {/* --------------------------------------------------------------- About */}
       <section className="section section--tint" id="about" aria-labelledby="about-title">
-        <div className="container sec">
+        <div className="container sec skewable">
           <Reveal className="sec__rail">
             <p className="sec-label mono">{dict.about.label}</p>
           </Reveal>
 
           <Reveal className="sec__body" delay={60}>
-            <h2 className="about__statement" id="about-title">
-              {dict.about.heading}
-            </h2>
+            <FillText
+              as="h2"
+              className="about__statement"
+              id="about-title"
+              text={dict.about.heading}
+            />
             <p className="about__body">{dict.about.body}</p>
           </Reveal>
         </div>
@@ -102,9 +107,15 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
       {/* The project, as a filmstrip pulled sideways by vertical scroll. */}
       <ProjectRail dict={dict} />
 
+      {/* The band: what the team works across, geared to the page's own scroll. */}
+      <Marquee
+        items={dict.capabilities.items.map((item) => item.title)}
+        label={dict.capabilities.heading}
+      />
+
       {/* -------------------------------------------------------- Capabilities */}
       <section className="section" id="capabilities" aria-labelledby="capabilities-title">
-        <div className="container sec">
+        <div className="container sec skewable">
           <Reveal className="sec__rail">
             <p className="sec-label mono">{dict.capabilities.label}</p>
           </Reveal>
@@ -138,7 +149,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
         id="process"
         aria-labelledby="process-title"
       >
-        <div className="container sec">
+        <div className="container sec skewable">
           <Reveal className="sec__rail">
             <p className="sec-label mono">{dict.process.label}</p>
           </Reveal>
@@ -157,7 +168,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
       {/* ------------------------------------------------------------- Founder
           A short introduction here; the story itself has its own route. */}
       <section className="section" id="founder" aria-labelledby="founder-title">
-        <div className="container sec">
+        <div className="container sec skewable">
           <Reveal className="sec__rail">
             <p className="sec-label mono">{dict.founder.label}</p>
           </Reveal>
@@ -198,7 +209,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
 
       {/* ------------------------------------------------------------- Contact */}
       <section className="section section--solid" id="contact" aria-labelledby="contact-title">
-        <div className="container contact">
+        <div className="container contact skewable">
           <div>
             <p className="sec-label mono">{dict.contact.label}</p>
             <h2 className="contact__heading" id="contact-title">

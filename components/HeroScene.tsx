@@ -3,6 +3,9 @@
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { ArrowIcon } from "./Icons";
+import { Scramble } from "./Scramble";
+import { SplitWords } from "./SplitWords";
+import { createFilmRenderer, type FilmRenderer } from "./filmShader";
 import { motion, prefersReduced } from "./motion";
 import type { Dictionary, Locale } from "@/lib/i18n";
 
@@ -71,6 +74,7 @@ export function HeroScene({ locale, dict }: { locale: Locale; dict: Dictionary }
   const videoRef = useRef<HTMLVideoElement>(null);
   const filmRef = useRef<HTMLDivElement>(null);
   const hintRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -80,7 +84,6 @@ export function HeroScene({ locale, dict }: { locale: Locale; dict: Dictionary }
     if (!root || !video || !film) return;
 
     const beats = Array.from(root.querySelectorAll<HTMLElement>(".hero__beat"));
-    const statement = root.querySelector<HTMLElement>("h1.hero__statement");
 
     /*
      * Reduced motion: no pin, no scrub, no fetch. The poster is already the
@@ -89,7 +92,6 @@ export function HeroScene({ locale, dict }: { locale: Locale; dict: Dictionary }
      * rest, which would otherwise repeat the same block down the page).
      */
     if (prefersReduced()) {
-      if (statement) statement.style.clipPath = "inset(0 0 0 0)";
       beats.forEach((b) => (b.style.opacity = "1"));
       return;
     }
@@ -103,6 +105,16 @@ export function HeroScene({ locale, dict }: { locale: Locale; dict: Dictionary }
       ready = true;
       video.pause();
       film.classList.add("is-live");
+
+      if (canvas && affordable) {
+        renderer = createFilmRenderer(video, canvas);
+        if (renderer) {
+          film.classList.add("is-shaded");
+          window.addEventListener("resize", onResize);
+          seekedThisFrame = true;
+          raf = requestAnimationFrame(paintFilm);
+        }
+      }
     };
     video.addEventListener("loadeddata", onLoaded);
 
@@ -141,18 +153,39 @@ export function HeroScene({ locale, dict }: { locale: Locale; dict: Dictionary }
     if (document.readyState === "complete") scheduleFetch();
     else window.addEventListener("load", scheduleFetch, { once: true });
 
-    // The statement wipes in on a scanline as the scene comes up, rather than
-    // fading — the clip-path opens downward over the type.
-    const intro = statement
-      ? gsap.fromTo(
-          statement,
-          { clipPath: "inset(0 0 100% 0)" },
-          { clipPath: "inset(0 0 0% 0)", duration: 1.1, ease: "power3.out", delay: 0.15 },
-        )
-      : null;
-
     let hintGone = false;
     let lastSeek = -1;
+
+    /*
+     * The shader.
+     *
+     * Taken only where it is affordable: a machine that has told us it has
+     * little memory, or a narrow viewport, keeps the plain video element. When
+     * the renderer is taken the video is still the source of truth — it is
+     * simply drawn through the canvas instead of composited directly, so
+     * everything about the scrub is unchanged.
+     */
+    const canvas = canvasRef.current;
+    const nav = navigator as Navigator & { deviceMemory?: number };
+    const affordable = (nav.deviceMemory ?? 8) > 4 && window.innerWidth >= 700;
+    let renderer: FilmRenderer | null = null;
+
+    /* Signed, normalised, and eased — the raw figure from ScrollTrigger is far
+       too spiky to drive a picture with. */
+    let velocity = 0;
+    let seekedThisFrame = false;
+    let raf = 0;
+
+    function paintFilm() {
+      if (!renderer) return;
+      renderer.render(velocity, seekedThisFrame);
+      seekedThisFrame = false;
+      velocity *= 0.9;
+      if (Math.abs(velocity) < 0.001) velocity = 0;
+      raf = requestAnimationFrame(paintFilm);
+    }
+
+    const onResize = () => renderer?.resize();
 
     /** Beat opacity for a given progress figure. Shared by the first paint
         and by every scroll update, so the two can never disagree. */
@@ -194,7 +227,14 @@ export function HeroScene({ locale, dict }: { locale: Locale; dict: Dictionary }
           if (lastSeek < 0 || Math.abs(time - lastSeek) > FRAME * coarse * 0.5) {
             video.currentTime = time;
             lastSeek = time;
+            // Only a new frame is worth a texture upload.
+            seekedThisFrame = true;
           }
+
+          // Signed and normalised. 2800px/s is about as fast as a deliberate
+          // flick goes; past that the picture would simply tear.
+          const signed = Math.max(-1, Math.min(1, self.getVelocity() / 2800));
+          velocity += (signed - velocity) * 0.25;
         }
 
         // Beats cross-fade with a little parallax, so the type has depth
@@ -209,7 +249,9 @@ export function HeroScene({ locale, dict }: { locale: Locale; dict: Dictionary }
     });
 
     return () => {
-      intro?.kill();
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", onResize);
+      renderer?.destroy();
       trigger.kill();
       window.removeEventListener("load", scheduleFetch);
       if (idle) {
@@ -243,6 +285,9 @@ export function HeroScene({ locale, dict }: { locale: Locale; dict: Dictionary }
             disablePictureInPicture
             tabIndex={-1}
           />
+          {/* Drawn over the video when the shader is taken; the video is then
+              only a texture source and is hidden by `.is-shaded`. */}
+          <canvas className="hero__canvas" ref={canvasRef} />
         </div>
         <div className="hero__scrim" aria-hidden="true" />
 
@@ -250,8 +295,13 @@ export function HeroScene({ locale, dict }: { locale: Locale; dict: Dictionary }
           <div className="hero__beats">
             {/* Beat 1 — the thesis */}
             <div className="hero__beat">
-              <p className="hero__lockup">{dict.hero.lockup}</p>
-              <h1 className="hero__statement">{dict.hero.statement}</h1>
+              <Scramble className="hero__lockup" text={dict.hero.lockup} />
+              <SplitWords
+                as="h1"
+                className="hero__statement"
+                text={dict.hero.statement}
+                delay={420}
+              />
               <p className="hero__lead">{dict.hero.lead}</p>
               <div className="hero__actions">
                 <Link href={`/${locale}/start`} className="btn">
