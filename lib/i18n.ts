@@ -263,6 +263,8 @@ const ar = {
     language: "اللغة",
     rights: "جميع الحقوق محفوظة.",
     location: "العراق",
+    /** الشعار المكتوب تحت العلامة نفسها — ثلاث كلمات، لا جملة. */
+    motto: ["نهندس", "نبتكر", "ننتصر"],
   },
 
   notFound: {
@@ -520,6 +522,8 @@ const en: typeof ar = {
     language: "Language",
     rights: "All rights reserved.",
     location: "Iraq",
+    /** The line set under the mark itself — three words, not a sentence. */
+    motto: ["Engineer", "Innovate", "Win"],
   },
 
   notFound: {

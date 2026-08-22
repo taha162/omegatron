@@ -27,6 +27,20 @@ export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
               <Logo className="brand__mark brand__mark--lg" />
               <Wordmark className="wordmark" />
             </Link>
+
+            {/* The line that is already set under the mark on the team's own
+                badge, and had never been said on the site. Three words with
+                the page's own diamond between them — the same separator the
+                band and the method rule use — so it reads as part of the mark
+                rather than as a tagline bolted under it. */}
+            <p className="motto">
+              {dict.footer.motto.map((word, i) => (
+                <span className="motto__word" key={word}>
+                  {i > 0 ? <span className="motto__tick" aria-hidden="true" /> : null}
+                  {word}
+                </span>
+              ))}
+            </p>
           </div>
 
           {/*
