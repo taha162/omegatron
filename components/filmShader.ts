@@ -60,12 +60,30 @@ void main() {
   float speed = abs(uVel);
 
   /*
+   * Three texture samples cost three times one, and at rest there is nothing
+   * for the extra two to show — the split is zero and they land on the same
+   * texel. Below a threshold the shader takes the cheap path and reads once.
+   * On a still page, which is most of the time a reader spends here, this is
+   * the difference between paying for the effect and not.
+   */
+  if (speed < 0.012) {
+    uv = clamp(uv, 0.0015, 0.9985);
+    /* Deliberately not named "flat" -- that is a reserved word in GLSL and
+       the whole program then fails to compile, which silently drops the
+       effect on every device. */
+    vec3 still = texture2D(uTex, uv).rgb;
+    still *= 1.0 - 0.05 * step(0.5, fract(gl_FragCoord.y * 0.5));
+    gl_FragColor = vec4(still, 1.0);
+    return;
+  }
+
+  /*
    * The wave. Strongest across the middle of the frame and tapering to nothing
    * at the top and bottom edges, so the picture never tears away from the
    * scrim it sits under.
    */
   float edge = sin(vUv.y * 3.14159);
-  float wave = sin(vUv.y * 7.0 + uTime * 0.6) * 0.5 + sin(vUv.y * 3.0 - uTime * 0.35) * 0.5;
+  float wave = sin(vUv.y * 7.0 + uTime * 0.6);
   uv.x += wave * edge * uVel * 0.055;
   uv.y += uVel * edge * 0.012;
 
@@ -84,10 +102,6 @@ void main() {
      frame reads as displayed. */
   col *= 1.0 - 0.05 * step(0.5, fract(gl_FragCoord.y * 0.5));
 
-  /* Grain, so flat dark areas do not band. */
-  float n = fract(sin(dot(vUv * uCanvas + uTime, vec2(12.9898, 78.233))) * 43758.5453);
-  col += (n - 0.5) * 0.022;
-
   gl_FragColor = vec4(col, 1.0);
 }`;
 
@@ -97,6 +111,15 @@ function compile(gl: WebGLRenderingContext, type: number, source: string) {
   gl.shaderSource(shader, source);
   gl.compileShader(shader);
   if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+    /*
+     * A compile failure is survivable — the caller falls back to the plain
+     * video — but it must not be silent. A single reserved word cost this
+     * effect on every device once already, and the only symptom was its
+     * quiet absence.
+     */
+    if (process.env.NODE_ENV !== "production") {
+      console.error("[film] shader failed to compile:", gl.getShaderInfoLog(shader));
+    }
     gl.deleteShader(shader);
     return null;
   }
@@ -184,8 +207,15 @@ export function createFilmRenderer(
   const start = performance.now();
 
   function resize() {
-    // Capped at 2x: past that the shader is paying for pixels nobody resolves.
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    /*
+     * Deliberately under-sampled.
+     *
+     * The canvas is stretched to fit by CSS, so it does not need device
+     * pixels — and this is dark, soft, out-of-focus footage sitting behind a
+     * scrim, where the loss is invisible and the saving is quadratic. At 0.7
+     * the shader touches half the fragments it otherwise would.
+     */
+    const dpr = Math.min(window.devicePixelRatio || 1, 1) * 0.7;
     const w = Math.round(canvas.clientWidth * dpr);
     const h = Math.round(canvas.clientHeight * dpr);
     if (w === 0 || h === 0) return;
