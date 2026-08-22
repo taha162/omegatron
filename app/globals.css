@@ -13,6 +13,11 @@
   --paper: #05070c;
   --surface: #0a0e17;
   --surface-2: #101623;
+  /* The same two tones, held just short of opaque so the ground behind them
+     reads through. Nothing changes hue — only how much of the ambient layer
+     each section lets past. */
+  --paper-veil: rgba(5, 7, 12, 0.34);
+  --surface-veil: rgba(10, 14, 23, 0.5);
   --panel: #0c111b;
 
   /* Ink — checked at or above 6.4:1 on --paper */
@@ -76,6 +81,9 @@
   --radius: 2px;
   --radius-lg: 3px;
   --radius-media: 3px;
+  /* Machined, not moulded: a button is a plate with its corners taken off,
+     not a lozenge. */
+  --radius-btn: 4px;
 
   --header-h: 4.5rem;
 
@@ -238,13 +246,33 @@ textarea {
 }
 
 .section--tint {
-  background: var(--surface);
+  position: relative;
+  background: var(--surface-veil);
+}
+
+/* The tones barely separate now that the ground reads through them, so each
+   toned section states its own top edge instead. */
+.section--tint::before,
+.section--solid::before {
+  content: "";
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 0;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(
+    to right,
+    rgba(5, 7, 12, 0),
+    var(--line-bright) 22%,
+    var(--line-bright) 78%,
+    rgba(5, 7, 12, 0)
+  );
 }
 
 .section--solid {
   position: relative;
   z-index: 1;
-  background: var(--paper);
+  background: var(--paper-veil);
 }
 
 .lead {
@@ -396,7 +424,7 @@ textarea {
   gap: 0.625rem;
   padding: 1.0625rem 2.25rem;
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--radius-btn);
   color: var(--metal-ink);
   font-size: 0.9375rem;
   font-weight: 800;
@@ -708,9 +736,18 @@ textarea {
   inset: 0;
   pointer-events: none;
   opacity: 0;
-  background: rgba(5, 7, 12, 0.62);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  /* Thin enough to read the page through. The tint is only there to hold the
+     type off whatever is passing underneath; the blur and the saturation lift
+     are what make it glass rather than a dark strip. */
+  background: linear-gradient(
+    180deg,
+    rgba(10, 14, 23, 0.34) 0%,
+    rgba(5, 7, 12, 0.2) 100%
+  );
+  backdrop-filter: blur(22px) saturate(150%);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+  /* The lit top edge of a pane of glass. */
+  box-shadow: inset 0 1px 0 rgba(232, 237, 245, 0.07);
   transition: opacity 0.5s var(--ease-hover);
 }
 
@@ -732,7 +769,7 @@ textarea {
 }
 
 .header.is-hud::after {
-  opacity: 0.03;
+  opacity: 0.022;
 }
 
 /* The sweep: a 1px rule that draws itself across the bottom edge, gold into
@@ -776,13 +813,18 @@ textarea {
 }
 
 /* The mark wipes in on a scanline rather than fading. */
+/* The mark sits in the middle of the bar, with the navigation on one side of
+   it and the controls on the other. It still wipes in on a scanline rather
+   than fading, and it still holds off until the HUD comes up — at the top of
+   the page the hero is already saying the name, in letters an inch high. */
 .brand {
-  grid-column: 1;
+  grid-row: 1;
+  grid-column: 2;
   display: inline-flex;
   align-items: center;
   gap: 0.625rem;
   flex: none;
-  justify-self: start;
+  justify-self: center;
   clip-path: inset(0 0 0 0);
   transition: clip-path 0.7s var(--ease-enter), opacity 0.4s var(--ease-hover);
 }
@@ -821,10 +863,11 @@ textarea {
 .wordmark__b { color: var(--gold); }
 
 .nav {
-  grid-column: 2;
+  grid-row: 1;
+  grid-column: 1;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: clamp(0.75rem, 0.2rem + 1.4vw, 1.75rem);
 }
 
@@ -869,6 +912,7 @@ textarea {
 }
 
 .header__actions {
+  grid-row: 1;
   grid-column: 3;
   display: flex;
   align-items: center;
@@ -880,9 +924,20 @@ textarea {
 .lang-toggle {
   display: inline-flex;
   align-items: center;
+  flex: none;
+  flex-wrap: nowrap;
+  white-space: nowrap;
   gap: 0.125rem;
   font-size: 0.8125rem;
   font-weight: 600;
+}
+
+/* Each option is wrapped with its separator; without this the wrapper is an
+   inline box and the pair breaks across two lines the moment the bar is
+   narrow — which is every phone, now that the mark takes the middle track. */
+.lang-toggle > span {
+  display: inline-flex;
+  align-items: center;
 }
 
 .lang-toggle__opt {
@@ -1533,7 +1588,7 @@ textarea {
 
 .award {
   position: relative;
-  background: var(--paper);
+  background: var(--paper-veil);
   overflow: hidden;
   padding-block: clamp(4.5rem, 3.5rem + 6vw, 8.5rem);
 }
@@ -1616,40 +1671,10 @@ textarea {
   transform-style: preserve-3d;
 }
 
-/* The plinth: three plates settling into depth as the section is entered. */
-/* The numeral stands on this; the caption sits under it. */
-.award__plinth {
-  position: relative;
-  width: 100%;
-  height: clamp(3.5rem, 8vw, 6rem);
-  transform-style: preserve-3d;
-  transform: rotateX(64deg);
-  display: grid;
-  place-items: center;
-  margin-block: calc(-1 * clamp(1rem, 2.5vw, 2rem)) clamp(0.75rem, 2vw, 1.5rem);
-}
-
-.award__plate {
-  position: absolute;
-  width: clamp(7rem, 15vw, 11.5rem);
-  height: clamp(7rem, 15vw, 11.5rem);
-  border: 1px solid var(--line-bright);
-  background:
-    repeating-linear-gradient(90deg, var(--pillar-tint, var(--steel-dim)) 0 1px, transparent 1px 14%),
-    repeating-linear-gradient(0deg, var(--pillar-tint, var(--steel-dim)) 0 1px, transparent 1px 22%),
-    linear-gradient(135deg, rgba(74, 144, 217, 0.12), rgba(5, 7, 12, 0.78) 60%);
-  transform: translateZ(calc(var(--z, 0px) * var(--assemble, 0)))
-    scale(calc(0.8 + 0.2 * var(--assemble, 0)));
-  opacity: var(--assemble, 0);
-}
-
-.award__plate:nth-child(1) { --z: 0px; }
-.award__plate:nth-child(2) { --z: 26px; }
-.award__plate:nth-child(3) { --z: 52px; border-color: var(--pillar-line, var(--steel-dim)); }
-
 /* The numeral. The biggest thing on the site, and the point of the section. */
 .award__rank {
   position: relative;
+  z-index: 1;
   font-family: var(--font-mono);
   font-size: clamp(5rem, 17vw, 13rem);
   font-weight: 700;
@@ -1665,13 +1690,52 @@ textarea {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  filter: drop-shadow(0 0 40px var(--pillar-glow, var(--steel-glow)));
+  overflow: hidden;
+  filter: drop-shadow(0 0 32px var(--pillar-glow, var(--steel-glow)));
 }
 
 /*
- * The chromatic split, as on the typed line: two offset copies in the two
- * accent hues that close onto the numeral as the section resolves. Driven by
- * `--glitch`, which runs 1 to 0.
+ * The light the figure stands in.
+ *
+ * It breathes, but not by animating the numeral's own drop-shadow — a filter
+ * on a keyframe re-rasterises the whole glyph box every frame. This is a
+ * separate layer behind it, and only its opacity and scale move.
+ */
+.award__pillar::before {
+  content: "";
+  position: absolute;
+  inset-block-start: -12%;
+  inset-inline: -18%;
+  block-size: 78%;
+  pointer-events: none;
+  z-index: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    var(--pillar-glow, var(--steel-glow)) 0%,
+    rgba(5, 7, 12, 0) 66%
+  );
+  opacity: 0.35;
+  animation: rank-breathe 7.2s var(--ease-hover) infinite;
+  animation-delay: var(--band-delay, 0s);
+  will-change: transform, opacity;
+}
+
+@keyframes rank-breathe {
+  0%, 100% { opacity: 0.26; transform: scale(0.92); }
+  50%      { opacity: 0.6;  transform: scale(1.08); }
+}
+
+/*
+ * The chromatic split.
+ *
+ * Two offset copies of the figure in the two accent hues, breathing in and out
+ * of register on their own clock rather than resolving once as the section is
+ * scrolled past. The periods are deliberately coprime — 6.5s against 8.3s —
+ * so the pair never settles into a rhythm you can predict.
+ *
+ * Both are transform and opacity on two absolutely positioned copies, which is
+ * the one thing a compositor can animate for free.
  */
 .award__rank span {
   position: absolute;
@@ -1681,22 +1745,33 @@ textarea {
   background-clip: initial;
   background: none;
   filter: none;
-  mix-blend-mode: screen;
-  opacity: calc(var(--glitch, 0) * 0.85);
+  will-change: transform, opacity;
 }
 
 .award__rank span:nth-of-type(1) {
   color: var(--steel);
-  transform: translate(calc(var(--glitch, 0) * -10px), calc(var(--glitch, 0) * 3px));
+  animation: rank-split-a 6.5s var(--ease-hover) infinite;
 }
 
 .award__rank span:nth-of-type(2) {
   color: var(--gold);
-  transform: translate(calc(var(--glitch, 0) * 10px), calc(var(--glitch, 0) * -3px));
+  animation: rank-split-b 8.3s var(--ease-hover) infinite;
 }
 
-/* A scanline band travelling the numeral, so it reads as displayed rather
-   than printed. */
+@keyframes rank-split-a {
+  0%, 100% { opacity: 0.12; transform: translate(-2px, 1px); }
+  38%      { opacity: 0.44; transform: translate(-9px, 3px); }
+  62%      { opacity: 0.2;  transform: translate(-4px, 0); }
+}
+
+@keyframes rank-split-b {
+  0%, 100% { opacity: 0.14; transform: translate(2px, -1px); }
+  44%      { opacity: 0.5;  transform: translate(9px, -3px); }
+  71%      { opacity: 0.22; transform: translate(4px, 0); }
+}
+
+/* The scanline texture. Static: it is the surface the figure is displayed on,
+   not an event. */
 .award__rank::after {
   content: "";
   position: absolute;
@@ -1709,6 +1784,33 @@ textarea {
   );
   opacity: 0.38;
   mix-blend-mode: multiply;
+}
+
+/* The band that travels it. A single bright sweep running down the figure and
+   round again, clipped to the numeral's own box. */
+.award__rank::before {
+  content: "";
+  position: absolute;
+  inset-inline: -6%;
+  inset-block-start: 0;
+  height: 26%;
+  pointer-events: none;
+  z-index: 1;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    var(--pillar-accent, var(--steel)) 50%,
+    transparent 100%
+  );
+  opacity: 0.16;
+  animation: rank-band 5.4s linear infinite;
+  animation-delay: var(--band-delay, 0s);
+  will-change: transform;
+}
+
+@keyframes rank-band {
+  0%   { transform: translateY(-120%); }
+  100% { transform: translateY(500%); }
 }
 
 .award__place {
@@ -1736,6 +1838,7 @@ textarea {
 }
 
 .award__pillar--third {
+  --band-delay: -2.7s;
   --pillar-accent: var(--steel);
   --pillar-glow: var(--steel-glow);
   --pillar-line: var(--steel-dim);
@@ -1749,7 +1852,7 @@ textarea {
 
 .rail {
   position: relative;
-  background: var(--surface);
+  background: var(--surface-veil);
 }
 
 .rail__viewport {
@@ -1922,6 +2025,103 @@ textarea {
 [dir="rtl"] .rail__progress::after {
   --sweep-to: left;
   transform-origin: right center;
+}
+
+/* --------------------------------------------------------------------------
+   The ground
+
+   One fixed layer behind everything, in the page's own near-black. Over it a
+   graticule — the drawing sheet the rest of the site is set on — faded out
+   toward the edges so it never reads as a tiled texture. Behind that, two
+   large soft lights, gold and steel, drifting on periods long enough that you
+   never catch them repeating.
+
+   It is `z-index: -1`, so it paints above the body's own background and below
+   every piece of content, and the sections above it carry their tone as a veil
+   rather than as paint. Both lights move by transform alone on their own
+   composited layers: no repaint, no layout, nothing per frame on the main
+   thread.
+   -------------------------------------------------------------------------- */
+
+.ambient {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+
+  /*
+   * The sheet, painted in one pass.
+   *
+   * This was two masked pseudo-elements to begin with, and a mask on a
+   * viewport-sized fixed layer has to be re-composited for the whole viewport
+   * on every scroll — measured, that alone took frames over budget from 3.2%
+   * to 7.4%. The fade is done in paint instead: each grid is followed by a
+   * radial wash back to the page's own black, so a layer of paper hides the
+   * grid below it while the grid above it survives. The stack rasterises once
+   * and is then only ever composited.
+   *
+   * Layers paint front to back, so this reads bottom-up: fine grid, washed
+   * back to a small window; coarse grid over it, washed back to a large one.
+   */
+  background-color: var(--paper);
+  background-image:
+    radial-gradient(122% 88% at 50% 10%, rgba(5, 7, 12, 0) 0%, var(--paper) 78%),
+    linear-gradient(to right, rgba(232, 237, 245, 0.07) 1px, rgba(5, 7, 12, 0) 1px),
+    linear-gradient(to bottom, rgba(232, 237, 245, 0.07) 1px, rgba(5, 7, 12, 0) 1px),
+    radial-gradient(66% 52% at 50% 26%, rgba(5, 7, 12, 0) 0%, var(--paper) 72%),
+    linear-gradient(to right, rgba(232, 237, 245, 0.045) 1px, rgba(5, 7, 12, 0) 1px),
+    linear-gradient(to bottom, rgba(232, 237, 245, 0.045) 1px, rgba(5, 7, 12, 0) 1px);
+  background-size:
+    auto, 92px 92px, 92px 92px,
+    auto, 23px 23px, 23px 23px;
+}
+
+/*
+ * The two lights.
+ *
+ * Size is the whole cost here. A radial gradient is soft for free — no blur
+ * filter — but the element still has to be composited over the viewport on
+ * every scroll, and at 78vmax each of these was a 1300px square doing that
+ * twice a frame: measured, the pair cost more than everything else on the
+ * background put together. At 48vmax they read the same, because what makes a
+ * light look large is its falloff, not its box.
+ */
+.ambient__glow {
+  position: absolute;
+  inline-size: 48vmax;
+  block-size: 48vmax;
+  border-radius: 50%;
+  will-change: transform;
+}
+
+.ambient__glow--gold {
+  inset-block-start: -13vmax;
+  inset-inline-start: -11vmax;
+  background: radial-gradient(circle, rgba(217, 174, 69, 0.2) 0%, rgba(5, 7, 12, 0) 66%);
+  animation: ambient-drift-a 38s ease-in-out infinite alternate;
+}
+
+.ambient__glow--steel {
+  inset-block-end: -15vmax;
+  inset-inline-end: -12vmax;
+  background: radial-gradient(circle, rgba(74, 144, 217, 0.22) 0%, rgba(5, 7, 12, 0) 66%);
+  animation: ambient-drift-b 47s ease-in-out infinite alternate;
+}
+
+@keyframes ambient-drift-a {
+  to { transform: translate3d(13vmax, 9vmax, 0) scale(1.18); }
+}
+
+@keyframes ambient-drift-b {
+  to { transform: translate3d(-12vmax, -10vmax, 0) scale(1.14); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient__glow {
+    animation: none;
+    will-change: auto;
+  }
 }
 
 /* --------------------------------------------------------------------------
@@ -2098,12 +2298,34 @@ textarea {
   align-items: start;
 }
 
+/*
+ * The plate has a top edge and no bottom one: it dissolves into whatever the
+ * page is showing behind it. A mask rather than a gradient overlay, so the
+ * fade is to the real ground — the graticule and the lights included — and not
+ * to a guess at what colour that ground happens to be here.
+ */
 .founder-portrait {
   position: relative;
   aspect-ratio: 4 / 5;
   overflow: hidden;
   border-radius: var(--radius-media);
   background: var(--surface-2);
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    #000 0%,
+    #000 58%,
+    rgba(0, 0, 0, 0.72) 78%,
+    rgba(0, 0, 0, 0.22) 92%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    180deg,
+    #000 0%,
+    #000 58%,
+    rgba(0, 0, 0, 0.72) 78%,
+    rgba(0, 0, 0, 0.22) 92%,
+    transparent 100%
+  );
 }
 
 /* The plate is taller than its frame so the slower travel reveals more of the
@@ -2646,8 +2868,19 @@ select.field__control {
   .nav,
   .header__cta { display: none; }
 
-  .header__inner { grid-template-columns: minmax(0, 1fr) auto; }
-  .header__actions { grid-column: 2; }
+  /* The mark keeps the middle on a phone too: the outer tracks stay, one of
+     them simply has nothing in it once the navigation folds into the menu.
+     It is set smaller here so the side tracks have room for the controls. */
+  .header__inner {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    gap: 0.5rem;
+  }
+
+  .brand { gap: 0.4rem; }
+  .brand__mark { width: 1.5rem; height: 1.5rem; }
+  .wordmark { font-size: 0.75rem; letter-spacing: 0.04em; }
+  .lang-toggle { font-size: 0.75rem; }
+  .lang-toggle__opt { padding: 0.3125rem 0.3125rem; }
   .nav-toggle { display: inline-flex; }
   .mobile-nav { display: block; }
 
@@ -2775,16 +3008,18 @@ select.field__control {
   .rail__progress { display: none; }
   .rail__spec { position: static; transform: none; background: none; }
 
-  .award__plate { opacity: 1; transform: none; }
   .award__traces path,
   .award__traces line { stroke-dashoffset: 0; }
   .award__traces circle { opacity: 1; }
+  .award__rank { animation: none; filter: drop-shadow(0 0 34px var(--pillar-glow, var(--steel-glow))); }
+  .award__rank span { animation: none; opacity: 0.16; }
+  .award__rank::before { display: none; }
+  .award__pillar::before { animation: none; opacity: 0.4; }
   .award__dust { display: none; }
   .award__caret,
   .founder-quote__caret { display: none; }
 
   .mask-line > * { transform: none; }
-  .skewable { transform: none !important; }
   .fill__word { color: var(--ink) !important; }
   .marquee__track { transform: none !important; }
   .rail__figure img { transform: none !important; }
@@ -2927,21 +3162,6 @@ select.field__control {
 
 .founder-actions .social {
   margin-block-start: 0;
-}
-
-/* --------------------------------------------------------------------------
-   The lean
-
-   `--lean` is written by the scroll engine and is zero whenever the page is
-   still. Only blocks with nothing pinned inside them carry it: a transform on
-   an ancestor re-parents `position: fixed` and `sticky`, which would tear the
-   hero and the filmstrip off their pins.
-   -------------------------------------------------------------------------- */
-
-.skewable {
-  transform: skewY(var(--lean, 0deg));
-  transform-origin: center top;
-  will-change: transform;
 }
 
 /* --------------------------------------------------------------------------

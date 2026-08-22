@@ -31,11 +31,10 @@ const MOTES = motes(26);
 /**
  * NURAI 2026 — the monument.
  *
- * The section opens dark. As it is entered, the board's traces draw
- * themselves, three plates assemble in depth, and the badge resolves out of a
- * chromatic split. The copy beside it types rather than fades. Everything is
- * driven by one ScrollTrigger writing three custom properties, so the CSS owns
- * the appearance and this file only owns the timing.
+ * The section opens dark. As it is entered, the board's traces draw themselves
+ * and the copy beside them types rather than fades. The two numerals are not
+ * on that clock: they are the point of the section, and they hold their own
+ * light the whole time they are on screen.
  */
 export function Award({ dict }: { dict: Dictionary }) {
   const rootRef = useRef<HTMLElement>(null);
@@ -52,8 +51,6 @@ export function Award({ dict }: { dict: Dictionary }) {
 
     if (prefersReduced()) {
       root.style.setProperty("--draw", "1");
-      root.style.setProperty("--assemble", "1");
-      root.style.setProperty("--glitch", "0");
       if (typed) typed.textContent = full;
       caret?.classList.add("is-done");
       return;
@@ -67,8 +64,18 @@ export function Award({ dict }: { dict: Dictionary }) {
       path.style.setProperty("--len", String(Math.ceil(path.getTotalLength())));
     });
 
-    const state = { draw: 0, assemble: 0, glitch: 1 };
+    const state = { draw: 0 };
 
+    /*
+     * Only the board's wiring is scrubbed now.
+     *
+     * The numerals used to resolve out of a chromatic split as the section was
+     * entered, and then sit there dead for as long as anyone looked at them —
+     * an effect you could only see by scrolling past it. They now carry their
+     * own life in CSS: the split breathes, the glow drifts and a band travels
+     * the figure, all of it running whether the page is moving or not. Nothing
+     * about that needs a scroll position, so nothing about it is written here.
+     */
     const build = gsap.timeline({
       scrollTrigger: {
         trigger: root,
@@ -78,15 +85,10 @@ export function Award({ dict }: { dict: Dictionary }) {
       },
       onUpdate() {
         root.style.setProperty("--draw", state.draw.toFixed(3));
-        root.style.setProperty("--assemble", state.assemble.toFixed(3));
-        root.style.setProperty("--glitch", state.glitch.toFixed(3));
       },
     });
 
-    build
-      .to(state, { draw: 1, duration: 1, ease: "none" })
-      .to(state, { assemble: 1, duration: 1, ease: "power2.out" }, 0.35)
-      .to(state, { glitch: 0, duration: 0.7, ease: "power4.out" }, 0.9);
+    build.to(state, { draw: 1, duration: 1, ease: "none" });
 
     // The line types once, when the section has actually been reached.
     let typing: gsap.core.Tween | null = null;
@@ -186,12 +188,6 @@ export function Award({ dict }: { dict: Dictionary }) {
                   <span>{p.rank}</span>
                   {p.rank}
                 </p>
-                <div className="award__plinth" aria-hidden="true">
-                  <span className="award__plate" />
-                  <span className="award__plate" />
-                  <span className="award__plate" />
-                </div>
-
                 <p className="award__place">{p.place}</p>
                 <p className="award__scope mono">{p.scope}</p>
               </div>

@@ -27,19 +27,22 @@ export function Methodology({ dict }: { dict: Dictionary }) {
     const { ScrollTrigger } = motion();
 
     /*
-     * Deliberately slow.
+     * Deliberately slow, and deliberately behind.
      *
-     * The rule used to be full before the reader had finished the first step,
-     * which made it decoration. Starting later and ending well past the list's
-     * own foot stretches the fill across roughly twice the scroll, so it is
-     * still travelling while the steps are being read — which is the only way
-     * anyone notices it is tracking them.
+     * Two separate things are being asked of this rule. It is stretched across
+     * roughly twice the section's own scroll — starting before the list is in
+     * view and ending well past its foot — so it is still travelling while the
+     * steps are being read rather than full by the second one. And `scrub` is
+     * a catch-up time in seconds, not a smoothing factor: at 2.6 the rule is
+     * unmistakably trailing the reader, arriving at each step a moment after
+     * they do. That lag is the effect. A rule that keeps up with the wheel is
+     * just a scrollbar.
      */
     const trigger = ScrollTrigger.create({
       trigger: list,
-      start: "top 88%",
-      end: "bottom 25%",
-      scrub: 1.1,
+      start: "top 95%",
+      end: "bottom 15%",
+      scrub: 2.6,
       onUpdate(self) {
         list.style.setProperty("--flow-progress", self.progress.toFixed(4));
       },
