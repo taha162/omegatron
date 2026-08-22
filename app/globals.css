@@ -1032,7 +1032,8 @@ textarea {
   background: var(--paper) url("/media/chip-poster.jpg") center / cover no-repeat;
 }
 
-.hero__video {
+.hero__video,
+.hero__canvas {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -1046,6 +1047,32 @@ textarea {
 }
 
 .hero__film.is-live .hero__video {
+  opacity: 1;
+}
+
+/*
+ * Where the shader was taken, the canvas is the picture and the video is only
+ * its texture source. The video is left painted and simply covered: a hidden
+ * or zero-opacity video is not a dependable `texImage2D` source — engines are
+ * free to stop updating one nothing is showing — and the canvas is opaque, so
+ * covering it is enough.
+ */
+.hero__video {
+  z-index: 0;
+}
+
+/* Opaque immediately, with no transition: the canvas covers it, and a video
+   that is still fading in can hand back an empty frame to `texImage2D`. */
+.hero__film.is-shaded .hero__video {
+  opacity: 1;
+  transition: none;
+}
+
+.hero__canvas {
+  z-index: 1;
+}
+
+.hero__film.is-live.is-shaded .hero__canvas {
   opacity: 1;
 }
 
@@ -1172,14 +1199,39 @@ textarea {
   margin-block-end: 1.5rem;
 }
 
-/* The scanline wipe: the heading is revealed by a clip-path opening downward
-   rather than by a fade. Scoped to the <h1>, since the later beats carry the
-   same class on a <p> and cross-fade instead — clipping those would shut them
-   permanently. Only where a script can open it again. */
+/* --------------------------------------------------------------------------
+   Words that arrive
+
+   Each word sits in its own clipping box and starts below it, so a line
+   assembles from behind its own baseline. Split on spaces only — Arabic
+   letters join, and per-character splitting severs those joins.
+   -------------------------------------------------------------------------- */
+
+.word {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  /* Descenders and Arabic tails would otherwise be clipped by the box. */
+  padding-block-end: 0.14em;
+  margin-block-end: -0.14em;
+}
+
+.word__inner {
+  display: inline-block;
+  will-change: transform;
+}
+
 @media (scripting: enabled) {
-  h1.hero__statement {
-    clip-path: inset(0 0 100% 0);
+  .word__inner {
+    transform: translateY(115%);
+    opacity: 0;
   }
+}
+
+.word__inner.is-in {
+  transform: none;
+  opacity: 1;
+  transition: transform 0.9s var(--ease-enter), opacity 0.5s var(--ease-hover);
 }
 
 [lang="ar"] .hero__statement {
@@ -2582,8 +2634,11 @@ select.field__control {
     min-height: 82svh;
   }
 
-  h1.hero__statement,
-  .hero__statement { clip-path: none !important; }
+  .word__inner {
+    transform: none !important;
+    opacity: 1 !important;
+    transition: none !important;
+  }
 
   .hero__beat {
     grid-area: auto;
@@ -2621,6 +2676,10 @@ select.field__control {
   .founder-quote__caret { display: none; }
 
   .mask-line > * { transform: none; }
+  .skewable { transform: none !important; }
+  .fill__word { color: var(--ink) !important; }
+  .marquee__track { transform: none !important; }
+  .rail__figure img { transform: none !important; }
   .founder-portrait img { transform: none !important; }
   .cursor { display: none; }
   .wipe { display: none; }
@@ -2655,7 +2714,7 @@ select.field__control {
   .hero { height: auto; }
   .hero__stage { position: static; height: auto; }
   .hero__beat { grid-area: auto; opacity: 1 !important; }
-  .hero__statement { clip-path: none !important; }
+  .word__inner { transform: none !important; opacity: 1 !important; }
   .rail__viewport { position: static; height: auto; overflow: visible; }
   .rail__track { flex-wrap: wrap; transform: none !important; }
 
@@ -2760,4 +2819,110 @@ select.field__control {
 
 .founder-actions .social {
   margin-block-start: 0;
+}
+
+/* --------------------------------------------------------------------------
+   The lean
+
+   `--lean` is written by the scroll engine and is zero whenever the page is
+   still. Only blocks with nothing pinned inside them carry it: a transform on
+   an ancestor re-parents `position: fixed` and `sticky`, which would tear the
+   hero and the filmstrip off their pins.
+   -------------------------------------------------------------------------- */
+
+.skewable {
+  transform: skewY(var(--lean, 0deg));
+  transform-origin: center top;
+  will-change: transform;
+}
+
+/* --------------------------------------------------------------------------
+   A line that lights as it is read
+   -------------------------------------------------------------------------- */
+
+.fill__word {
+  color: var(--ink-3);
+  transition: color 0.45s var(--ease-hover), text-shadow 0.45s var(--ease-hover);
+}
+
+.fill__word.is-lit {
+  color: var(--ink);
+}
+
+/* The last words to light carry the accent's glow, so the line finishes on the
+   brand rather than simply stopping. */
+.about__statement .fill__word.is-lit {
+  text-shadow: 0 0 26px rgba(217, 174, 69, 0.16);
+}
+
+/* --------------------------------------------------------------------------
+   The band
+
+   Runs continuously, and leans with the page. Edges are masked rather than cut,
+   so items enter and leave rather than appearing at a hard boundary.
+   -------------------------------------------------------------------------- */
+
+.marquee {
+  position: relative;
+  overflow: hidden;
+  padding-block: clamp(1.25rem, 3vw, 2rem);
+  border-block: 1px solid var(--line);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+}
+
+.marquee__track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+}
+
+.marquee__set {
+  display: flex;
+  align-items: center;
+}
+
+.marquee__item {
+  display: flex;
+  align-items: center;
+  gap: clamp(1.25rem, 3vw, 2.5rem);
+  padding-inline-end: clamp(1.25rem, 3vw, 2.5rem);
+  white-space: nowrap;
+  font-size: clamp(1.125rem, 2.6vw, 1.875rem);
+  font-weight: 800;
+  color: var(--ink-2);
+  letter-spacing: -0.01em;
+}
+
+[lang="ar"] .marquee__item {
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+/* The separator is the same diamond the process rule uses. */
+.marquee__tick {
+  width: 6px;
+  height: 6px;
+  flex: none;
+  background: var(--gold);
+  transform: rotate(45deg);
+  box-shadow: 0 0 12px var(--gold-glow);
+}
+
+/* --------------------------------------------------------------------------
+   Depth in the filmstrip
+
+   Each plate's picture is wider than its frame and slides against it as the
+   strip travels, so the panels sit at different distances rather than moving
+   as one flat sheet.
+   -------------------------------------------------------------------------- */
+
+.rail__figure img {
+  width: 118%;
+  inset-inline-start: -9%;
+  transform: translate3d(calc(var(--plate-shift, 0) * 7%), 0, 0);
+}
+
+.rail__panel:hover .rail__figure img {
+  transform: translate3d(calc(var(--plate-shift, 0) * 7%), 0, 0) scale(1.03);
 }

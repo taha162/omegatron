@@ -59,7 +59,26 @@ export function SmoothScroll() {
       overscroll: false,
     });
 
-    lenis.on("scroll", ScrollTrigger.update);
+    /*
+     * The lean.
+     *
+     * Content tilts a degree or so into the direction of travel and rights
+     * itself the moment the page settles — the visual half of the weight the
+     * damper gives the wheel. It is written to one custom property on the root
+     * and read by `.skewable`, which is only ever put on blocks that contain
+     * nothing pinned: a transform on an ancestor makes `position: fixed` and
+     * `sticky` resolve against that ancestor instead of the viewport, which
+     * would tear the hero and the filmstrip off their pins.
+     */
+    const root = document.documentElement;
+    let lean = 0;
+
+    lenis.on("scroll", ({ velocity }: { velocity: number }) => {
+      ScrollTrigger.update();
+      const target = Math.max(-1.1, Math.min(1.1, velocity / 26));
+      lean += (target - lean) * 0.16;
+      root.style.setProperty("--lean", `${lean.toFixed(3)}deg`);
+    });
 
     const step = (time: number) => lenis.raf(time * 1000);
     gsap.ticker.add(step);
@@ -95,6 +114,7 @@ export function SmoothScroll() {
 
     return () => {
       window.clearTimeout(settle);
+      root.style.removeProperty("--lean");
       document.removeEventListener("click", onAnchorClick);
       gsap.ticker.remove(step);
       lenis.destroy();

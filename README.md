@@ -172,6 +172,31 @@ therefore overlap rather than meeting end to end. This is checked rather than
 assumed: walking the built page in 32 steps at 390px, 768px and 1440px, the
 emptiest screen still carries 45 characters of visible copy.
 
+### The shader
+
+`components/filmShader.ts` puts the film through a fragment shader — raw WebGL,
+one program, no library. Two things happen to the picture, and both are tied to
+scroll velocity rather than to a clock: a lateral wave that leans the board the
+way the page is moving, and a chromatic split that opens as the wave grows. At
+rest both fall to zero and the frame is a pixel-exact copy of the video. That is
+the point — the effect is a consequence of movement, not a filter permanently on
+top of the footage.
+
+The video stays the source of truth: it is still decoded, still seeked, and is
+simply drawn through the canvas instead of composited directly. It is left
+painted and covered rather than hidden, because an engine is free to stop
+updating a video nothing is showing, and a hidden element is then not a
+dependable `texImage2D` source.
+
+**The texture is not uploaded once.** A scrubbed film never plays a new frame,
+so a single upload that happens to land while the element is still fading in
+leaves a black texture for the whole session — which is exactly what happened
+the first time. It now re-uploads whenever `currentTime` has moved, plus a
+90-frame warm-up after the renderer is built.
+
+Skipped on a machine reporting 4GB or less, on viewports under 700px, and under
+reduced motion. The plain video element is a complete experience on its own.
+
 ### The rest
 
 - A custom cursor: an 8px dot in `mix-blend-mode: difference`, opening to 40px
@@ -182,6 +207,19 @@ emptiest screen still carries 45 characters of visible copy.
   the screen read as two progress bars.
 - The menu control is a 2x2 array of pads, not three lines: the corner of the
   package the site opens on. Open, the array rotates and one diagonal retracts.
+- **Words, not characters.** The hero's statement arrives a word at a time and
+  the About line lights word by word as it is read. Splitting per character
+  would sever Arabic joins and render every word as a row of isolated forms, so
+  nothing on this site is ever split below the word.
+- **The lockup decodes.** The team's name resolves out of random glyphs from its
+  own script. It is server-rendered as the real string, so no-script visitors
+  and crawlers get the name rather than noise.
+- **The lean.** Content tilts about a degree into the direction of travel and
+  rights itself when the page settles. Carried only by blocks with nothing
+  pinned inside them — a transform on an ancestor re-parents `position: fixed`
+  and `sticky`, which would tear the hero and the filmstrip off their pins.
+- **The band.** The capability names run continuously and are geared to the
+  page: scrolling adds to their rate and can reverse it.
 - Magnetic pull on the badge and the founder's call to action; a ripple where a
   press lands.
 - A diagonal shutter between routes, skipped on first load.
