@@ -35,7 +35,9 @@ app/
                           capabilities, method, founder, contact
     founder/page.tsx      the founder's own route
     start/page.tsx        Start a Project — the long-form request
-    not-found.tsx
+    [...rest]/page.tsx    anything else under a locale — answers 404
+    not-found.tsx         the 404 itself, in both languages
+  global-error.tsx        the last resort: its own document, both languages
   api/contact/route.ts    server-side form handler and email delivery
   globals.css             the entire design system, one file
   icon.svg                favicon
@@ -425,6 +427,19 @@ generated `*.vercel.app` hostname.
   `prefers-reduced-motion` path that removes the reveal entirely. The mobile
   menu closes on Escape and returns focus to the control that opened it, locks
   the page behind it, and dims it.
+- **Touch targets** are answered by input device rather than by width, in one
+  `(pointer: coarse)` block at the end of the stylesheet. It has to come after
+  every `max-width` query in the file: the width rules narrow the header as the
+  viewport narrows, which is backwards for the viewport that is being touched,
+  and a coarse-pointer rule placed beside the component it corrects is silently
+  undone further down. Only the reachable area changes — nothing moves for a
+  mouse.
+- **Every wrong URL is still the site.** `[...rest]` catches anything under a
+  locale that is not a real page and answers a genuine 404 rather than rendering
+  404 copy under a 200. Because a not-found boundary cannot read route params
+  and so cannot know which language the visitor was reading, the 404 and the
+  global error screen are both written in both languages, each block carrying
+  its own `lang` and `dir`.
 - **SEO:** per-language metadata, canonical and `hreflang` alternates, a
   per-language Open Graph card, `robots.txt`, `sitemap.xml`, and JSON-LD for the
   organisation, the award, and a `ProfilePage` for the founder's route.

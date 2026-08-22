@@ -1,0 +1,20 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "//": "Attaches to a dev server already running on 3000 (e.g. `npm run dev` in a VS Code terminal) instead of starting a second one. No command, so nothing is spawned.",
+      "name": "omegatron-dev",
+      "url": "http://localhost:3000",
+      "port": 3000,
+      "autoPort": false
+    },
+    {
+      "//": "Use this one when nothing is serving 3000 yet. Port is pinned because lib/site.ts falls back to http://localhost:3000 for canonical, sitemap and JSON-LD URLs, which would be wrong on a drifted port.",
+      "name": "omegatron-dev-start",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 3000,
+      "autoPort": false
+    }
+  ]
+}
