@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { BackLink } from "@/components/BackLink";
 import { ProjectForm } from "@/components/ProjectForm";
 import { DEFAULT_LOCALE, getDictionary, isLocale } from "@/lib/i18n";
 
@@ -35,10 +36,13 @@ export default async function StartPage({ params }: { params: Promise<{ lang: st
 
   return (
     <>
-      <section className="start-hero">
+      <section className="start-hero" aria-labelledby="start-title">
         <div className="container">
+          <BackLink href={`/${lang}#contact`} label={dict.nav.back} />
           <p className="sec-label mono">{dict.start.label}</p>
-          <h1 className="start-hero__title">{dict.start.heading}</h1>
+          <h1 className="start-hero__title" id="start-title">
+            {dict.start.heading}
+          </h1>
           <p className="lead">{dict.start.lead}</p>
         </div>
       </section>

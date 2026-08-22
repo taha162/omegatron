@@ -20,7 +20,6 @@ const ar = {
   meta: {
     siteName: "أوميكاترون",
     brandSub: "أوميكاترون",
-    tagline: "ENGINEER · INNOVATE · WIN",
     otherLocaleLabel: "Switch to English",
     title: "أوميكاترون | فريق ميكاترونكس",
     description:
@@ -49,24 +48,27 @@ const ar = {
     close: "إغلاق",
     skipToContent: "تخطَّ إلى المحتوى",
     primary: "التنقّل الرئيسي",
+    back: "رجوع",
   },
 
   hero: {
-    wordmark: "OmegaTron",
     statement: "نبني أنظمة تستشعر وتقرّر وتتحرّك.",
     lead: "فريق ميكاترونكس في العراق. نصمّم ونصنّع ونبرمج داخل الفريق.",
     primaryCta: "شاهد المشاريع",
     secondaryCta: "ابدأ مشروعًا",
-    scrollHint: "مرّر للاستكشاف",
+    /** يُعرض كبيرًا فوق البيان — اسم الفريق بلغة الصفحة. */
+    lockup: "أوميكاترون",
   },
 
   award: {
     label: "الإنجاز",
-    title: "NURAI 2026 — المركز الثالث في العراق",
+    title: "NURAI 2026",
     body:
-      "المركز الثالث على مستوى العراق في NURAI 2026. بُني وجرت معايرته والتحقّق منه داخل الفريق.",
-    place: "المركز الثالث",
-    year: "NURAI 2026",
+      "المركز الأول على مستوى جامعة الموصل، والمركز الثالث على مستوى العراق. بُني وجرت معايرته والتحقّق منه داخل الفريق.",
+    places: [
+      { rank: "01", place: "المركز الأول", scope: "جامعة الموصل" },
+      { rank: "03", place: "المركز الثالث", scope: "العراق" },
+    ],
   },
 
   about: {
@@ -134,6 +136,7 @@ const ar = {
     body: "يضع معمارية الأنظمة ويتابع تنفيذها مع الفريق، من الغلاف الميكانيكي إلى البرمجيات المدمجة. عمله أن يحوّل الفكرة إلى نموذج يعمل، ثم يختبره حتى يصمد.",
     imageAlt: "طه جاسم محمد، مؤسس أوميكاترون.",
     readMore: "قصة المؤسس",
+    social: "حسابات طه",
   },
 
   contact: {
@@ -274,7 +277,6 @@ const en: typeof ar = {
   meta: {
     siteName: "OmegaTron",
     brandSub: "Mechatronics",
-    tagline: "ENGINEER · INNOVATE · WIN",
     otherLocaleLabel: "التبديل إلى العربية",
     title: "OmegaTron | Mechatronics Team",
     description:
@@ -303,24 +305,27 @@ const en: typeof ar = {
     close: "Close",
     skipToContent: "Skip to content",
     primary: "Primary",
+    back: "Back",
   },
 
   hero: {
-    wordmark: "OmegaTron",
     statement: "We build systems that sense, decide, and move.",
     lead: "A mechatronics team in Iraq. We design, fabricate, and program in-house.",
     primaryCta: "See our work",
     secondaryCta: "Start a project",
-    scrollHint: "Scroll to explore",
+    /** Set large above the statement — the team's name, in the page's language. */
+    lockup: "OMEGATRON",
   },
 
   award: {
     label: "Recognition",
-    title: "NURAI 2026 — 3rd Place in Iraq",
+    title: "NURAI 2026",
     body:
-      "Ranked 3rd nationally at NURAI 2026. Built, calibrated, and validated in-house.",
-    place: "3rd Place",
-    year: "NURAI 2026",
+      "First place at the University of Mosul, and third nationally in Iraq. Built, calibrated, and validated in-house.",
+    places: [
+      { rank: "01", place: "First place", scope: "University of Mosul" },
+      { rank: "03", place: "Third place", scope: "Iraq" },
+    ],
   },
 
   about: {
@@ -388,6 +393,7 @@ const en: typeof ar = {
     body: "He sets the system architecture and works through it with the team, from the mechanical enclosure to the embedded software. His job is to turn an idea into a prototype that runs — and then test it until it holds.",
     imageAlt: "Taha Jasim Mohammed, founder of OmegaTron.",
     readMore: "The founder's story",
+    social: "Taha's profiles",
   },
 
   contact: {

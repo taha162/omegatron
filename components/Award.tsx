@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { Magnetic } from "./Magnetic";
 import { motion, prefersReduced } from "./motion";
 import type { Dictionary } from "@/lib/i18n";
 
@@ -40,7 +39,6 @@ const MOTES = motes(26);
  */
 export function Award({ dict }: { dict: Dictionary }) {
   const rootRef = useRef<HTMLElement>(null);
-  const badgeRef = useRef<HTMLDivElement>(null);
   const typedRef = useRef<HTMLSpanElement>(null);
   const caretRef = useRef<HTMLSpanElement>(null);
 
@@ -114,37 +112,12 @@ export function Award({ dict }: { dict: Dictionary }) {
       },
     });
 
-    /* The badge tilts in 3D toward the pointer while it is over it. */
-    const badge = badgeRef.current;
-    function onMove(event: PointerEvent) {
-      if (!badge) return;
-      const box = badge.getBoundingClientRect();
-      const x = (event.clientX - box.left) / box.width - 0.5;
-      const y = (event.clientY - box.top) / box.height - 0.5;
-      badge.style.setProperty("--tilt-y", `${(x * 16).toFixed(2)}deg`);
-      badge.style.setProperty("--tilt-x", `${(-y * 16).toFixed(2)}deg`);
-    }
-
-    function onLeave() {
-      badge?.style.setProperty("--tilt-x", "0deg");
-      badge?.style.setProperty("--tilt-y", "0deg");
-    }
-
-    const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-    if (fine && badge) {
-      badge.addEventListener("pointermove", onMove);
-      badge.addEventListener("pointerleave", onLeave);
-    }
 
     return () => {
       typing?.kill();
       typer.kill();
       build.scrollTrigger?.kill();
       build.kill();
-      if (badge) {
-        badge.removeEventListener("pointermove", onMove);
-        badge.removeEventListener("pointerleave", onLeave);
-      }
     };
   }, [dict.award.body]);
 
@@ -199,26 +172,30 @@ export function Award({ dict }: { dict: Dictionary }) {
       <div className="container">
         <div className="award__grid">
           <div className="award__stage">
-            <div className="award__assembly" aria-hidden="true">
-              <span className="award__plate" />
-              <span className="award__plate" />
-              <span className="award__plate" />
-            </div>
+            {dict.award.places.map((p, i) => (
+              <div
+                className={`award__pillar ${
+                  i === 0 ? "award__pillar--first" : "award__pillar--third"
+                }`}
+                key={p.rank}
+              >
+                {/* The numeral, with two offset copies behind it that close on
+                    to it as the section resolves. */}
+                <p className="award__rank" lang="en" dir="ltr" aria-hidden="true">
+                  <span>{p.rank}</span>
+                  <span>{p.rank}</span>
+                  {p.rank}
+                </p>
+                <div className="award__plinth" aria-hidden="true">
+                  <span className="award__plate" />
+                  <span className="award__plate" />
+                  <span className="award__plate" />
+                </div>
 
-            <Magnetic strength={0.18} radius={160} className="award__badge-anchor">
-              <div className="award__badge" ref={badgeRef}>
-                <p className="award__place">
-                  {/* Two offset copies in the accent hues; they close onto the
-                      real text as the badge resolves. */}
-                  <span aria-hidden="true">{dict.award.place}</span>
-                  <span aria-hidden="true">{dict.award.place}</span>
-                  {dict.award.place}
-                </p>
-                <p className="award__year" lang="en" dir="ltr">
-                  {dict.award.year}
-                </p>
+                <p className="award__place">{p.place}</p>
+                <p className="award__scope mono">{p.scope}</p>
               </div>
-            </Magnetic>
+            ))}
           </div>
 
           <div>

@@ -27,15 +27,33 @@ export function SmoothScroll() {
 
     const { gsap, ScrollTrigger } = motion();
 
-    // A finger is direct manipulation and needs to keep up with the thumb, so
-    // touch is given a shorter settle than the wheel.
     const coarse = window.matchMedia("(pointer: coarse)").matches;
 
+    /*
+     * The weight, and why it is a duration rather than a lerp.
+     *
+     * A lerp moves a fixed fraction of the remaining distance each frame. It
+     * never actually arrives, so the last stretch of every gesture crawls, and
+     * because the step depends on the distance left, a short flick and a long
+     * one settle at different rates. That inconsistency is what reads as
+     * "not smooth" even though nothing is dropping frames.
+     *
+     * A duration with an exponential ease-out gives every gesture the same
+     * wall-clock settle whatever its length, and lands rather than
+     * asymptotically approaching. The curve below is steep at the start and
+     * flat at the end: the page takes the movement up immediately and puts it
+     * down softly, which is the "precision dial" weight without the drag.
+     */
     const lenis = new Lenis({
-      lerp: coarse ? 0.15 : 0.09,
+      duration: coarse ? 0.9 : 1.15,
+      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       wheelMultiplier: 1,
-      touchMultiplier: 1.4,
+      touchMultiplier: 1.5,
       smoothWheel: true,
+      // Without this the finger drags the page and the platform's own scroll
+      // at once, and the two fight over the same gesture.
+      syncTouch: true,
+      syncTouchLerp: 0.075,
       // The browser's own overscroll gestures would otherwise fire underneath
       // the engine — pull-to-refresh on a page that is not scrolling itself.
       overscroll: false,
@@ -48,6 +66,16 @@ export function SmoothScroll() {
     // GSAP's lag smoothing pauses the ticker after a long frame, which would
     // leave the scroll stalled mid-gesture.
     gsap.ticker.lagSmoothing(0);
+
+    /*
+     * Pinned sections are measured from the document, and the document's
+     * height changes as fonts land and images decode. Refreshing once things
+     * have settled stops a pin starting a few hundred pixels from where the
+     * section actually is — which shows up as the scene jumping when it is
+     * first reached.
+     */
+    const settle = window.setTimeout(() => ScrollTrigger.refresh(), 600);
+    document.fonts?.ready.then(() => ScrollTrigger.refresh()).catch(() => {});
 
     // An anchor inside a Lenis page has to be handled by Lenis, or the browser
     // jumps the document out from under the engine.
@@ -66,6 +94,7 @@ export function SmoothScroll() {
     document.addEventListener("click", onAnchorClick);
 
     return () => {
+      window.clearTimeout(settle);
       document.removeEventListener("click", onAnchorClick);
       gsap.ticker.remove(step);
       lenis.destroy();

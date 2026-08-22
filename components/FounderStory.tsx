@@ -2,7 +2,9 @@
 
 import Image from "next/image";
 import { useEffect, useRef } from "react";
+import { BackLink } from "./BackLink";
 import { MaskLines } from "./MaskLines";
+import { Social } from "./Social";
 import { Magnetic } from "./Magnetic";
 import { RippleLink } from "./RippleLink";
 import { ArrowIcon } from "./Icons";
@@ -75,7 +77,10 @@ export function FounderStory({
       const target = quoteRef.current;
       const typer = ScrollTrigger.create({
         trigger: typed,
-        start: "top 78%",
+        // Fires as soon as the block is anywhere near the fold. Held back to
+        // 78% it could sit on screen at load as an empty rule with a blinking
+        // caret, which reads as a broken element rather than a pending one.
+        start: "top 95%",
         once: true,
         onEnter() {
           const cursor = { n: 0 };
@@ -101,6 +106,8 @@ export function FounderStory({
 
   return (
     <div className="container founder-page">
+      <BackLink href={`/${locale}#founder`} label={dict.nav.back} />
+
       <div className="founder-grid">
         <div className="founder-portrait" ref={portraitRef}>
           <Image
@@ -143,12 +150,16 @@ export function FounderStory({
             <span className="founder-quote__caret" ref={caretRef} aria-hidden="true" />
           </blockquote>
 
-          <Magnetic strength={0.3} radius={110}>
-            <RippleLink href={`/${locale}/start`} className="btn">
-              {dict.nav.start}
-              <ArrowIcon className="btn__arrow" />
-            </RippleLink>
-          </Magnetic>
+          <div className="founder-actions">
+            <Magnetic strength={0.3} radius={110}>
+              <RippleLink href={`/${locale}/start`} className="btn">
+                {dict.nav.start}
+                <ArrowIcon className="btn__arrow" />
+              </RippleLink>
+            </Magnetic>
+
+            <Social label={dict.founder.social} />
+          </div>
         </div>
       </div>
     </div>

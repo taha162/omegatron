@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Logo, Wordmark } from "./Logo";
-import { LOCALES, type Dictionary, type Locale } from "@/lib/i18n";
+import type { Dictionary, Locale } from "@/lib/i18n";
 
 /**
  * Public contact address. Set NEXT_PUBLIC_CONTACT_EMAIL to surface it here;
@@ -27,26 +27,6 @@ export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
               <Logo className="brand__mark brand__mark--lg" />
               <Wordmark className="wordmark" />
             </Link>
-            <p className="footer__tagline" lang="en" dir="ltr">
-              {dict.meta.tagline}
-            </p>
-
-            {/* The language pair belongs with the brand, not filed under
-                "contact" as it was. */}
-            <div className="footer__langs" role="group" aria-label={dict.footer.language}>
-              {LOCALES.map((code) => (
-                <Link
-                  key={code}
-                  href={`/${code}`}
-                  className="footer__link"
-                  lang={code}
-                  hrefLang={code}
-                  aria-current={code === locale ? "page" : undefined}
-                >
-                  {code === "ar" ? "العربية" : "English"}
-                </Link>
-              ))}
-            </div>
           </div>
 
           {/*

@@ -363,45 +363,139 @@ textarea {
    Buttons
    -------------------------------------------------------------------------- */
 
+/*
+ * Two controls, and they are machined rather than styled.
+ *
+ * Each carries four corner ticks — the registration marks on a drawing sheet —
+ * which draw inward on approach, and a light that sweeps the face once. The
+ * accent stays the brand's gold; nothing here invents a new colour.
+ */
 .btn {
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  padding: 0.9375rem 1.75rem;
-  background: var(--gold);
+  gap: 0.625rem;
+  padding: 1.0625rem 2.125rem;
+  background: linear-gradient(160deg, var(--gold-bright) 0%, var(--gold) 52%, #c39a34 100%);
   color: var(--ink-inverse);
-  border: 1px solid var(--gold);
+  border: 1px solid var(--gold-bright);
   border-radius: var(--radius);
   font-size: 0.9375rem;
-  font-weight: 700;
+  font-weight: 800;
+  letter-spacing: 0.01em;
   line-height: 1.2;
   cursor: pointer;
   text-align: center;
   overflow: hidden;
-  transition: background-color 0.3s var(--ease-hover),
-    border-color 0.3s var(--ease-hover), color 0.3s var(--ease-hover),
-    box-shadow 0.3s var(--ease-hover);
+  isolation: isolate;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.34) inset,
+    0 12px 30px -14px var(--gold-glow);
+  transition: transform 0.35s var(--ease-hover), box-shadow 0.35s var(--ease-hover),
+    border-color 0.35s var(--ease-hover), color 0.35s var(--ease-hover),
+    background-color 0.35s var(--ease-hover);
+}
+
+[lang="ar"] .btn {
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+/* The sweep. A band of light crossing the face once per hover, held off the
+   edges by the button's own overflow. */
+.btn::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: -140%;
+  width: 60%;
+  z-index: -1;
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.44) 50%,
+    transparent 100%
+  );
+  transition: inset-inline-start 0.7s var(--ease-hover);
+}
+
+.btn:hover::before,
+.btn:focus-visible::before {
+  inset-inline-start: 140%;
+}
+
+/* The corner ticks. One element, four corners, drawn with a masked gradient so
+   the whole set costs no extra nodes. They sit just inside the edge and pull
+   in on approach. */
+.btn::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    linear-gradient(currentColor, currentColor) 0 0 / 9px 1px no-repeat,
+    linear-gradient(currentColor, currentColor) 0 0 / 1px 9px no-repeat,
+    linear-gradient(currentColor, currentColor) 100% 0 / 9px 1px no-repeat,
+    linear-gradient(currentColor, currentColor) 100% 0 / 1px 9px no-repeat,
+    linear-gradient(currentColor, currentColor) 0 100% / 9px 1px no-repeat,
+    linear-gradient(currentColor, currentColor) 0 100% / 1px 9px no-repeat,
+    linear-gradient(currentColor, currentColor) 100% 100% / 9px 1px no-repeat,
+    linear-gradient(currentColor, currentColor) 100% 100% / 1px 9px no-repeat;
+  transition: opacity 0.35s var(--ease-hover), inset 0.45s var(--ease-enter);
+}
+
+.btn:hover::after,
+.btn:focus-visible::after {
+  inset: 8px;
+  opacity: 0.5;
 }
 
 .btn:hover {
-  background: var(--gold-bright);
-  border-color: var(--gold-bright);
-  box-shadow: 0 0 24px -4px var(--gold-glow);
+  transform: translateY(-2px);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) inset,
+    0 20px 44px -16px var(--gold-glow);
 }
 
+.btn:active {
+  transform: translateY(0);
+}
+
+/* The quiet one: a hairline that fills with gold from the leading edge. */
 .btn--ghost {
   background: transparent;
   color: var(--ink);
   border-color: var(--line-bright);
+  box-shadow: none;
 }
 
-.btn--ghost:hover {
-  background: transparent;
-  color: var(--gold);
+.btn--ghost::before {
+  inset-inline-start: 0;
+  inset-inline-end: auto;
+  width: 100%;
+  background: var(--gold);
+  transform: scaleX(0);
+  transform-origin: var(--fill-from, left) center;
+  transition: transform 0.45s var(--ease-enter);
+}
+
+[dir="rtl"] .btn--ghost::before {
+  --fill-from: right;
+}
+
+.btn--ghost:hover::before,
+.btn--ghost:focus-visible::before {
+  inset-inline-start: 0;
+  transform: scaleX(1);
+}
+
+.btn--ghost:hover,
+.btn--ghost:focus-visible {
+  color: var(--ink-inverse);
   border-color: var(--gold);
-  box-shadow: 0 0 24px -6px var(--gold-glow);
+  transform: translateY(-2px);
+  box-shadow: 0 18px 40px -18px var(--gold-glow);
 }
 
 .btn__arrow {
@@ -427,9 +521,15 @@ textarea {
 }
 
 .btn[disabled]:hover {
-  background: var(--gold);
+  transform: none;
   border-color: var(--gold);
   box-shadow: none;
+}
+
+.btn[disabled]:hover::before,
+.btn[disabled]:hover::after {
+  opacity: 0;
+  transition: none;
 }
 
 /* The ripple a click leaves behind, scaled from the pointer. */
@@ -579,29 +679,37 @@ textarea {
 
 /* The sweep: a 1px rule that draws itself across the bottom edge, gold into
    steel, once the HUD comes up. */
+/*
+ * The bar's own edge. A plain hairline, deliberately not a gradient: the
+ * reading progress line sits a few pixels above it, and two coloured rules
+ * that close to the top of the screen read as two progress bars.
+ */
 .header__sweep {
   position: absolute;
   inset-block-end: 0;
   inset-inline: 0;
   height: 1px;
   pointer-events: none;
-  background: linear-gradient(
-    to var(--sweep-to, right),
-    var(--gold) 0%,
-    var(--steel) 100%
-  );
-  transform: scaleX(0);
-  transform-origin: left center;
-  transition: transform 0.9s var(--ease-enter);
-}
-
-[dir="rtl"] .header__sweep {
-  --sweep-to: left;
-  transform-origin: right center;
+  background: var(--line-strong);
+  opacity: 0;
+  transition: opacity 0.5s var(--ease-hover);
 }
 
 .header.is-hud .header__sweep {
-  transform: scaleX(1);
+  opacity: 1;
+}
+
+/*
+ * The bar's contents sit above the overlay.
+ *
+ * `.mobile-nav` is a child of the header, so its z-index resolves inside the
+ * header's stacking context, not against the page. Left lower than the sheet,
+ * the overlay painted straight over the close button and the menu could not be
+ * shut — which is exactly what happened.
+ */
+.header__inner {
+  position: relative;
+  z-index: 2;
 }
 
 .header__inner > * {
@@ -757,47 +865,75 @@ textarea {
   color: var(--ink-inverse);
 }
 
-/* The hamburger rotates into an X on a spring. */
+/*
+ * The menu control: four pads, not three lines.
+ *
+ * A 2x2 array of square pads — the corner of a QFN package, which is the part
+ * the whole site opens on. Closed, it is a quiet array; on approach the pads
+ * take the accent; open, the array rotates 45 degrees and the diagonal pair
+ * retracts, leaving two pads on an axis. It reads as a mechanism changing
+ * state rather than as the same hamburger every site ships.
+ */
 .nav-toggle {
   display: none;
   align-items: center;
   justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2.75rem;
+  height: 2.75rem;
   background: transparent;
-  border: 0;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
   color: var(--ink);
   cursor: pointer;
+  transition: border-color 0.35s var(--ease-hover);
+}
+
+.nav-toggle:hover {
+  border-color: var(--line-strong);
 }
 
 .nav-toggle__bars {
   display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 4px;
-  width: 18px;
-  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  width: 17px;
+  height: 17px;
+  transition: transform 0.55s cubic-bezier(0.34, 1.4, 0.5, 1);
 }
 
 .nav-toggle[aria-expanded="true"] .nav-toggle__bars {
-  transform: rotate(180deg);
+  transform: rotate(45deg);
 }
 
 .nav-toggle__bars span {
-  height: 1.5px;
+  display: block;
+  width: 100%;
+  height: 100%;
   background: currentColor;
-  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
-    opacity 0.2s var(--ease-hover);
+  transition: transform 0.45s cubic-bezier(0.34, 1.4, 0.5, 1),
+    opacity 0.3s var(--ease-hover), background-color 0.35s var(--ease-hover);
+}
+
+.nav-toggle:hover .nav-toggle__bars span:nth-child(1),
+.nav-toggle:hover .nav-toggle__bars span:nth-child(4) {
+  background: var(--gold);
+}
+
+/* Open: the pair on one diagonal pulls in and goes, leaving a two-pad axis. */
+.nav-toggle[aria-expanded="true"] .nav-toggle__bars span:nth-child(2),
+.nav-toggle[aria-expanded="true"] .nav-toggle__bars span:nth-child(3) {
+  opacity: 0;
+  transform: scale(0.2);
 }
 
 .nav-toggle[aria-expanded="true"] .nav-toggle__bars span:nth-child(1) {
-  transform: translateY(5.5px) rotate(45deg);
+  transform: translate(2px, 2px);
+  background: var(--gold);
 }
 
-.nav-toggle[aria-expanded="true"] .nav-toggle__bars span:nth-child(2) {
-  opacity: 0;
-}
-
-.nav-toggle[aria-expanded="true"] .nav-toggle__bars span:nth-child(3) {
-  transform: translateY(-5.5px) rotate(-45deg);
+.nav-toggle[aria-expanded="true"] .nav-toggle__bars span:nth-child(4) {
+  transform: translate(-2px, -2px);
+  background: var(--gold);
 }
 
 /* Full-screen overlay menu, links staggered 50ms apart. */
@@ -805,11 +941,13 @@ textarea {
   display: none;
   position: fixed;
   inset: 0;
-  z-index: 90;
+  /* Inside the header's stacking context, below `.header__inner`. */
+  z-index: 1;
   padding: calc(var(--header-h) + 2rem) var(--gutter) 2rem;
-  background: rgba(5, 7, 12, 0.96);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  /* Opaque. At 96% the hero's own type and buttons read straight through the
+     sheet, which put a ghost of the primary action directly behind the real
+     one. A blur over a playing film costs more than it hides. */
+  background: linear-gradient(180deg, var(--paper) 0%, #03050a 100%);
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.4s var(--ease-hover), visibility 0s linear 0.4s;
@@ -957,14 +1095,71 @@ textarea {
   }
 }
 
-.hero__wordmark {
+/*
+ * The team's name, set as a lockup rather than an eyebrow.
+ *
+ * It is the first thing on the page and it has to say whose site this is, so
+ * it is large and it carries the only gradient in the interface: steel at the
+ * leading edge running through to the brand gold, with a slow specular band
+ * travelling across it. It is written in the page's own language — Arabic
+ * readers get أوميكاترون, not a transliteration they have to decode.
+ */
+.hero__lockup {
   display: block;
-  font-size: var(--step--2);
-  font-weight: 700;
-  letter-spacing: 0.3em;
+  position: relative;
+  width: fit-content;
+  font-size: clamp(1.75rem, 5.2vw, 3.75rem);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--ink-3);
-  margin-block-end: 1.25rem;
+  margin-block-end: clamp(0.75rem, 2vw, 1.25rem);
+  background: linear-gradient(
+    100deg,
+    var(--steel) 0%,
+    var(--ink) 34%,
+    #ffffff 46%,
+    var(--gold-bright) 66%,
+    var(--gold) 100%
+  );
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: lockup-sheen 9s var(--ease-hover) infinite;
+}
+
+/* Arabic is not an uppercasing script, and tracking tears its joins apart. */
+[lang="ar"] .hero__lockup {
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 700;
+  line-height: 1.4;
+  font-size: clamp(1.875rem, 5.6vw, 4rem);
+}
+
+@keyframes lockup-sheen {
+  0%, 100% { background-position: 100% 0; }
+  50% { background-position: 0 0; }
+}
+
+/* A hairline under the lockup, tying it to the rail language of the page. */
+.hero__lockup::after {
+  content: "";
+  position: absolute;
+  inset-block-end: -0.35em;
+  inset-inline: 0;
+  height: 1px;
+  background: linear-gradient(
+    to var(--rule-to, right),
+    var(--steel-dim),
+    var(--gold-dim) 60%,
+    transparent
+  );
+}
+
+[dir="rtl"] .hero__lockup::after {
+  --rule-to: left;
 }
 
 .hero__statement {
@@ -1045,7 +1240,13 @@ textarea {
   transform-origin: right center;
 }
 
-/* Scroll indicator: breathes until the first scroll, then leaves. */
+/*
+ * The scroll indicator, without the caption.
+ *
+ * A rule that breathes at the foot of the scene and leaves after the first
+ * scroll. The words are gone: on a page whose whole opening is a scroll, being
+ * told to scroll is noise.
+ */
 .hero__hint {
   position: absolute;
   inset-block-end: clamp(1.5rem, 4vh, 3rem);
@@ -1067,9 +1268,17 @@ textarea {
 
 .hero__hint-rule {
   width: 1px;
-  height: 2.5rem;
+  height: 3.25rem;
   background: linear-gradient(to bottom, transparent, var(--steel));
   animation: breathe 2.6s ease-in-out infinite;
+}
+
+.hero__hint-dot {
+  width: 4px;
+  height: 4px;
+  background: var(--gold);
+  transform: rotate(45deg);
+  box-shadow: 0 0 10px var(--gold-glow);
 }
 
 @keyframes breathe {
@@ -1169,7 +1378,7 @@ textarea {
   position: relative;
   background: var(--paper);
   overflow: hidden;
-  padding-block: clamp(6rem, 4rem + 9vw, 12rem);
+  padding-block: clamp(4.5rem, 3.5rem + 6vw, 8.5rem);
 }
 
 .award__grid {
@@ -1225,191 +1434,157 @@ textarea {
   to { transform: translate3d(0, -140px, 0); }
 }
 
-/* Layer 3 — the monument itself. */
+/* Layer 3 — the monument itself.
+
+   Two placings, not one. Each stands on its own plinth of assembling plates,
+   and each is titled by a numeral set at the largest size anywhere on the
+   site — because a placing is a number, and shrinking it into a badge is what
+   made the section forgettable. First place takes the brand gold; third takes
+   the board's steel, so the two are told apart at a glance rather than read.
+   -------------------------------------------------------------------------- */
+
 .award__stage {
   position: relative;
   z-index: 1;
-  perspective: 1200px;
   display: grid;
-  place-items: center;
-  min-height: clamp(18rem, 34vw, 27rem);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(2rem, 6vw, 5.5rem);
+  perspective: 1400px;
 }
 
-/* The plates and the badge share one cell: the badge stands on the stack, and
-   flowing it into a row of its own would drop it below the monument. */
-.award__assembly,
-.award__badge-anchor {
-  grid-area: 1 / 1;
-  place-self: center;
-}
-
-.award__badge-anchor {
-  z-index: 2;
-}
-
-.award__assembly {
+.award__pillar {
   position: relative;
-  transform-style: preserve-3d;
-  /* Shallow enough that the plates still read as plates; at 58 degrees the
-     stack foreshortened into a single dark trapezoid. */
-  transform: rotateX(46deg) rotateZ(var(--tilt-z, 0deg));
   display: grid;
-  place-items: center;
+  justify-items: center;
+  transform-style: preserve-3d;
 }
 
-/* The plates: three boards stacked in depth, each arriving from further out
-   and settling as the section is entered. `--assemble` runs 0..1. */
+/* The plinth: three plates settling into depth as the section is entered. */
+/* The numeral stands on this; the caption sits under it. */
+.award__plinth {
+  position: relative;
+  width: 100%;
+  height: clamp(3.5rem, 8vw, 6rem);
+  transform-style: preserve-3d;
+  transform: rotateX(64deg);
+  display: grid;
+  place-items: center;
+  margin-block: calc(-1 * clamp(1rem, 2.5vw, 2rem)) clamp(0.75rem, 2vw, 1.5rem);
+}
+
 .award__plate {
-  grid-area: 1 / 1;
-  width: clamp(11rem, 22vw, 17rem);
-  height: clamp(11rem, 22vw, 17rem);
+  position: absolute;
+  width: clamp(7rem, 15vw, 11.5rem);
+  height: clamp(7rem, 15vw, 11.5rem);
   border: 1px solid var(--line-bright);
   background:
-    repeating-linear-gradient(90deg, rgba(74, 144, 217, 0.16) 0 1px, transparent 1px 14%),
-    repeating-linear-gradient(0deg, rgba(74, 144, 217, 0.1) 0 1px, transparent 1px 22%),
-    linear-gradient(135deg, rgba(74, 144, 217, 0.14), rgba(5, 7, 12, 0.72) 60%);
+    repeating-linear-gradient(90deg, var(--pillar-tint, var(--steel-dim)) 0 1px, transparent 1px 14%),
+    repeating-linear-gradient(0deg, var(--pillar-tint, var(--steel-dim)) 0 1px, transparent 1px 22%),
+    linear-gradient(135deg, rgba(74, 144, 217, 0.12), rgba(5, 7, 12, 0.78) 60%);
   transform: translateZ(calc(var(--z, 0px) * var(--assemble, 0)))
-    scale(calc(0.86 + 0.14 * var(--assemble, 0)));
+    scale(calc(0.8 + 0.2 * var(--assemble, 0)));
   opacity: var(--assemble, 0);
-  transition: none;
 }
 
-.award__plate:nth-child(1) { --z: 0px; border-color: var(--steel-dim); }
-.award__plate:nth-child(2) { --z: 34px; }
-.award__plate:nth-child(3) { --z: 68px; border-color: var(--gold-dim); }
+.award__plate:nth-child(1) { --z: 0px; }
+.award__plate:nth-child(2) { --z: 26px; }
+.award__plate:nth-child(3) { --z: 52px; border-color: var(--pillar-line, var(--steel-dim)); }
 
-/* A brushed-metal sheen across the top plate. */
-.award__plate:nth-child(3)::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(
-      118deg,
-      rgba(232, 237, 245, 0.05) 0 1px,
-      transparent 1px 3px
-    ),
-    radial-gradient(120% 80% at 20% 0%, rgba(232, 237, 245, 0.12), transparent 60%);
-}
-
-/* The badge sits above the stack, facing the reader rather than lying on the
-   board with it. */
-.award__badge {
+/* The numeral. The biggest thing on the site, and the point of the section. */
+.award__rank {
   position: relative;
-  z-index: 2;
-  transform: translateY(calc(-1 * clamp(1.5rem, 4vw, 3rem)))
-    rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
-  transform-style: preserve-3d;
-  display: grid;
-  place-items: center;
-  padding: clamp(1rem, 2vw, 1.5rem) clamp(1.5rem, 3vw, 2.25rem);
-  border: 1px solid var(--gold-dim);
-  border-radius: var(--radius);
-  background: linear-gradient(150deg, rgba(232, 237, 245, 0.1), rgba(5, 7, 12, 0.5));
-  backdrop-filter: blur(12px) saturate(150%);
-  -webkit-backdrop-filter: blur(12px) saturate(150%);
-  box-shadow: 0 0 40px -12px var(--gold-glow), inset 0 1px 0 rgba(232, 237, 245, 0.16);
-  transition: transform 0.4s var(--ease-hover), box-shadow 0.4s var(--ease-hover);
-  cursor: default;
-}
-
-.award__badge:hover {
-  box-shadow: 0 0 60px -10px var(--gold-glow), inset 0 1px 0 rgba(232, 237, 245, 0.24);
-}
-
-.award__place {
-  position: relative;
-  font-size: clamp(1.5rem, 3.4vw, 2.5rem);
-  font-weight: 800;
-  line-height: 1;
-  color: var(--ink);
-  white-space: nowrap;
-}
-
-[lang="ar"] .award__place {
+  font-family: var(--font-mono);
+  font-size: clamp(5rem, 17vw, 13rem);
   font-weight: 700;
-  line-height: 1.35;
+  line-height: 0.82;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  background: linear-gradient(
+    170deg,
+    #ffffff 0%,
+    var(--pillar-accent, var(--steel)) 42%,
+    rgba(5, 7, 12, 0.35) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 40px var(--pillar-glow, var(--steel-glow)));
 }
 
 /*
- * The chromatic split. Two copies of the text sit behind the real one in the
- * two accent hues and separate for a moment as the badge resolves, then land.
- * `--glitch` runs 1..0, so the split closes rather than opening.
+ * The chromatic split, as on the typed line: two offset copies in the two
+ * accent hues that close onto the numeral as the section resolves. Driven by
+ * `--glitch`, which runs 1 to 0.
  */
-.award__place span {
+.award__rank span {
   position: absolute;
   inset: 0;
   pointer-events: none;
-}
-
-.award__place span:nth-of-type(1) {
-  color: var(--steel);
-  transform: translateX(calc(var(--glitch, 0) * -6px));
+  -webkit-background-clip: initial;
+  background-clip: initial;
+  background: none;
+  filter: none;
   mix-blend-mode: screen;
+  opacity: calc(var(--glitch, 0) * 0.85);
 }
 
-.award__place span:nth-of-type(2) {
+.award__rank span:nth-of-type(1) {
+  color: var(--steel);
+  transform: translate(calc(var(--glitch, 0) * -10px), calc(var(--glitch, 0) * 3px));
+}
+
+.award__rank span:nth-of-type(2) {
   color: var(--gold);
-  transform: translateX(calc(var(--glitch, 0) * 6px));
-  mix-blend-mode: screen;
+  transform: translate(calc(var(--glitch, 0) * 10px), calc(var(--glitch, 0) * -3px));
 }
 
-.award__year {
-  font-family: var(--font-mono);
-  font-size: var(--step--2);
-  letter-spacing: 0.22em;
-  color: var(--steel);
-  margin-block-start: 0.5rem;
+/* A scanline band travelling the numeral, so it reads as displayed rather
+   than printed. */
+.award__rank::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(5, 7, 12, 0.3) 0 1px,
+    transparent 1px 5px
+  );
+  opacity: 0.38;
+  mix-blend-mode: multiply;
 }
 
-/* The copy beside it, typed rather than faded. */
-.award__title {
-  font-size: var(--step-3);
-  font-weight: 800;
-  line-height: 1.05;
-  letter-spacing: -0.02em;
-  margin-block: 1rem 1.25rem;
-  text-wrap: balance;
-}
-
-[lang="ar"] .award__title {
-  font-weight: 700;
-  line-height: 1.4;
-  letter-spacing: 0;
-}
-
-.award__body {
-  color: var(--ink-2);
-  max-width: 44ch;
-  font-weight: 300;
+.award__place {
+  margin-block-start: clamp(0.5rem, 1.4vw, 1rem);
   font-size: var(--step-1);
-  line-height: 1.65;
-  min-height: 3.4em;
+  font-weight: 800;
+  color: var(--ink);
+  text-align: center;
 }
 
-[lang="ar"] .award__body {
-  font-weight: 400;
-  line-height: 1.9;
+[lang="ar"] .award__place { font-weight: 700; }
+
+.award__scope {
+  margin-block-start: 0.25rem;
+  color: var(--pillar-accent, var(--steel));
+  text-align: center;
 }
 
-/* The terminal caret, shown only while the line is still being typed. */
-.award__caret {
-  display: inline-block;
-  width: 0.6ch;
-  margin-inline-start: 0.15ch;
-  background: var(--gold);
-  animation: caret 1s steps(1) infinite;
-  vertical-align: -0.1em;
-  height: 1.05em;
+/* First place is gold; third is the board's steel. */
+.award__pillar--first {
+  --pillar-accent: var(--gold);
+  --pillar-glow: var(--gold-glow);
+  --pillar-line: var(--gold-dim);
+  --pillar-tint: rgba(217, 174, 69, 0.2);
 }
 
-.award__caret.is-done {
-  display: none;
+.award__pillar--third {
+  --pillar-accent: var(--steel);
+  --pillar-glow: var(--steel-glow);
+  --pillar-line: var(--steel-dim);
+  --pillar-tint: rgba(74, 144, 217, 0.2);
 }
 
-@keyframes caret {
-  0%, 50% { opacity: 1; }
-  50.01%, 100% { opacity: 0; }
-}
 
 /* --------------------------------------------------------------------------
    Projects — a horizontal filmstrip, pinned and driven by vertical scroll
@@ -1938,32 +2113,22 @@ textarea {
   gap: clamp(2rem, 1rem + 3vw, 3.5rem);
 }
 
-.footer__tagline {
-  color: var(--ink-3);
-  margin-block-start: 1rem;
-  font-size: var(--step--2);
-  letter-spacing: 0.16em;
-  font-family: var(--font-mono);
-}
-
-.footer__langs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem 1rem;
-  margin-block-start: 1.25rem;
-}
-
-.footer__langs .footer__link[aria-current] {
-  color: var(--ink);
-  font-weight: 600;
-}
-
+/*
+ * A column title is a title, and it has to look like one.
+ *
+ * Set in the data register, in the accent, over a rule that spans the column —
+ * so the eye reads "heading, then its list" instead of a slightly greyer link
+ * sitting on top of four others.
+ */
 .footer__title {
-  color: var(--ink-3);
-  margin-block-end: 0.875rem;
+  display: block;
+  color: var(--gold);
+  padding-block-end: 0.75rem;
+  margin-block-end: 1.125rem;
+  border-block-end: 1px solid var(--line-strong);
 }
 
-.footer__list { display: grid; gap: 0.5rem; }
+.footer__list { display: grid; gap: 0.6875rem; }
 
 .footer__link {
   font-size: var(--step--1);
@@ -2362,6 +2527,11 @@ select.field__control {
 @media (max-width: 620px) {
   .form__row { grid-template-columns: minmax(0, 1fr); }
 
+  .award__stage {
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(2rem, 8vw, 3rem);
+  }
+
   .bento {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -2443,8 +2613,6 @@ select.field__control {
   .rail__spec { position: static; transform: none; background: none; }
 
   .award__plate { opacity: 1; transform: none; }
-  .award__assembly { transform: none; }
-  .award__badge { transform: none; }
   .award__traces path,
   .award__traces line { stroke-dashoffset: 0; }
   .award__traces circle { opacity: 1; }
@@ -2492,4 +2660,104 @@ select.field__control {
   .rail__track { flex-wrap: wrap; transform: none !important; }
 
   body { color: #000; background: #fff; }
+}
+
+/* --------------------------------------------------------------------------
+   Back — the way out of a leaf page
+
+   An arrow that steps back into its own rule on approach. It is a link to the
+   section the page came from, not `history.back()`: a visitor arriving from a
+   search result has no history to go back to, and a control that does nothing
+   is worse than no control.
+   -------------------------------------------------------------------------- */
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 1.125rem 0.625rem 0.875rem;
+  margin-block-end: clamp(1.5rem, 3vw, 2.5rem);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  color: var(--ink-2);
+  font-size: var(--step--1);
+  font-weight: 600;
+  transition: color 0.3s var(--ease-hover), border-color 0.3s var(--ease-hover),
+    background-color 0.3s var(--ease-hover);
+}
+
+[dir="rtl"] .back {
+  padding-inline: 0.875rem 1.125rem;
+}
+
+.back:hover {
+  color: var(--ink);
+  border-color: var(--gold-dim);
+  background: rgba(217, 174, 69, 0.06);
+}
+
+.back__arrow {
+  flex: none;
+  transition: transform 0.3s var(--ease-hover);
+  transform: scaleX(-1);
+}
+
+[dir="rtl"] .back__arrow {
+  transform: none;
+}
+
+.back:hover .back__arrow {
+  transform: scaleX(-1) translateX(3px);
+}
+
+[dir="rtl"] .back:hover .back__arrow {
+  transform: translateX(3px);
+}
+
+/* --------------------------------------------------------------------------
+   The founder's profiles
+   -------------------------------------------------------------------------- */
+
+.social {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin-block-start: clamp(1.5rem, 3vw, 2rem);
+}
+
+.social__link {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  color: var(--ink-3);
+  transition: color 0.3s var(--ease-hover), border-color 0.3s var(--ease-hover),
+    transform 0.3s var(--ease-hover), box-shadow 0.3s var(--ease-hover);
+}
+
+.social__link:hover {
+  color: var(--gold);
+  border-color: var(--gold-dim);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px -14px var(--gold-glow);
+}
+
+.social__link svg {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+/* On the founder's own page the row sits beside the call to action. */
+.founder-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: clamp(1rem, 2.5vw, 1.75rem);
+  margin-block-start: clamp(1.5rem, 3vw, 2rem);
+}
+
+.founder-actions .social {
+  margin-block-start: 0;
 }

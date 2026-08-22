@@ -154,3 +154,43 @@ export function SolidIcon(props: IconProps) {
     </Base>
   );
 }
+
+/* --------------------------------------------------------------------------
+   Profile marks
+
+   These two are other companies' trademarks, so they are drawn to their own
+   proportions rather than restyled onto this site's icon grid — a redrawn
+   Instagram glyph is just a wrong Instagram glyph.
+   -------------------------------------------------------------------------- */
+
+export function LinkedInIcon(props: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden="true"
+      focusable="false"
+      {...props}
+    >
+      <path d="M6.94 5.5a1.94 1.94 0 1 1-3.88 0 1.94 1.94 0 0 1 3.88 0ZM3.4 8.93h3.2V21H3.4V8.93Zm5.32 0h3.07v1.65h.04c.43-.81 1.47-1.66 3.03-1.66 3.24 0 3.84 2.13 3.84 4.9V21h-3.2v-5.53c0-1.32-.02-3.02-1.84-3.02-1.84 0-2.12 1.44-2.12 2.92V21h-3.2V8.93Z" />
+    </svg>
+  );
+}
+
+export function InstagramIcon(props: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.7}
+      aria-hidden="true"
+      focusable="false"
+      {...props}
+    >
+      <rect x="3" y="3" width="18" height="18" rx="5" />
+      <circle cx="12" cy="12" r="4" />
+      <circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}

@@ -48,6 +48,8 @@ components/               Header, Footer, ProjectForm, Logo, Icons
   FounderStory.tsx        the founder route's editorial layout
   SmoothScroll.tsx        Lenis, wired to the GSAP ticker
   Cursor / Magnetic / RippleLink / PageWipe / MaskLines / Reveal
+  Social.tsx              the founder's profiles
+  BackLink.tsx            the way out of a leaf page
   motion.ts               one GSAP + ScrollTrigger registration
 lib/
   i18n.ts                 every string on the site, in both languages
@@ -55,7 +57,7 @@ lib/
   upload.ts               attachment limits shared by client and server
   site.ts                 canonical URL resolution
 public/images/            photography — see public/images/README.md
-public/media/             the hero film (three H.264 tiers, one VP9, one poster)
+public/media/             the hero film (one H.264, one VP9, one poster)
 ```
 
 ### Editing content
@@ -127,10 +129,19 @@ Tailwind, no animation library beyond GSAP, and no component kit.
 
 `components/SmoothScroll.tsx` takes the wheel and the touch off the document
 and eases the real scroll position toward a target, so movement carries weight
-instead of snapping — lerp `0.09` on a pointer, `0.15` under a finger, which
-needs to keep up with the thumb. Because it drives the *native* scroll position
-rather than transforming the page, `position: sticky` — and therefore every
-pinned section — anchors, the scrollbar and find-in-page all keep working.
+instead of snapping. Because it drives the *native* scroll position rather than
+transforming the page, `position: sticky` — and therefore every pinned section —
+anchors, the scrollbar and find-in-page all keep working.
+
+**The weight is a duration, not a lerp.** A lerp moves a fixed fraction of the
+remaining distance each frame: it never quite arrives, so the last stretch of
+every gesture crawls, and because the step depends on the distance left, a short
+flick and a long one settle at different rates. That inconsistency is what reads
+as "not smooth" even when nothing is dropping frames. A duration with an
+exponential ease-out (`1.15s` on a pointer, `0.9s` under a finger) gives every
+gesture the same wall-clock settle whatever its length, and lands rather than
+approaching. `syncTouch` stops the finger dragging Lenis and the platform's own
+scroll at the same time.
 
 **Lenis and ScrollTrigger share one clock.** Left on separate loops, GSAP reads
 a scroll position Lenis has not written yet and every pinned section lags a
@@ -166,6 +177,11 @@ emptiest screen still carries 45 characters of visible copy.
 - A custom cursor: an 8px dot in `mix-blend-mode: difference`, opening to 40px
   over anything clickable. It is an *addition* to the system pointer, not a
   replacement, so nothing is lost if it never renders. Fine pointers only.
+- One reading line, and only one. The header's own bottom edge is a plain
+  hairline rather than a gradient — two coloured rules that close to the top of
+  the screen read as two progress bars.
+- The menu control is a 2x2 array of pads, not three lines: the corner of the
+  package the site opens on. Open, the array rotates and one diagonal retracts.
 - Magnetic pull on the badge and the founder's call to action; a ripple where a
   press lands.
 - A diagonal shutter between routes, skipped on first load.
@@ -195,67 +211,72 @@ it has decoded a frame, and is fetched only **after the page's own `load`**, on
 an idle callback — a multi-megabyte media fetch running alongside the document
 only pushes out the moment the hero becomes readable.
 
-### The ladder
+### One encode, at maximum quality
 
-The source is 1080p, so **there is no tier above it**: a 1440p or 4K entry would
-be an upscale of pixels that were never shot. A browser downloads exactly one
-file — the component asks `canPlayType` and assigns `video.src` itself, because
-a fallthrough list of `<source>` elements makes the browser fetch the MP4, fail
-to decode it, and fetch the WebM as well.
+The team asked for the highest quality the source allows, on every device, and
+accepted the weight that comes with it. So there is no ladder:
 
 | File | Codec | Size | Served to |
 | --- | --- | --- | --- |
-| `chip-1080.mp4` | 1920x1080 H.264 all-intra | 4.7 MB | ≥1200px viewports |
-| `chip-720.mp4` | 1280x720 H.264 all-intra | 2.7 MB | 700–1200px |
-| `chip-540.mp4` | 960x540 H.264 all-intra | 1.6 MB | <700px, a metered or slow link, or ≤4 GB of device memory |
-| `chip-540.webm` | 854x480 VP9 all-intra | 3.5 MB | browsers without H.264 |
+| `chip-1080.mp4` | 1920x1080 H.264, all-intra | 31.3 MB | everything that can decode H.264 |
+| `chip-720.webm` | 1280x720 VP9, all-intra | 10.6 MB | browsers that cannot |
 
-Scrubbing decodes a frame per seek, so the cost is the decoder's and not only
-the network's — a phone handed the 1080p file drops frames even once it has
-finished downloading it. That is why the tier is chosen by viewport and device
-memory, not by bandwidth alone.
+**501 frames** — every frame of the source, at 24fps. Over a 300svh track that
+is roughly one frame per 3px of scroll on a desktop screen, which is what makes
+a slow scrub read as motion rather than as a slideshow.
 
 **Every frame is a keyframe.** Scrubbing lands on an arbitrary time, and with an
 inter-frame group the decoder has to walk forward from the last keyframe to get
 there; all-intra means one decode per seek, at any position, in any direction.
-That is also why the files are as large as they are for 7 seconds of footage.
+That is the entire reason 7 seconds of footage costs 31 MB, and it is the
+reason the scrub never hitches.
 
-**167 frames.** The source is 501 frames at 24fps; every third one is kept. Over
-a 300svh track that is roughly one frame per 10px of scroll on a desktop
-screen — finer than the eye resolves while scrolling, and a third of the bytes.
+The source is 1080p, so **there is no tier above it** — a 1440p or 4K entry
+would be an upscale of pixels that were never shot. Measured alternatives, all
+rejected: HEVC saved 13% for a Safari-only branch; a short GOP saved half the
+weight but made backward seeks cost up to seven decodes; a WebP image sequence
+came to 12.4 MB at a *lower* resolution.
 
-**Frame selection.** Below half a frame of movement nothing is asked for. Faster
-scrolling raises that threshold, because at speed the eye cannot resolve single
-frames and holding the decoder to every one of them is what drops the frame
-rate; on a device already marked light the floor is five frames, as a deliberate
-coarsening. HEVC was measured at 4.1 MB against H.264's 4.7 MB for the same
-quality — 13%, which did not justify a second encode pipeline and a
-Safari-only branch. A WebP image sequence was measured at 12.4 MB and rejected.
+**Nothing waits on it.** `preload="none"`, the source assigned on an idle
+callback after the page's own `load`, and the poster painted as the layer's own
+CSS background — so the hero heading is readable in about 250ms and the footage
+arrives behind it. Until it is decodable, `ready` stays false and the scene
+holds on the poster, which is the film's own first frame.
+
+On a device with 4GB of memory or less, or a viewport under 700px, the decoder
+is asked for a new frame less often. It is the same file at the same
+resolution; only the seek rate is coarsened, because what a phone struggles
+with is decoding a fresh frame on every animation frame while also scrolling.
 
 To re-cut the film from a new source:
 
 ```bash
-ffmpeg -i source.mp4 \
-  -vf "select='not(mod(n\,3))',scale=1920:1080:flags=lanczos,setpts=N/24/TB" -r 24 \
+ffmpeg -i source.mp4 -vf "scale=1920:1080:flags=lanczos" \
   -c:v libx264 -profile:v high -pix_fmt yuv420p -g 1 -keyint_min 1 -bf 0 \
-  -sc_threshold 0 -crf 32 -preset slow -movflags +faststart -an \
+  -sc_threshold 0 -crf 22 -preset slow -movflags +faststart -an \
   public/media/chip-1080.mp4
 ```
 
 ## The award
 
-`components/Award.tsx` sits immediately after the hero. The section opens dark;
-as it is entered the board's traces draw themselves (each path reports its own
-`getTotalLength()`, so the dash animation is exact rather than a guess), three
-plates assemble in depth under a `perspective: 1200px`, and the badge resolves
-out of a chromatic split — two offset copies in the two accent hues closing onto
-the real text. The line beside it types rather than fades.
+`components/Award.tsx` sits immediately after the hero and carries **two**
+placings from NURAI 2026 — first at the University of Mosul, third nationally
+in Iraq.
+
+Each placing is a numeral set at the largest size anywhere on the site,
+standing on its own plinth of plates that assemble in depth under a
+`perspective: 1400px`. First place takes the brand gold, third the board's
+steel, so the two are told apart before they are read. Both resolve out of a
+chromatic split — two offset copies in the accent hues closing onto the figure —
+and a scanline band crosses each one so it reads as displayed rather than
+printed. Behind them the board's traces draw themselves; each path reports its
+own `getTotalLength()`, so the dash animation is exact rather than a guess.
 
 One ScrollTrigger writes three custom properties (`--draw`, `--assemble`,
 `--glitch`); the stylesheet owns every appearance decision and the component
-owns only the timing. The typed line carries the full sentence as its
-`aria-label`, so assistive technology never reads a half-finished sentence.
-
+owns only the timing. The line beside it types rather than fades, and carries
+the full sentence as its `aria-label` so assistive technology never reads a
+half-finished one.
 
 ## Typography
 
