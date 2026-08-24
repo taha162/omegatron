@@ -13,6 +13,15 @@ import type { Dictionary, Locale } from "@/lib/i18n";
 const FPS = 24;
 
 /**
+ * How hard the film chases the scroll, as a time constant in seconds.
+ *
+ * Expressed this way rather than as a per-frame fraction so the feel is the same
+ * on a 30Hz, 60Hz or 120Hz panel. See the note at the call site for why this is
+ * tighter than the fraction it replaced.
+ */
+const FILM_TAU = 0.045;
+
+/**
  * One encode, served to every device.
  *
  * The team asked for maximum quality everywhere, so there is no ladder: this is
@@ -229,6 +238,12 @@ export function HeroScene({ locale, dict }: { locale: Locale; dict: Dictionary }
       raf = requestAnimationFrame(loop);
 
       const now = performance.now();
+      /* Seconds since the previous frame, clamped so a tab returning from the
+         background does not hand the filter one enormous step. On the first
+         frame after a pause there is no previous time; one frame at 60Hz is the
+         safe assumption. */
+      const dt = lastFrameAt ? Math.min(0.1, (now - lastFrameAt) / 1000) : 1 / 60;
+
       /*
        * Only frames the shader is actually responsible for are judged.
        *
@@ -251,9 +266,29 @@ export function HeroScene({ locale, dict }: { locale: Locale; dict: Dictionary }
       lastFrameAt = now;
 
       if (ready && Number.isFinite(vid.duration) && vid.duration > 0) {
-        // Chase the scroll rather than snapping to it, so a flick asks the
-        // decoder for a run of frames instead of one impossible jump.
-        easedTime += (targetTime - easedTime) * 0.24;
+        /*
+         * Chase the scroll rather than snapping to it, so a discontinuity asks
+         * the decoder for a run of frames instead of one impossible jump.
+         *
+         * This is a time constant now, not a per-frame fraction. The old `0.24`
+         * once per rAF was τ = 61ms at 60Hz but 30ms at 120Hz and 122ms at 30Hz
+         * — the film was twice as tight to the scroll on a fast panel, while
+         * Lenis's side was already dt-normalised, so the ratio between the two
+         * curves shifted with refresh rate.
+         *
+         * It is also TIGHTER than before (τ = 45ms against 61ms), which is the
+         * opposite of the intuition now that the page carries more weight. The
+         * film's visible lag against the beats is `velocity x FILM_TAU` and does
+         * not contain Lenis's τ at all, while heavier page smoothing halves peak
+         * on-screen velocity — so the two are in series, not in conflict, and
+         * doubling the page's τ already cut the film's worst-case lag on its
+         * own. What is left for this filter to absorb is scroll Lenis never
+         * smoothed: a scrollbar drag, find-in-page, the keyboard, and refresh
+         * resyncs, all of which arrive as true discontinuities. At 45ms a
+         * full-page jump still ramps over about 0.14s, which the decoder can
+         * take.
+         */
+        easedTime += (targetTime - easedTime) * (1 - Math.exp(-dt / FILM_TAU));
 
         const total = Math.max(1, Math.round(vid.duration * FPS));
         const raw = Math.round((easedTime * FPS) / step) * step;
@@ -334,37 +369,36 @@ export function HeroScene({ locale, dict }: { locale: Locale; dict: Dictionary }
     video.addEventListener("loadeddata", onLoaded);
 
     /*
-     * The film is fetched after the page's own load, not during it.
+     * The film is fetched as soon as the scene mounts.
      *
-     * The poster is already painted as the layer's background, so the scene
-     * has its picture from the first frame; starting a multi-megabyte media
-     * fetch alongside the document only pushes out the moment the hero becomes
-     * readable. Until the footage is decodable, `ready` stays false and the
-     * poster simply holds.
+     * It used to wait for the page's own `load` and then an idle callback, on
+     * the reasoning that a multi-megabyte media fetch alongside the document
+     * pushes out the moment the hero becomes readable. That reasoning had two
+     * holes. The first frame is all this needs to go live, and on a faststart
+     * container that is about 92 KB, not 32 MB — nothing like the weight the
+     * deferral was written to avoid. And the boot curtain is now over the hero
+     * for the whole of that wait, so there is no reader to keep waiting: the
+     * deferral was buying quiet on a screen nobody was looking at, while making
+     * the curtain sit there for the length of `load` before even starting.
+     *
+     * `requestIdleCallback` also does not fire in a backgrounded tab, so the
+     * old path could leave the film unfetched indefinitely on a page opened in
+     * a background tab — which is exactly when a reader expects it ready.
+     *
+     * `preload` stays `none` in the server-rendered markup, so the parser
+     * starts nothing; the hint is lifted only at the moment the fetch is
+     * actually wanted.
      */
     const chosen = pickSource(video);
 
-    let idle = 0;
-    let idleIsTimeout = false;
-
     function fetchFilm() {
       if (vid.src) return;
+      vid.preload = "auto";
       vid.src = chosen.src;
       vid.load();
     }
 
-    function scheduleFetch() {
-      const w = window as Window & { requestIdleCallback?: (cb: () => void) => number };
-      if (typeof w.requestIdleCallback === "function") {
-        idle = w.requestIdleCallback(fetchFilm);
-      } else {
-        idleIsTimeout = true;
-        idle = window.setTimeout(fetchFilm, 200);
-      }
-    }
-
-    if (document.readyState === "complete") scheduleFetch();
-    else window.addEventListener("load", scheduleFetch, { once: true });
+    fetchFilm();
 
     /*
      * Beat opacity for a given progress figure. Shared by the first paint and
@@ -409,9 +443,14 @@ export function HeroScene({ locale, dict }: { locale: Locale; dict: Dictionary }
           targetTime = p * video.duration;
         }
 
-        // Signed and normalised. 2800px/s is about as fast as a deliberate
-        // flick goes; past that the picture would simply tear.
-        const signed = Math.max(-1, Math.min(1, self.getVelocity() / 2800));
+        /* Signed and normalised. The divisor is a flick calibration, and a
+           flick is a transient — peak velocity roughly halved when the page's
+           time constant doubled, so the old 2800 now leaves the wave and the
+           chromatic split muted at exactly the moment they are meant to give
+           the board mass. Not halved outright to 1400: sustained scroll velocity
+           does NOT halve (a first-order lag has unity DC gain), so that would
+           over-saturate during a long read. */
+        const signed = Math.max(-1, Math.min(1, self.getVelocity() / 1800));
         velocity += (signed - velocity) * 0.25;
 
         // Beats cross-fade with a little parallax, so the type has depth
@@ -435,12 +474,6 @@ export function HeroScene({ locale, dict }: { locale: Locale; dict: Dictionary }
       window.removeEventListener("resize", onResize);
       renderer?.destroy();
       trigger.kill();
-      window.removeEventListener("load", scheduleFetch);
-      if (idle) {
-        const w = window as Window & { cancelIdleCallback?: (h: number) => void };
-        if (!idleIsTimeout && typeof w.cancelIdleCallback === "function") w.cancelIdleCallback(idle);
-        else window.clearTimeout(idle);
-      }
       video.removeEventListener("loadeddata", onLoaded);
       video.removeAttribute("src");
       video.load();

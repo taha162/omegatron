@@ -28,36 +28,65 @@ export function SmoothScroll() {
     const { gsap, ScrollTrigger } = motion();
 
     /*
-     * The weight, and why it is a duration rather than a lerp.
+     * The weight, expressed as a time constant.
      *
-     * A lerp moves a fixed fraction of the remaining distance each frame. It
-     * never actually arrives, so the last stretch of every gesture crawls, and
-     * because the step depends on the distance left, a short flick and a long
-     * one settle at different rates. That inconsistency is what reads as
-     * "not smooth" even though nothing is dropping frames.
+     * The two modes Lenis offers are the same filter. In `Animate.advance` the
+     * duration branch leaves exactly 2^(-10·t/D) of the gap outstanding — an
+     * exponential decay with τ = D/(10·ln2) — and the lerp branch calls
+     * `damp(v, target, lerp*60, dt)`, an exponential decay with τ = 1/(60·lerp)
+     * evaluated against real elapsed time. Only τ decides the feel.
      *
-     * A duration with an exponential ease-out gives every gesture the same
-     * wall-clock settle whatever its length, and lands rather than
-     * asymptotically approaching. The curve below is steep at the start and
-     * flat at the end: the page takes the movement up immediately and puts it
-     * down softly, which is the "precision dial" weight without the drag.
+     * That makes the old comment here wrong on every count, so it is gone: in
+     * 1.3.x `damp` exponentiates dt and is frame-rate independent, exponential
+     * decay has a distance-independent time constant so a short flick and a long
+     * one settle at the same rate, and the lerp branch snaps home once the two
+     * round to the same pixel rather than approaching forever. The only real
+     * difference is that duration mode has a deadline — and `onVirtualScroll`
+     * resets the clock on every wheel event, so during a gesture that deadline
+     * never arrives either.
+     *
+     * `lerp: 0.055` is τ = 0.303s, exactly double the old 1.05s duration's
+     * 0.151s, and about 0.91s for a notch to come fully to rest. The knob now
+     * names τ directly instead of hiding a 6.93x factor inside an easing
+     * function, and it leaves `duration`/`easing` free for the one call that
+     * genuinely wants a wall-clock deadline — the anchor jump below.
+     *
+     * TRAP: passing `easing` without `duration` silently sets `duration = 1`,
+     * and the duration branch outranks lerp. Neither key may appear here or the
+     * whole tuning reverts to τ = 0.144s with nothing logged.
      */
     const lenis = new Lenis({
-      duration: 1.05,
-      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      lerp: 0.055,
+      /* Left at 1 deliberately. A first-order lag has unity DC gain: sustained
+         input settles at exactly the same px/s whatever τ is, and one notch
+         still travels exactly as far — only the ramp-up and the tail lengthen.
+         Raising this to "compensate" would re-pace every pinned section against
+         a scroll length it was authored to, and raise the film's seek rate. */
       wheelMultiplier: 1,
-      touchMultiplier: 1.6,
       smoothWheel: true,
       /*
-       * Touch is left to the platform.
+       * Touch is left to the platform. Same conclusion as before, different
+       * evidence — the old reasoning here claimed two easing curves fight each
+       * other, but with `syncTouch` on Lenis preventDefaults `touchmove` and the
+       * platform curve never runs at all. There is only ever one.
        *
-       * iOS and Android already run momentum scrolling on their own
-       * compositors, off the main thread, tuned to the device. Driving it from
-       * JavaScript puts a second easing curve on top of one that is already
-       * running, and the two disagree about where the page should be for the
-       * whole length of every flick — which is what a finger reads as
-       * stuttering. The wheel still gets the weight; a finger gets the
-       * platform's own, which is better than anything this can synthesise.
+       * The reasons that actually hold are specific to this page. Taking touch
+       * would put the scroll position itself on the main thread, which is the
+       * same thread already decoding a 1080p all-intra seek and uploading it as
+       * a texture — and the phone path already coarsens to every third frame
+       * precisely because that thread is saturated, so a decode hitch would
+       * freeze the page under the finger rather than only the film. Touch is
+       * also direct manipulation: any lag has the finger itself as its
+       * reference, which is why smoothing that reads as weight on a wheel reads
+       * as broken under a thumb. And preventDefaulting `touchmove` costs iOS
+       * Safari's URL-bar collapse for the life of the session.
+       *
+       * Consequence, stated plainly: none of the tuning above is felt on a
+       * phone. It is a wheel and trackpad change.
+       *
+       * `touchMultiplier` used to sit here at 1.6 and was a verified no-op —
+       * `onVirtualScroll` early-returns for every touch event while syncTouch is
+       * false, discarding the delta it had just scaled.
        */
       syncTouch: false,
       // The browser's own overscroll gestures would otherwise fire underneath
@@ -106,7 +135,30 @@ export function SmoothScroll() {
       const target = document.querySelector(url.hash);
       if (!target) return;
       event.preventDefault();
-      lenis.scrollTo(target as HTMLElement, { offset: -80 });
+      /*
+       * The one call that wants a deadline rather than a decay — and no offset.
+       *
+       * A per-call `duration` wins over the instance's lerp inside `advance`, so
+       * this jump lands in a known 1.1s however far it has to travel. Left on
+       * the page's own τ = 0.303s, a page-length anchor spends well over a
+       * second visibly creeping into place. A wheel event mid-jump still takes
+       * over cleanly, because `onUpdate` keeps `targetScroll` on the current
+       * position while the jump is programmatic.
+       *
+       * There used to be an `offset: -80` here as well, and it was
+       * double-counting. Lenis already subtracts the root's
+       * `scroll-padding-block-start` when it resolves an element target, and the
+       * stylesheet sets that to `calc(var(--header-h) + 2rem)` — 104px, which is
+       * exactly the clearance the fixed bar needs. The extra 80 on top landed
+       * every in-page anchor 184px above its own section, so About, Projects,
+       * Capabilities and Contact all overshot into the whitespace above their
+       * headings. The clearance now lives in one place, in CSS, beside the
+       * header height it depends on.
+       */
+      lenis.scrollTo(target as HTMLElement, {
+        duration: 1.1,
+        easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      });
       history.pushState(null, "", url.hash);
     }
 

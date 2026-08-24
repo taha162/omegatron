@@ -25,7 +25,7 @@ export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
           <div>
             <Link href={`/${locale}`} className="brand" aria-label={dict.nav.home}>
               <Logo className="brand__mark brand__mark--lg" />
-              <Wordmark className="wordmark" />
+              <Wordmark className="brand__word" />
             </Link>
 
             {/* The line that is already set under the mark on the team's own

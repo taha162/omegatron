@@ -723,7 +723,11 @@ textarea {
 .header__inner {
   height: var(--header-h);
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  /* The mark takes the inline-start edge, the controls the inline-end, and the
+     navigation rides the slack between them. Column 1 is the right-hand edge
+     in Arabic and the left-hand edge in English — one rule, both directions,
+     no `[dir]` override anywhere in this bar. */
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 1rem;
 }
@@ -812,26 +816,27 @@ textarea {
   z-index: 1;
 }
 
-/* The mark wipes in on a scanline rather than fading. */
-/* The mark sits in the middle of the bar, with the navigation on one side of
-   it and the controls on the other. It still wipes in on a scanline rather
-   than fading, and it still holds off until the HUD comes up — at the top of
-   the page the hero is already saying the name, in letters an inch high. */
+/*
+ * The mark takes the inline-start corner and stays there.
+ *
+ * It used to sit in the middle of the bar and hold itself off until the HUD
+ * came up, on the grounds that the hero was already saying the name in the
+ * centre of the screen in letters an inch high. At the corner it is no longer
+ * standing on top of the hero lockup, so the hold has nothing left to avoid —
+ * and every route that is not the home page has no hero at all, which meant
+ * `/founder`, `/start` and the 404 all opened with a completely empty bar.
+ *
+ * The clip-path went with it. A clip that never changes still costs a stacking
+ * context and its own paint path, for the whole life of a fixed bar.
+ */
 .brand {
   grid-row: 1;
-  grid-column: 2;
+  grid-column: 1;
+  justify-self: start;
   display: inline-flex;
   align-items: center;
   gap: 0.625rem;
   flex: none;
-  justify-self: center;
-  clip-path: inset(0 0 0 0);
-  transition: clip-path 0.7s var(--ease-enter), opacity 0.4s var(--ease-hover);
-}
-
-.header:not(.is-hud) .brand {
-  clip-path: inset(0 0 100% 0);
-  opacity: 0;
 }
 
 .brand__mark {
@@ -851,7 +856,24 @@ textarea {
   height: 2.375rem;
 }
 
-.wordmark {
+/*
+ * The small wordmark — the one set in type, in the header and the footer.
+ *
+ * It is named for the block it belongs to. It used to be called `.wordmark`,
+ * which is also what the drawn hero lockup calls its root, so it was quietly
+ * collecting that block's `display: block`, `position: relative`, `inline-size`
+ * and — the visible symptom — a `margin-block-end` of up to 24px. As a centred
+ * flex item, a bottom margin lifts the ink by half its value: the word sat
+ * about 12px above the bar's centre line, in the footer as well as the header.
+ *
+ * Nothing here centres it. `.brand` is `inline-flex` with `align-items: center`,
+ * so the word is centred the moment it stops carrying a margin it never asked
+ * for. The two declarations below are stated so no future rule can put one back
+ * without someone noticing.
+ */
+.brand__word {
+  align-self: center;
+  margin-block: 0;
   font-weight: 800;
   letter-spacing: 0.06em;
   line-height: 1.1;
@@ -859,15 +881,25 @@ textarea {
   font-size: 0.9375rem;
 }
 
-.wordmark__a { color: var(--ink); }
-.wordmark__b { color: var(--gold); }
+.brand__word-a { color: var(--ink); }
+.brand__word-b { color: var(--gold); }
 
 .nav {
   grid-row: 1;
-  grid-column: 1;
+  grid-column: 2;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  /* `minmax(0, 1fr)` lets the track shrink; this lets the item shrink with it.
+     Without it the automatic minimum size is min-content and the bar goes wide
+     instead of the row compressing. */
+  min-inline-size: 0;
+  /* Centred between the mark and the controls — but `safe` first, so a row that
+     no longer fits falls back to start-alignment and spills in one direction
+     rather than two. The plain declaration above it is the fallback for engines
+     that do not know the keyword; collapsing these to one line hands old Safari
+     `flex-start` from nowhere. */
+  justify-content: center;
+  justify-content: safe center;
   gap: clamp(0.75rem, 0.2rem + 1.4vw, 1.75rem);
 }
 
@@ -1326,13 +1358,64 @@ textarea {
   animation-delay: calc(var(--i) * var(--wm-step) + 0.46s);
 }
 
-/* One pass of light once the mark is whole. */
-.wordmark__sheen {
-  opacity: 0;
-  animation: wm-sheen 1.15s var(--ease-hover) forwards;
-  animation-delay: calc(var(--wm-groups) * var(--wm-step) + 0.5s);
+/*
+ * The idle clock.
+ *
+ * Declared on the two elements that use it rather than on the block, so nothing
+ * here can reach anything else.
+ *
+ * 9.2s against 7.3s is coprime on purpose. The two do not return to the same
+ * phase for eleven minutes, so the gleam sometimes arrives with the rule at full
+ * and sometimes against it, and the mark never falls into a rhythm a reader can
+ * anticipate — the same reasoning as the 6.5s/8.3s split on `.award__rank`.
+ *
+ * `--wm-idle-in` is the moment the entrance is over: the last thing it does is
+ * the sheen, at `groups x step + 0.5s` running for 1.15s. It resolves per script
+ * from the component's own `--wm-groups`.
+ */
+.wordmark__sheen,
+.wordmark__rule {
+  --wm-idle-in: calc(var(--wm-groups) * var(--wm-step) + 2.4s);
+  --wm-gleam: 9.2s;
+  --wm-breath: 7.3s;
 }
 
+/*
+ * One pass of light once the mark is whole — and then the same band, a third as
+ * bright and twice as slow, for as long as the page is open. A milled face
+ * catching the room each time it turns, not a thing that blinks.
+ *
+ * The handoff is the cascade, not a script. A later animation in the list wins
+ * the properties it declares, but only once it is past its own delay: before
+ * that it is in its before-phase with no fill and contributes nothing, so
+ * `wm-sheen`'s `forwards` fill holds the rect exactly where the entrance left
+ * it. At `--wm-idle-in` the two idle animations take ownership of transform and
+ * opacity on the same frame. Both sides of that frame are at opacity 0, so the
+ * band snapping back to its start is never painted.
+ *
+ * For 70% of every cycle the band is parked off the letterforms — outside the
+ * viewBox and fully transparent, which is nothing to paint and nothing to
+ * composite. Only the last 2.76s of each 9.2s crosses the mark.
+ *
+ * No `will-change`: an infinite animation already promotes for the life of the
+ * page, and the hint would only restate a decision already made.
+ */
+.wordmark__sheen {
+  opacity: 0;
+  animation:
+    wm-sheen 1.15s var(--ease-hover) forwards,
+    wm-gleam-move var(--wm-gleam) linear infinite,
+    wm-gleam-fade var(--wm-gleam) linear infinite;
+  animation-delay:
+    calc(var(--wm-groups) * var(--wm-step) + 0.5s),
+    var(--wm-idle-in),
+    var(--wm-idle-in);
+}
+
+/* The rule keeps the mark alive between passes. Opacity only — the entrance
+   owns `transform`, and its `forwards` scaleX(1) is left standing. The cycle
+   opens and closes at 1, which is where the entrance parked it, so the loop
+   joins on its own resting value and there is no step at the handoff. */
 .wordmark__rule {
   display: block;
   block-size: 1px;
@@ -1345,8 +1428,12 @@ textarea {
   );
   transform: scaleX(0);
   transform-origin: var(--rule-from, left) center;
-  animation: wm-rule 0.9s var(--ease-enter) forwards;
-  animation-delay: calc(var(--wm-groups) * var(--wm-step) + 0.35s);
+  animation:
+    wm-rule 0.9s var(--ease-enter) forwards,
+    wm-rule-breathe var(--wm-breath) var(--ease-hover) infinite;
+  animation-delay:
+    calc(var(--wm-groups) * var(--wm-step) + 0.35s),
+    var(--wm-idle-in);
 }
 
 [dir="rtl"] .wordmark__rule {
@@ -1377,12 +1464,47 @@ textarea {
   to { transform: scaleX(1); }
 }
 
-/* Nobody who asked for less motion needs to watch a name being written. */
+/*
+ * The travel. Constant velocity, like `rank-band`: a light source crossing at a
+ * steady rate, not an easing gesture.
+ *
+ * The distance is 1.55 box-widths in BOTH scripts, so the two gleam at the same
+ * apparent speed despite different viewBoxes: `--wm-sweep-from/to` are multiples
+ * of each mark's own width, and each viewBox width IS that width (Arabic 8416
+ * units over 5430 = 1.550; Latin 8940 over 5768 = 1.550). Direction comes free
+ * from the same properties — Arabic runs right to left with the writing, Latin
+ * left to right — so there is no directional selector anywhere in this loop.
+ */
+@keyframes wm-gleam-move {
+  0%, 70% { transform: translateX(var(--wm-sweep-from)); }
+  100%    { transform: translateX(var(--wm-sweep-to)); }
+}
+
+/* The brightness, split out of the travel so each gets its own curve and no
+   engine has to decide which keyframe's easing governs a property that skips
+   keyframes. Peak 0.34 against the entrance's 1.0 — the gradient's own hot stop
+   is white at 0.85, so the idle gleam lands at about 0.29 white over the
+   letterform. A reflection, not an announcement. */
+@keyframes wm-gleam-fade {
+  0%, 70% { opacity: 0; }
+  76%     { opacity: 0.34; }
+  94%     { opacity: 0.26; }
+  100%    { opacity: 0; }
+}
+
+@keyframes wm-rule-breathe {
+  0%, 100% { opacity: 1; }
+  46%      { opacity: 0.48; }
+}
+
+/* Nobody who asked for less motion needs to watch a name being written — or a
+   mark that never settles. `animation: none` resets the whole comma list, so
+   the entrance and the idle loop die on the same line. */
 @media (prefers-reduced-motion: reduce) {
   .wordmark__trace { animation: none; opacity: 0; }
   .wordmark__fill { animation: none; opacity: 1; }
   .wordmark__sheen { animation: none; opacity: 0; }
-  .wordmark__rule { animation: none; transform: scaleX(1); }
+  .wordmark__rule { animation: none; opacity: 1; transform: scaleX(1); }
 }
 
 .hero__statement {
@@ -1578,6 +1700,194 @@ textarea {
   to {
     clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
   }
+}
+
+/* --------------------------------------------------------------------------
+   Boot — the screen the reader watches while the scene is made ready
+
+   Costs no network at all. The mark is the same outline data the hero lockup
+   already ships in the client bundle, drawn as bare hairlines; everything else
+   is a rule, a lamp and a gradient. Nothing here is fetched.
+
+   It sits above every other overlay because it is the only thing that should be
+   readable while it is up, and it hands over by lifting rather than fading, so
+   the page underneath is revealed rather than cross-dissolved into.
+   -------------------------------------------------------------------------- */
+
+.boot {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  display: grid;
+  place-items: center;
+  padding: var(--gutter);
+  background: var(--paper);
+  cursor: pointer;
+
+  /*
+   * The dead-man's switch.
+   *
+   * This is the whole reason the curtain is safe. If the JavaScript bundle
+   * never arrives, or throws before the component mounts, nothing is left to
+   * take this panel down — so the stylesheet takes it down itself at twelve
+   * seconds, whatever else is or is not running. A `forwards` fill on
+   * visibility and opacity, so it stays gone.
+   *
+   * Nothing else on the page is gated behind a class this panel owns, so this
+   * is the only escape hatch that has to exist.
+   */
+  animation: boot-abandon 0.4s linear 12s forwards;
+}
+
+@keyframes boot-abandon {
+  to { opacity: 0; visibility: hidden; }
+}
+
+/* The lift. The panel leaves upward and the page is already live beneath it. */
+.boot.is-off {
+  animation: boot-lift 0.62s var(--ease-enter) forwards;
+  pointer-events: none;
+}
+
+@keyframes boot-lift {
+  to { transform: translateY(-100%); }
+}
+
+.boot__inner {
+  display: grid;
+  justify-items: center;
+  gap: clamp(1.5rem, 4vw, 2.5rem);
+  inline-size: min(100%, 34rem);
+}
+
+.boot.is-off .boot__inner {
+  opacity: 0;
+  transition: opacity 0.24s var(--ease-hover);
+}
+
+/* The mark, plotted rather than typed — one hairline per stroke, in writing
+   order. The same contours the hero lockup uses, with no gradient and no clip,
+   so it carries no ids that could collide with the lockup's own. */
+.boot__mark {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+  overflow: visible;
+}
+
+.boot__stroke {
+  fill: none;
+  stroke: var(--gold-bright);
+  stroke-width: 1.3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: boot-draw 0.55s var(--ease-hover) forwards;
+  animation-delay: calc(0.15s + var(--i) * 0.07s);
+}
+
+@keyframes boot-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+/* The meter. One rule, filled a third at a time as each gate closes — the
+   fill is a transform so it costs nothing to move. */
+.boot__meter {
+  position: relative;
+  inline-size: 100%;
+  block-size: 1px;
+  background: var(--line-strong);
+  overflow: hidden;
+}
+
+.boot__meter-fill {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to var(--boot-to, right), var(--steel), var(--gold));
+  transform-origin: var(--boot-from, left) center;
+  transition: transform 0.5s var(--ease-enter);
+}
+
+[dir="rtl"] .boot__meter-fill {
+  --boot-to: left;
+  --boot-from: right;
+}
+
+.boot__gates {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: clamp(1rem, 4vw, 2.25rem);
+}
+
+.boot__gate {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--ink-3);
+  transition: color 0.4s var(--ease-hover);
+}
+
+.boot__gate.is-done { color: var(--ink-2); }
+
+/* The lamp: a diamond, the same mark the band and the method rule use. Steel
+   while the gate is open, gold and lit once it closes. */
+.boot__lamp {
+  inline-size: 5px;
+  block-size: 5px;
+  flex: none;
+  background: var(--line-bright);
+  transform: rotate(45deg);
+  transition: background-color 0.4s var(--ease-hover), box-shadow 0.4s var(--ease-hover);
+}
+
+.boot__gate.is-done .boot__lamp {
+  background: var(--gold);
+  box-shadow: 0 0 10px var(--gold-glow);
+}
+
+/*
+ * The scanline. One hairline travelling the panel, so the screen has a pulse
+ * while the gates are still open. Transform only, on its own layer.
+ */
+.boot__scan {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: 0;
+  block-size: 1px;
+  background: linear-gradient(
+    to var(--boot-to, right),
+    transparent,
+    var(--steel-dim) 30%,
+    var(--gold-dim) 70%,
+    transparent
+  );
+  opacity: 0.7;
+  animation: boot-scan 3.4s var(--ease-hover) infinite;
+}
+
+[dir="rtl"] .boot__scan {
+  --boot-to: left;
+}
+
+@keyframes boot-scan {
+  0% { transform: translateY(0); opacity: 0; }
+  12% { opacity: 0.7; }
+  88% { opacity: 0.7; }
+  100% { transform: translateY(100svh); opacity: 0; }
+}
+
+/* Asked for less motion, the curtain is never raised at all — the component
+   returns before it renders. This is belt and braces for the case where the
+   preference is turned on while the page is open. */
+@media (prefers-reduced-motion: reduce) {
+  .boot { display: none; }
+}
+
+@media print {
+  .boot { display: none !important; }
 }
 
 /* --------------------------------------------------------------------------
@@ -3026,17 +3336,22 @@ select.field__control {
   .nav,
   .header__cta { display: none; }
 
-  /* The mark keeps the middle on a phone too: the outer tracks stay, one of
-     them simply has nothing in it once the navigation folds into the menu.
-     It is set smaller here so the side tracks have room for the controls. */
+  /* With the navigation folded into the menu the bar is two things: the mark at
+     the inline-start edge and the controls at the inline-end, with one flexible
+     track holding them apart. `.nav` is out of the grid entirely at this width,
+     so the controls have to be told to take the second column — left on column
+     3 they would open a third, empty track and stop short of the edge, and in
+     RTL that dead space lands on the left where it is least expected. */
   .header__inner {
-    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    grid-template-columns: auto minmax(0, 1fr);
     gap: 0.5rem;
   }
 
+  .header__actions { grid-column: 2; }
+
   .brand { gap: 0.4rem; }
   .brand__mark { width: 1.5rem; height: 1.5rem; }
-  .wordmark { font-size: 0.75rem; letter-spacing: 0.04em; }
+  .brand__word { font-size: 0.75rem; letter-spacing: 0.04em; }
   .lang-toggle { font-size: 0.75rem; }
   .lang-toggle__opt { padding: 0.3125rem 0.3125rem; }
   .nav-toggle { display: inline-flex; }
