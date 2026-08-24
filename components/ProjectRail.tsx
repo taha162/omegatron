@@ -37,12 +37,38 @@ export function ProjectRail({ dict }: { dict: Dictionary }) {
     const sign = directionSign();
     const figures = Array.from(root.querySelectorAll<HTMLElement>(".rail__figure"));
     let distance = 0;
+    let trackX = 0;
+
+    /*
+     * Where each plate sits with the strip parked at zero.
+     *
+     * Read once per measure, never during a scroll. The handler below used to
+     * call `getBoundingClientRect()` on all three figures immediately after
+     * `gsap.set` had written a transform to their shared parent — a write
+     * followed by a read, which is a forced synchronous layout, on every scroll
+     * frame the rail was pinned. Nothing about that read was necessary: the
+     * track translates as one rigid body, so a plate's live position is its
+     * resting position plus the track's current x, which is a number this file
+     * already has.
+     */
+    const rest: Array<{ left: number; width: number }> = [];
 
     function measure() {
       // How far past the viewport the strip extends. Clamped at zero so a
       // strip that already fits never creates a pin with nothing to do.
       distance = Math.max(0, track!.scrollWidth - window.innerWidth);
       root!.style.height = `${window.innerHeight + distance}px`;
+
+      // Park the strip, take the geometry, put it back. The reads here are
+      // batched after a single write and happen once per refresh, not per frame.
+      gsap.set(track, { x: 0 });
+      rest.length = 0;
+      for (const figure of figures) {
+        const box = figure.getBoundingClientRect();
+        rest.push({ left: box.left, width: box.width });
+      }
+      gsap.set(track, { x: trackX });
+
       return distance;
     }
 
@@ -58,25 +84,34 @@ export function ProjectRail({ dict }: { dict: Dictionary }) {
       onUpdate(self) {
         const p = self.progress;
         root.style.setProperty("--rail-progress", p.toFixed(4));
-        gsap.set(track, { x: -distance * p * sign });
+
+        trackX = -distance * p * sign;
+        gsap.set(track, { x: trackX });
 
         /*
-         * Depth. Each plate's picture slides against its own frame by an
-         * amount that depends on where the panel currently sits across the
-         * viewport, so the strip reads as several distances rather than one
-         * flat sheet moving sideways.
+         * Depth. Each plate's picture slides against its own frame by an amount
+         * that depends on where the panel currently sits across the viewport, so
+         * the strip reads as several distances rather than one flat sheet moving
+         * sideways.
+         *
+         * Derived, not measured. The whole block below is now writes only — no
+         * layout is read after a style is written, so the frame never stalls
+         * waiting for the engine to re-resolve geometry it already knew.
          */
         const mid = window.innerWidth / 2;
-        for (const figure of figures) {
-          const box = figure.getBoundingClientRect();
-          const off = (box.left + box.width / 2 - mid) / window.innerWidth;
-          figure.style.setProperty("--plate-shift", (-off * sign).toFixed(4));
+        for (let i = 0; i < figures.length; i += 1) {
+          const plate = rest[i];
+          if (!plate) continue;
+          const centre = plate.left + trackX + plate.width / 2;
+          const off = (centre - mid) / window.innerWidth;
+          figures[i].style.setProperty("--plate-shift", (-off * sign).toFixed(4));
         }
       },
     });
 
     return () => {
       trigger.kill();
+      trackX = 0;
       gsap.set(track, { x: 0 });
       root.style.height = "";
     };

@@ -136,7 +136,7 @@ export function SmoothScroll() {
       if (!target) return;
       event.preventDefault();
       /*
-       * The one call that wants a deadline rather than a decay.
+       * The one call that wants a deadline rather than a decay — and no offset.
        *
        * A per-call `duration` wins over the instance's lerp inside `advance`, so
        * this jump lands in a known 1.1s however far it has to travel. Left on
@@ -144,9 +144,18 @@ export function SmoothScroll() {
        * second visibly creeping into place. A wheel event mid-jump still takes
        * over cleanly, because `onUpdate` keeps `targetScroll` on the current
        * position while the jump is programmatic.
+       *
+       * There used to be an `offset: -80` here as well, and it was
+       * double-counting. Lenis already subtracts the root's
+       * `scroll-padding-block-start` when it resolves an element target, and the
+       * stylesheet sets that to `calc(var(--header-h) + 2rem)` — 104px, which is
+       * exactly the clearance the fixed bar needs. The extra 80 on top landed
+       * every in-page anchor 184px above its own section, so About, Projects,
+       * Capabilities and Contact all overshot into the whitespace above their
+       * headings. The clearance now lives in one place, in CSS, beside the
+       * header height it depends on.
        */
       lenis.scrollTo(target as HTMLElement, {
-        offset: -80,
         duration: 1.1,
         easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       });
