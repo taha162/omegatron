@@ -1552,10 +1552,25 @@ textarea {
   transition: transform 0.9s var(--ease-enter), opacity 0.5s var(--ease-hover);
 }
 
+/*
+ * Arabic is set smaller than Latin here, not just lighter.
+ *
+ * The statement used to take `--step-4` in both scripts — 88px on a 1900px
+ * screen — and only the weight and the line-height were adjusted for Arabic.
+ * That is not enough. Cairo's Arabic is denser and taller than its Latin at the
+ * same pixel size, and an Arabic word is a joined run that cannot be broken, so
+ * at 88px inside the beat's 46rem the line held about two words: the statement
+ * came out as three lines with تستشعر stranded on its own.
+ *
+ * A ceiling of 3.75rem puts three words on a line and the sentence on two, which
+ * is what it was written to be. It is not a quieter hero — 60px of Cairo bold
+ * carries further than 60px of Latin does.
+ */
 [lang="ar"] .hero__statement {
-  line-height: 1.3;
+  font-size: clamp(1.875rem, 1.25rem + 2.85vw, 3.75rem);
+  line-height: 1.35;
   letter-spacing: 0;
-  max-width: 17ch;
+  max-width: 20ch;
   font-weight: 700;
 }
 
@@ -1565,10 +1580,25 @@ textarea {
   margin-block-end: 2rem;
   font-weight: 300;
   font-size: var(--step-1);
+  /* `pretty` rather than `balance`: this is a two-line supporting line, and what
+     spoils it is a last line holding a single word — which is exactly what
+     `داخل الفريق.` was doing. Engines that do not know the keyword ignore it. */
+  text-wrap: pretty;
 }
 
+/*
+ * Arabic gets more measure, for the same reason the statement above gets less
+ * size: its words are joined runs that cannot be broken to fit.
+ *
+ * At 46ch the lead came to 567px against about 570px of text — three pixels
+ * short, which put `داخل الفريق.` alone on a second line filling a fifth of the
+ * measure. 50ch is still a comfortable line and lets the sentence close on one.
+ * Narrower viewports wrap it as normal, where `text-wrap: pretty` above keeps
+ * the split even.
+ */
 [lang="ar"] .hero__lead {
   font-weight: 400;
+  max-width: 50ch;
 }
 
 .hero__actions {
